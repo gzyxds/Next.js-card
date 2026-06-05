@@ -17,6 +17,8 @@ import {
   MessageCircleQuestion,
   ArrowRight,
   BadgeCheck,
+  UserPlus,
+  LogIn,
 } from "lucide-react";
 
 /* ========== 导航数据结构 ========== */
@@ -316,14 +318,27 @@ export default function Header() {
         </nav>
 
         {/* CTA + Mobile Toggle */}
-        <div className="flex items-center gap-3">
-          <Button
-            size="sm"
-            className="hidden rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-5 text-base font-semibold text-white transition-all hover:-translate-y-0.5 md:inline-flex"
-            asChild
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* 登入按钮 */}
+          <a
+            href="https://haoka.lot-ml.com/login.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm font-medium text-slate-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 sm:inline-flex lg:px-3.5 lg:py-2 lg:text-base"
           >
-            <Link href="#plans">立即办理</Link>
-          </Button>
+            <LogIn className="size-4" />
+            登入
+          </a>
+          {/* 注册按钮 */}
+          <a
+            href="https://haoka.lot-ml.com/plugreg.html?agentid=90925"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 rounded-md bg-blue-600 px-2.5 py-1.5 text-sm font-medium text-white transition-all hover:bg-blue-700 hover:-translate-y-0.5 sm:inline-flex lg:px-3.5 lg:py-2 lg:text-base"
+          >
+            <UserPlus className="size-4" />
+            注册
+          </a>
           <button
             className="inline-flex size-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}

@@ -66,20 +66,20 @@ const CAROUSEL_SLIDES = [
 const LEFT_MENU = [
   {
     icon: Smartphone,
-    title: "买手机",
-    subtitle: "5G手机",
+    title: "172号卡",
+    subtitle: "店铺口碑4.98",
     href: "#",
   },
   {
     icon: CreditCard,
-    title: "交话费",
-    subtitle: "手机交费",
+    title: "浩卡联盟",
+    subtitle: "号卡精选商城",
     href: "#",
   },
   {
     icon: Wifi,
-    title: "办套餐",
-    subtitle: "5G套餐 4G套餐",
+    title: "林夕号卡",
+    subtitle: "万千号卡 尽在林夕",
     href: "/haoka",
   },
   {
@@ -229,11 +229,11 @@ export default function HeroSection() {
         <div className="absolute -top-32 -right-20 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-blue-600/[0.03] via-transparent to-transparent blur-3xl" />
       </div>
 
-      <div className={containerClass("py-8 md:py-12")} style={SITE_WIDTH_STYLE}>
-        {/* 三栏布局：左侧菜单 + 中间轮播 + 右侧服务 */}
-        <div className="grid gap-5 lg:grid-cols-[220px_1fr_280px] lg:items-stretch">
+      <div className={containerClass("py-6 sm:py-8 md:py-10 lg:py-12")} style={SITE_WIDTH_STYLE}>
+        {/* 响应式布局：lg → 三栏，md → 轮播+右侧，<md → 单列 */}
+        <div className="grid gap-4 md:gap-5 md:grid-cols-[1fr_280px] lg:grid-cols-[220px_1fr_280px] lg:items-stretch">
           {/* ======================================================================== */}
-          {/* 左侧：垂直业务导航菜单 */}
+          {/* 左侧：垂直业务导航菜单（仅 ≥lg 显示） */}
           {/* ======================================================================== */}
           <div className="hidden lg:flex lg:flex-col">
             <div className="flex h-full flex-col overflow-hidden rounded-md border bg-card shadow-sm">
@@ -269,12 +269,12 @@ export default function HeroSection() {
           </div>
 
           {/* ======================================================================== */}
-          {/* 中间：轮播主视觉 + 品牌标语 */}
+          {/* 中间：轮播主视觉 + 移动端/平板适配内容 */}
           {/* ======================================================================== */}
-          <div className="flex flex-col h-full">
-            {/* 轮播图 - flex-1 撑满列高度 */}
+          <div className="flex flex-col lg:h-full">
+            {/* 轮播图 — 各端适配最小高度 */}
             <div
-              className="relative flex-1 overflow-hidden rounded-md"
+              className="relative overflow-hidden rounded-md min-h-[180px] sm:min-h-[220px] md:min-h-[240px] lg:flex-1"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               onMouseEnter={stopAutoPlay}
@@ -303,14 +303,14 @@ export default function HeroSection() {
               ))}
 
                 {/* 指示器 */}
-                <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
+                <div className="absolute bottom-3 sm:bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 sm:gap-2">
                   {CAROUSEL_SLIDES.map((_, index) => (
                     <button
                       key={index}
                       type="button"
                       className={`cursor-pointer rounded-full border-none p-0 transition-all duration-300 ${
                         index === currentSlide
-                          ? "w-6 bg-white"
+                          ? "w-5 sm:w-6 bg-white"
                           : "w-2 bg-white/40 hover:bg-white/70"
                       }`}
                       style={{ height: "6px" }}
@@ -324,23 +324,23 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* 移动端：核心优势 2x2 + 快捷入口 */}
-            <div className="space-y-4 lg:hidden">
+            {/* 移动端 + 平板(<lg)：核心优势 2x2 + 快捷入口 */}
+            <div className="mt-4 space-y-4 lg:hidden">
               {/* 核心优势 2x2 */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 {CORE_ADVANTAGES.map((adv) => {
                   const Icon = adv.icon;
                   return (
                     <div
                       key={adv.title}
-                      className="flex items-center gap-3 rounded-md bg-card px-3.5 py-3 shadow-sm"
+                      className="flex items-center gap-2.5 sm:gap-3 rounded-md bg-card px-3 sm:px-3.5 py-2.5 sm:py-3 shadow-sm"
                     >
-                      <div className={`flex size-8 shrink-0 items-center justify-center rounded-md ${adv.bg}`}>
-                        <Icon className={`size-4 ${adv.color}`} />
+                      <div className={`flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-md ${adv.bg}`}>
+                        <Icon className={`size-3.5 sm:size-4 ${adv.color}`} />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">{adv.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">{adv.subtitle}</p>
+                        <p className="text-xs sm:text-sm font-bold leading-tight">{adv.title}</p>
+                        <p className="truncate text-[11px] sm:text-xs text-muted-foreground">{adv.subtitle}</p>
                       </div>
                     </div>
                   );
@@ -352,16 +352,16 @@ export default function HeroSection() {
                 const Icon = link.icon;
                 const content = (
                   <>
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-500/10 to-blue-500/10 transition-transform group-hover:scale-110">
-                      <Icon className="size-4 text-blue-600" />
+                    <div className="flex size-7 sm:size-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-500/10 to-blue-500/10 transition-transform group-hover:scale-110">
+                      <Icon className="size-3.5 sm:size-4 text-blue-600" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold transition-colors group-hover:text-blue-600">
+                      <p className="text-xs sm:text-sm font-semibold transition-colors group-hover:text-blue-600">
                         {link.label}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">{link.subtitle}</p>
+                      <p className="truncate text-[11px] sm:text-xs text-muted-foreground">{link.subtitle}</p>
                     </div>
-                    <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-blue-600" />
+                    <ArrowRight className="size-3.5 sm:size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-blue-600" />
                   </>
                 );
 
@@ -369,7 +369,7 @@ export default function HeroSection() {
                   <button
                     key={link.label}
                     type="button"
-                    className="group flex w-full items-center gap-3 rounded-md bg-card px-4 py-3.5 text-left shadow-sm transition-all hover:bg-blue-50/50 active:scale-95"
+                    className="group flex w-full items-center gap-2.5 sm:gap-3 rounded-md bg-card px-3 sm:px-4 py-3 sm:py-3.5 text-left shadow-sm transition-all hover:bg-blue-50/50 active:scale-95"
                   >
                     {content}
                   </button>
@@ -379,7 +379,7 @@ export default function HeroSection() {
                     href={link.href}
                     target={link.isExternal ? "_blank" : undefined}
                     rel={link.isExternal ? "noopener noreferrer" : undefined}
-                    className="group flex w-full items-center gap-3 rounded-md bg-card px-4 py-3.5 shadow-sm transition-all hover:bg-blue-50/50 active:scale-95"
+                    className="group flex w-full items-center gap-2.5 sm:gap-3 rounded-md bg-card px-3 sm:px-4 py-3 sm:py-3.5 shadow-sm transition-all hover:bg-blue-50/50 active:scale-95"
                   >
                     {content}
                   </Link>
@@ -389,10 +389,9 @@ export default function HeroSection() {
           </div>
 
           {/* ======================================================================== */}
-          {/* 右侧：核心优势 2x2 + 快捷入口列表 + 运营商底栏 */}
-          {/* 参考 Hero.astro 右侧设计 */}
+          {/* 右侧：核心优势 2x2 + 快捷入口列表 + 运营商底栏（≥md 显示） */}
           {/* ======================================================================== */}
-          <div className="flex flex-col gap-5 h-full">
+          <div className="hidden md:flex md:flex-col gap-4 md:gap-5 lg:h-full">
             {/* 核心优势 2x2 */}
             <div className="flex flex-col rounded-md">
               {/* 分隔标题 */}
@@ -505,40 +504,40 @@ export default function HeroSection() {
         {/* ======================================================================== */}
         {/* 底部：运营商合作标识 + 数据统计 */}
         {/* ======================================================================== */}
-        <div className="mt-5 overflow-hidden rounded-md border bg-card shadow-sm">
-          <div className="flex flex-col gap-0 divide-y divide-border sm:flex-row sm:divide-x sm:divide-y-0 md:items-center md:justify-between">
+        <div className="mt-4 md:mt-5 overflow-hidden rounded-md border bg-card shadow-sm">
+          <div className="flex flex-col divide-y divide-border sm:flex-row sm:divide-x sm:divide-y-0 md:items-center md:justify-between">
             {/* 运营商标识 */}
-            <div className="flex flex-wrap items-center gap-3 px-5 py-4">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 sm:py-4">
+              <span className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 合作运营商
               </span>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 {OPERATORS.map((op) => (
                   <div
                     key={op.name}
-                    className="flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1"
+                    className="flex items-center gap-1 sm:gap-1.5 rounded-full border bg-background px-2 sm:px-2.5 py-0.5 sm:py-1"
                     title={op.name}
                   >
-                    <span className={`inline-block size-2 rounded-full ${op.color}`} />
-                    <span className="text-xs font-medium">{op.name}</span>
+                    <span className={`inline-block size-1.5 sm:size-2 rounded-full ${op.color}`} />
+                    <span className="text-[11px] sm:text-xs font-medium">{op.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 数据统计 */}
-            <div className="flex divide-x divide-border px-5 py-4 sm:px-4">
-              <div className="flex flex-col items-center px-4 first:pl-0">
-                <span className="text-lg font-bold text-foreground">100万+</span>
-                <span className="text-xs text-muted-foreground">用户信赖</span>
+            <div className="flex divide-x divide-border px-4 sm:px-4 py-3 sm:py-4 justify-around sm:justify-normal">
+              <div className="flex flex-col items-center px-3 sm:px-4 first:pl-0">
+                <span className="text-base sm:text-lg font-bold text-foreground">100万+</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">用户信赖</span>
               </div>
-              <div className="flex flex-col items-center px-4">
-                <span className="text-lg font-bold text-foreground">300+</span>
-                <span className="text-xs text-muted-foreground">城市覆盖</span>
+              <div className="flex flex-col items-center px-3 sm:px-4">
+                <span className="text-base sm:text-lg font-bold text-foreground">300+</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">城市覆盖</span>
               </div>
-              <div className="flex flex-col items-center px-4 last:pr-0">
-                <span className="text-lg font-bold text-foreground">4.9分</span>
-                <span className="text-xs text-muted-foreground">用户好评</span>
+              <div className="flex flex-col items-center px-3 sm:px-4 last:pr-0">
+                <span className="text-base sm:text-lg font-bold text-foreground">4.9分</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">用户好评</span>
               </div>
             </div>
           </div>

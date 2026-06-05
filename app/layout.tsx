@@ -15,10 +15,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 /** 站点名称 */
-const SITE_NAME = "极速流量卡";
+const SITE_NAME = "流量派";
 /** 站点描述 */
 const SITE_DESC =
-  "极速流量卡平台提供电信、联通、移动、广电正规手机号卡在线办理，19元起大流量套餐，全国通用包邮到家，官方授权正规渠道。";
+  "流量派流量卡平台提供电信、联通、移动、广电正规手机号卡在线办理，19元起大流量套餐，全国通用包邮到家，官方授权正规渠道。";
 
 export const metadata: Metadata = {
   title: {

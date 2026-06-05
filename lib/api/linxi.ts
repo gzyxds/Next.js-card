@@ -1,56 +1,25 @@
 /**
- * 林夕通信 API 封装模块（号卡极团系统）
- * 
- * 林夕通信使用号卡极团系统开放接口，包括：
- * - 查询套餐列表（/order/api/haoteam/getlist）
- * - 获取号码（/order/api/haoteam/gethao）
- * - 提交订单（/order/api/haoteam/pushorder）
- * - 订单查询（/order/api/haoteam/haoteamquery）
- * - 照片上传（/order/api/haoteam/getimg）
- * 
- * API文档：https://console-docs.apipost.cn/preview/0c0d9f77125b886c/c2401b80a91b5a4d
- * 店铺地址：https://h5.vip12300.cn/index?k=SGpiazRLQVZSREk9
- * 
- * 认证方式：apiuser（接入账号）+ apipwd（MD5加密后的密钥）
+ * 林夕通信（号卡极团系统）API 服务模块 — 仅供服务端使用
+ *
+ * 接口文档：见 API对接文档/林夕通信/ 目录
+ * 接口规范：号卡极团系统开放接口
+ * API基础地址：https://h5.vip12300.cn
+ * 认证方式：apiuser + apipwd（原始密钥MD5加密后传输）
+ * Content-Type：application/x-www-form-urlencoded
+ *
+ * ⚠️ 本文件使用了 Node.js 内置模块（node:crypto），
+ *    只能在服务端组件（Server Component / Route Handler / Server Action）中 import。
+ *
+ * ===== 缓存策略 =====
+ * 服务端内存缓存，有效期 12 小时。
+ * 首次请求从 API 拉取全量商品数据并预计算元数据；
+ * 后续请求直接从缓存返回，大幅提升页面加载速度。
  */
+import { createHash } from "node:crypto";
 
-import { createHash } from 'node:crypto';
+/* ========== 类型定义 ========== */
 
-/** 林夕通信平台配置（号卡极团系统） */
-const LINXI_CONFIG = {
-  /** API基础地址 - 林夕通信站点地址 */
-  baseUrl: process.env.LINXI_API_BASE_URL || 'https://h5.vip12300.cn',
-  /** 林夕通信H5店铺首页 */
-  shopUrl: 'https://h5.vip12300.cn/index?k=SGpiazRLQVZSREk9',
-  /** 林夕通信H5下单页面基础URL */
-  orderBaseUrl: 'https://h5.vip12300.cn/order/index',
-  /** 接入账号 - 在林夕通信平台注册的账号 */
-  apiUser: process.env.LINXI_API_USER || '',
-  /** 接入密钥 - 原始密钥，需MD5加密后发送 */
-  apiPwdRaw: process.env.LINXI_API_PWD || '',
-  /** 代理ID参数（林夕通信店铺uid参数） */
-  agentId: 'SGpiazRLQVZSREk9',
-};
-
-/**
- * 对字符串进行 MD5 加密
- * @param str - 待加密字符串
- * @returns 32位小写MD5哈希值
- */
-function md5(str: string): string {
-  return createHash('md5').update(str).digest('hex');
-}
-
-/**
- * 获取MD5加密后的API密钥
- * 号卡极团系统要求：先获取原始密钥，再进行MD5加密后传输
- * @returns MD5加密后的密钥
- */
-function getApiPwd(): string {
-  return md5(LINXI_CONFIG.apiPwdRaw);
-}
-
-/** 号卡极团系统商品接口类型定义 */
+/** 林夕通信商品数据类型（来自号卡极团系统 API） */
 export interface LinxiProduct {
   /** 产品ID */
   id: string;
@@ -58,35 +27,35 @@ export interface LinxiProduct {
   shop_img: string;
   /** 商品名称 */
   shop_name: string;
-  /** 商品描述，如"19元包50G通用+30G定向+通话0.1元/分钟" */
+  /** 商品描述（月租+流量+通话等） */
   shop_des: string;
-  /** 商品标签，如"收货地即归属地, 考核激活充值不销户" */
+  /** 标签（逗号分隔） */
   shop_tag: string;
-  /** 运营商，如"中国电信" */
+  /** 运营商名称（中国电信/中国移动/中国联通/中国广电） */
   shop_yys: string;
-  /** 选号ID，为空则不支持选号 */
+  /** 选号ID */
   shop_number: string;
-  /** 资费详情链接 */
+  /** 资费链接 */
   shop_link: string;
-  /** 商品资料介绍（HTML格式） */
+  /** 资料（HTML格式） */
   shop_rule: string;
   /** 可发货省份 */
   shop_provinces: string;
-  /** 是否需要照片 0-不需要 其他-需要 */
-  shop_photos: string | null;
-  /** 结算周期 0-次月返 1-秒返 2-月月返 */
+  /** 是否需要照片 0=不需要 */
+  shop_photos: string;
+  /** 结算周期 0=次月返 1=秒返 2=月月返 */
   shop_money: string;
   /** 创建时间 */
   s_time: string;
   /** 最小限制年龄 */
-  min_age: number | null;
+  min_age: string | null;
   /** 最大限制年龄 */
-  max_age: number | null;
-  /** 佣金 */
+  max_age: string | null;
+  /** 佣金金额 */
   shop_bkge: number;
   /** 序号 */
   shop_sort: string;
-  /** 月月返/秒返金额 */
+  /** 月月返秒返金额 */
   first_bkge: number;
   /** 月月返共计返利月数 */
   rebate_num: string;
@@ -94,340 +63,350 @@ export interface LinxiProduct {
   gsd_province: string | null;
   /** 选号默认归属市 */
   gsd_city: string | null;
-  /** 禁发关键词，命中其中任意一个则禁止提交 */
+  /** 禁发关键词（命中即禁） */
   Prohibited: string;
 }
 
 /**
- * 构建时内存缓存
- * 避免静态生成时对相同API的重复请求
+ * 扩展商品类型，包含预计算的元数据
+ *
+ * 在服务端抓取时即完成运营商、归属地、时长、标签的解析，
+ * 避免客户端每次渲染都重复解析。
  */
-let productsCache: { data: LinxiProduct[]; timestamp: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5分钟缓存有效期
-
-/**
- * 获取商品列表
- * 构建时使用内存缓存，避免对同一API重复请求导致部署超时
- * @returns 商品列表数组
- */
-export async function fetchLinxiProducts(): Promise<LinxiProduct[]> {
-  // 缓存命中且未过期，直接返回
-  if (productsCache && Date.now() - productsCache.timestamp < CACHE_TTL) {
-    return productsCache.data;
-  }
-
-  if (!LINXI_CONFIG.apiUser || !LINXI_CONFIG.apiPwdRaw) {
-    console.warn('Linxi API: apiuser或apipwd未配置，请在环境变量中设置 LINXI_API_USER 和 LINXI_API_PWD');
-    return [];
-  }
-
-  const body = new URLSearchParams({
-    apiuser: LINXI_CONFIG.apiUser,
-    apipwd: getApiPwd(),
-  });
-
-  try {
-    const response = await fetch(`${LINXI_CONFIG.baseUrl}/order/api/haoteam/getlist`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    });
-
-    const data: LinxiProduct[] = await response.json();
-
-    if (!Array.isArray(data)) {
-      console.error('Linxi API Error: 返回数据格式异常', JSON.stringify(data).substring(0, 200));
-      return [];
-    }
-
-    // 写入缓存
-    productsCache = { data, timestamp: Date.now() };
-    console.log(`Linxi API: 成功获取 ${data.length} 个商品`);
-    return data;
-  } catch (error) {
-    console.error('Linxi FetchProducts Error:', error);
-    return [];
-  }
+export interface LinxiProductWithMeta extends LinxiProduct {
+  /** 预计算运营商枚举 */
+  _operator: LinxiOperator;
+  /** 预计算月租价格（数字） */
+  _price: number;
+  /** 预计算月流量文本（如 "100GB"） */
+  _flow: string;
+  /** 预计算语音通话文本（如 "500分钟"） */
+  _voice: string;
+  /** 预计算套餐时长 */
+  _duration: string;
+  /** 预计算标签列表 */
+  _tags: { text: string; className: string }[];
+  /** 预计算办理链接（跳转店铺首页） */
+  _orderUrl: string;
 }
 
-/**
- * 获取店铺首页URL
- * @returns 林夕通信H5店铺地址
- */
-export function getLinxiShopUrl(): string {
-  return LINXI_CONFIG.shopUrl;
-}
+/** 运营商枚举 */
+export type LinxiOperator = "mobile" | "telecom" | "unicom" | "broadcast" | "unknown";
 
-/**
- * 根据商品ID获取下单URL
- * 跳转到林夕通信H5店铺对应商品下单页面
- * URL格式：/order/index?uid=代理ID&pid=商品ID
- * @param productId - 商品ID
- * @returns 带商品ID的林夕通信下单页面URL
- */
-export function getLinxiOrderUrl(productId: string | number): string {
-  return `${LINXI_CONFIG.orderBaseUrl}?uid=${LINXI_CONFIG.agentId}&pid=${productId}`;
-}
+/* ========== 配置 ========== */
 
-/**
- * 获取商品详情URL
- * 跳转到林夕通信店铺对应商品下单页面（详情页即下单页）
- * URL格式：/order/index?uid=代理ID&pid=商品ID
- * @param _netAddr - 商品资料介绍地址（号卡极团系统无此字段，保留参数兼容）
- * @param productId - 商品ID
- * @returns 商品详情/下单页面URL
- */
-export function getLinxiProductDetailUrl(_netAddr: string, productId: string | number): string {
-  return `${LINXI_CONFIG.orderBaseUrl}?uid=${LINXI_CONFIG.agentId}&pid=${productId}`;
-}
-
-/**
- * 获取可选号码列表
- * @param pid - 产品ID
- * @param province - 省份，如"湖南省"
- * @param city - 城市，如"长沙市"
- * @returns 可选号码数组
- */
-export async function fetchLinxiNumbers(
-  pid: string,
-  province: string,
-  city: string
-): Promise<string[]> {
-  if (!LINXI_CONFIG.apiUser || !LINXI_CONFIG.apiPwdRaw) {
-    return [];
-  }
-
-  const body = new URLSearchParams({
-    pid,
-    province,
-    city,
-    apiuser: LINXI_CONFIG.apiUser,
-    apipwd: getApiPwd(),
-  });
-
-  try {
-    const response = await fetch(`${LINXI_CONFIG.baseUrl}/order/api/haoteam/gethao`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    });
-
-    const data = await response.json();
-
-    if (Array.isArray(data)) {
-      return data.map(String);
-    }
-
-    return [];
-  } catch (error) {
-    console.error('Linxi FetchNumbers Error:', error);
-    return [];
-  }
-}
-
-/**
- * 提交订单参数类型
- */
-export interface LinxiOrderParams {
-  /** 姓名 */
-  order_Name: string;
-  /** 手机号 */
-  order_Phone: string;
-  /** 身份证号 */
-  order_IDCard: string;
-  /** 省市区，空格隔开 */
-  order_Province: string;
-  /** 详细地址，不小于4个字符 */
-  order_Address: string;
-  /** 下游订单号，保证唯一 */
-  api_xid: string;
-  /** 产品ID */
-  pid: string;
-  /** 选中号码，不选号传空 */
-  haoma?: string;
-  /** 订单变动回调地址 */
-  callbackurl?: string;
-  /** 选号密文（选号返回时需携带） */
-  checkCode?: string;
-}
-
-/**
- * 提交订单结果类型
- */
-export interface LinxiOrderResult {
-  /** 状态码，200表示成功 */
-  code: string;
-  /** 产品ID */
-  pid?: string;
-  /** 上游订单号 */
-  apiorder?: string;
-  /** 接收状态 */
-  apistatus?: string;
-  /** 拒绝原因 */
-  reason?: string;
-}
-
-/**
- * 提交订单
- * @param params - 订单参数
- * @returns 下单结果
- */
-export async function submitLinxiOrder(params: LinxiOrderParams): Promise<LinxiOrderResult> {
-  if (!LINXI_CONFIG.apiUser || !LINXI_CONFIG.apiPwdRaw) {
-    return { code: '-1', reason: 'API凭据未配置' };
-  }
-
-  const body = new URLSearchParams({
-    ...params,
-    apiuser: LINXI_CONFIG.apiUser,
-    apipwd: getApiPwd(),
-  } as Record<string, string>);
-
-  try {
-    const response = await fetch(`${LINXI_CONFIG.baseUrl}/order/api/haoteam/pushorder`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'multipart/form-data' },
-      body: body.toString(),
-    });
-
-    const data: LinxiOrderResult = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Linxi SubmitOrder Error:', error);
-    return { code: '-1', reason: '网络错误' };
-  }
-}
-
-/**
- * 订单查询结果类型
- */
-export interface LinxiOrderInfo {
-  code: string;
-  order_id: string;
-  api_xid: string;
-  order_status: string;
-  order_Express: string;
-  plan_mobile: string;
-  api_reason: string;
-  is_active: string;
-  is_recharge: string;
-  recharge_amount: string;
-}
-
-/**
- * 查询订单状态
- * @param apiSn - 上游订单号
- * @returns 订单信息
- */
-export async function queryLinxiOrder(apiSn: string): Promise<LinxiOrderInfo | null> {
-  if (!LINXI_CONFIG.apiUser || !LINXI_CONFIG.apiPwdRaw) {
-    return null;
-  }
-
-  const body = new URLSearchParams({
-    apiuser: LINXI_CONFIG.apiUser,
-    apipwd: getApiPwd(),
-    api_sn: apiSn,
-  });
-
-  try {
-    const response = await fetch(`${LINXI_CONFIG.baseUrl}/order/api/haoteam/haoteamquery`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-    });
-
-    const data: LinxiOrderInfo = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Linxi QueryOrder Error:', error);
-    return null;
-  }
-}
-
-/**
- * 解析商品价格
- * 从商品描述中提取月租价格，如"19元包50G..." -> 19
- * @param des - 商品描述
- * @returns 月租价格
- */
-export function parseLinxiPrice(des: string): number {
-  const match = des.match(/(\d+)元/);
-  return match ? parseInt(match[1], 10) : 29;
-}
-
-/**
- * 解析套餐流量
- * 从商品描述中提取通用和定向流量
- * @param des - 商品描述，如"19元包50G通用+30G定向+通话0.1元/分钟"
- * @returns 通用流量和定向流量
- */
-export function parseLinxiTraffic(des: string): { general: string; directional: string } {
-  const generalMatch = des.match(/(\d+)G通用/);
-  const directionalMatch = des.match(/(\d+)G定向/);
-  return {
-    general: generalMatch ? `${generalMatch[1]}G` : '0G',
-    directional: directionalMatch ? `${directionalMatch[1]}G` : '0G',
-  };
-}
-
-/**
- * 解析通话分钟数
- * @param des - 商品描述
- * @returns 通话分钟数字符串
- */
-export function parseLinxiMinutes(des: string): string {
-  const mMatch = des.match(/通话(\d+)分钟/);
-  if (mMatch) return `${mMatch[1]}分钟`;
-  // 某些商品描述为"通话0.1元/分钟"
-  if (des.includes('通话') && des.includes('元/分钟')) return '0分钟';
-  return '0分钟';
-}
-
-/** 运营商映射配置 - 根据号卡极团系统 API shop_yys 字段返回值 */
-const OPERATOR_MAP: Record<string, { key: string; label: string }> = {
-  '中国移动': { key: 'mobile', label: '中国移动' },
-  '移动': { key: 'mobile', label: '中国移动' },
-  '中国电信': { key: 'telecom', label: '中国电信' },
-  '电信': { key: 'telecom', label: '中国电信' },
-  '中国联通': { key: 'unicom', label: '中国联通' },
-  '联通': { key: 'unicom', label: '中国联通' },
-  '中国广电': { key: 'broadcast', label: '中国广电' },
-  '广电': { key: 'broadcast', label: '中国广电' },
+/** 林夕通信平台配置（环境变量注入） */
+const LINXI_CONFIG = {
+  /** 号卡极团系统 API 基础地址 */
+  baseUrl: "https://h5.vip12300.cn",
+  /** 对接账号 */
+  apiUser: process.env.LINXI_API_USER || "",
+  /** 对接密钥（原始值，代码内自动 MD5 加密） */
+  apiPwd: process.env.LINXI_API_PWD || "",
+  /** 代理 UID（办理链接参数） */
+  uid: "SGpiazRLQVZSREk9",
+  /** 办理订单页面基础 URL */
+  orderBaseUrl: "https://vip.777haoka.cn/order/index",
+  /** H5 店铺首页（兜底链接） */
+  shopUrl: "https://h5.vip12300.cn/index?k=SGpiazRLQVZSREk9",
 };
 
 /**
- * 映射运营商名称到内部标识
- * 根据号卡极团系统 API 返回的 shop_yys 字段进行匹配
- * @param op - 运营商原始名称，如"中国电信"、"中国移动"等
- * @returns 运营商标识，未匹配到返回 'unknown'
+ * 根据商品 ID 生成林夕通信的立即办理链接
+ * 格式：https://vip.777haoka.cn/order/index?uid={uid}&pid={productId}
+ * @param productId - 商品ID
  */
-export function mapLinxiOperator(op: string): 'unicom' | 'mobile' | 'telecom' | 'broadcast' | 'unknown' {
-  if (!op) return 'unknown';
-  const trimmed = op.trim();
-  // 精确匹配
-  if (OPERATOR_MAP[trimmed]) return OPERATOR_MAP[trimmed].key as 'unicom' | 'mobile' | 'telecom' | 'broadcast';
-  // 模糊匹配：包含关键词
-  if (trimmed.includes('联通')) return 'unicom';
-  if (trimmed.includes('移动')) return 'mobile';
-  if (trimmed.includes('电信')) return 'telecom';
-  if (trimmed.includes('广电')) return 'broadcast';
-  console.warn(`Linxi API: 未知运营商名称 "${op}"`);
-  return 'unknown';
+export function getLinxiOrderUrl(productId: string | number): string {
+  return `${LINXI_CONFIG.orderBaseUrl}?uid=${LINXI_CONFIG.uid}&pid=${productId}`;
+}
+
+/* ========== 运营商工具 ========== */
+
+/** 运营商中文标签映射 */
+export const LINXI_OPERATOR_LABEL: Record<LinxiOperator, string> = {
+  mobile: "中国移动",
+  telecom: "中国电信",
+  unicom: "中国联通",
+  broadcast: "中国广电",
+  unknown: "其他",
+};
+
+/**
+ * 将 API 返回的运营商字段映射到枚举
+ * @param shopYys - API 返回的 shop_yys 字段（如 "中国电信"）
+ */
+export function mapLinxiOperator(shopYys: string): LinxiOperator {
+  if (!shopYys) return "unknown";
+  if (shopYys.includes("移动")) return "mobile";
+  if (shopYys.includes("电信")) return "telecom";
+  if (shopYys.includes("联通")) return "unicom";
+  if (shopYys.includes("广电")) return "broadcast";
+  return "unknown";
+}
+
+/* ========== 套餐名称解析工具 ========== */
+
+/**
+ * 从商品名称/描述中提取月租价格（数字）
+ * @param text - 商品名称或描述
+ */
+export function parseLinxiPrice(text: string): number {
+  const m = text.match(/(\d+\.?\d*)元/);
+  return m ? parseFloat(m[1]) : 0;
 }
 
 /**
- * 获取运营商中文名称
- * @param op - 运营商原始名称
- * @returns 运营商中文名称
+ * 从商品名称/描述中提取月流量文本（如 "100GB"）
+ * @param text - 商品名称或描述
  */
-export function getLinxiOperatorLabel(op: string): string {
-  if (!op) return '未知';
-  const trimmed = op.trim();
-  if (OPERATOR_MAP[trimmed]) return OPERATOR_MAP[trimmed].label;
-  if (trimmed.includes('联通')) return '中国联通';
-  if (trimmed.includes('移动')) return '中国移动';
-  if (trimmed.includes('电信')) return '中国电信';
-  if (trimmed.includes('广电')) return '中国广电';
-  return '未知';
+export function parseLinxiFlow(text: string): string {
+  return text.match(/\d+(?:\.\d+)?\s*(?:GB|G|MB)/i)?.[0]?.trim() || "";
+}
+
+/**
+ * 从商品名称/描述中提取语音通话时长（如 "500分钟"）
+ * @param text - 商品名称或描述
+ */
+export function parseLinxiVoice(text: string): string {
+  return text.match(/\d+\s*分钟/)?.[0]?.trim() || "";
+}
+
+/**
+ * 从商品名称/描述中提取套餐时长标签
+ * @param text - 商品名称或描述
+ */
+export function parseLinxiDuration(text: string): string {
+  if (!text) return "未知";
+  if (/长期/.test(text)) return "长期";
+  if (/半年|6个月/.test(text)) return "6个月";
+  if (/2年|二年|24个月|24月/.test(text)) return "2年";
+  if (/1年|一年|12个月|12月/.test(text)) return "1年";
+  if (/4年|四年/.test(text)) return "4年";
+  return "标准套餐";
+}
+
+/**
+ * 为商品生成彩色标签列表
+ * @param product - 林夕通信商品对象
+ */
+export function parseLinxiTags(
+  product: LinxiProduct,
+): { text: string; className: string }[] {
+  const tags: { text: string; className: string }[] = [];
+
+  /* ===== 返佣类型 ===== */
+  if (product.shop_money === "1") {
+    tags.push({ text: "秒返佣金", className: "bg-green-50 text-green-600 border-green-100" });
+  } else if (product.shop_money === "2") {
+    tags.push({ text: "月月返佣", className: "bg-blue-50 text-blue-600 border-blue-100" });
+  } else {
+    tags.push({ text: "次月返佣", className: "bg-blue-50 text-blue-600 border-blue-100" });
+  }
+
+  /* ===== 归属地信息 ===== */
+  if (product.gsd_province) {
+    tags.push({
+      text: `归属${product.gsd_province}`,
+      className: "bg-cyan-50 text-cyan-600 border-cyan-100",
+    });
+  }
+
+  /* ===== 流量 ===== */
+  const flow = parseLinxiFlow(product.shop_des || product.shop_name);
+  if (flow) {
+    tags.push({
+      text: flow,
+      className: "bg-indigo-50 text-indigo-600 border-indigo-100",
+    });
+  }
+
+  /* ===== 套餐时长 ===== */
+  const duration = parseLinxiDuration(product.shop_des || product.shop_name);
+  if (duration && duration !== "标准套餐") {
+    tags.push({
+      text: duration,
+      className: "bg-purple-50 text-purple-600 border-purple-100",
+    });
+  }
+
+  /* ===== 需要照片 ===== */
+  if (product.shop_photos !== "0" && product.shop_photos) {
+    tags.push({
+      text: "需照片",
+      className: "bg-amber-50 text-amber-600 border-amber-100",
+    });
+  }
+
+  /* ===== 选号信息 ===== */
+  if (product.shop_number) {
+    tags.push({
+      text: "可选号",
+      className: "bg-orange-50 text-orange-600 border-orange-100",
+    });
+  }
+
+  /* ===== 商品标签 ===== */
+  if (product.shop_tag) {
+    // shop_tag 是逗号分隔的标签
+    const tagItems = product.shop_tag.split(",").filter(Boolean).slice(0, 3);
+    for (const t of tagItems) {
+      const trimmed = t.trim();
+      if (trimmed) {
+        tags.push({
+          text: trimmed,
+          className: "bg-gray-50 text-gray-600 border-gray-100",
+        });
+      }
+    }
+  }
+
+  return tags;
+}
+
+/* ========== MD5 工具 ========== */
+
+/**
+ * 计算 MD5（32位小写）
+ * 号卡极团系统约定：apipwd 需经过 MD5 加密后传输
+ * @param str - 待加密字符串
+ */
+function md5(str: string): string {
+  return createHash("md5").update(str, "utf8").digest("hex");
+}
+
+/* ========== 缓存 ========== */
+
+/** 缓存有效期（毫秒），默认 12 小时 */
+const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+
+/** 缓存条目 */
+interface CacheEntry {
+  data: { products: LinxiProductWithMeta[]; total: number };
+  timestamp: number;
+  apiUser: string;
+}
+
+/** 模块级缓存变量（服务进程内全局共享） */
+let productsCache: CacheEntry | null = null;
+
+/**
+ * 检查缓存是否有效
+ * @param apiUser - 当前配置的 apiUser，用于校验缓存一致性
+ */
+function isCacheValid(apiUser: string): boolean {
+  return (
+    productsCache !== null &&
+    productsCache.apiUser === apiUser &&
+    Date.now() - productsCache.timestamp < CACHE_TTL_MS
+  );
+}
+
+/**
+ * 为商品列表批量预计算元数据
+ * 服务端一次性解析，客户端直接使用预计算字段
+ * @param products - 原始商品列表
+ */
+function attachMeta(products: LinxiProduct[]): LinxiProductWithMeta[] {
+  return products.map((p) => ({
+    ...p,
+    _operator: mapLinxiOperator(p.shop_yys),
+    _price: parseLinxiPrice(p.shop_des || p.shop_name),
+    _flow: parseLinxiFlow(p.shop_des || p.shop_name),
+    _voice: parseLinxiVoice(p.shop_des || p.shop_name),
+    _duration: parseLinxiDuration(p.shop_des || p.shop_name),
+    _tags: parseLinxiTags(p),
+    /* 生成带 uid + pid 的精准办理链接 */
+    _orderUrl: getLinxiOrderUrl(p.id),
+  }));
+}
+
+/* ========== 核心 API 调用 ========== */
+
+/**
+ * 调用号卡极团系统查询套餐接口获取全部商品列表
+ * POST /order/api/haoteam/getlist
+ */
+async function fetchProductsFromAPI(): Promise<LinxiProduct[]> {
+  const { baseUrl, apiUser, apiPwd } = LINXI_CONFIG;
+
+  /* ===== 构建 x-www-form-urlencoded 请求体 ===== */
+  const params = new URLSearchParams();
+  params.append("apiuser", apiUser);
+  // 号卡极团系统约定：apipwd 需 MD5 加密后传输
+  params.append("apipwd", md5(apiPwd));
+
+  const response = await fetch(`${baseUrl}/order/api/haoteam/getlist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
+    body: params.toString(),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`林夕通信API请求失败: HTTP ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  /* ===== API 直接返回数组，需校验 ===== */
+  if (!Array.isArray(result)) {
+    // 可能是错误响应对象
+    if (result && typeof result === "object" && "code" in result && result.code !== 200) {
+      throw new Error(`林夕通信API错误: ${result.msg || result.message || "未知错误"}`);
+    }
+    return [];
+  }
+
+  return result as LinxiProduct[];
+}
+
+/**
+ * 获取林夕通信全部在售商品（带缓存）— 仅供服务端调用
+ * POST /order/api/haoteam/getlist
+ *
+ * ===== 缓存行为 =====
+ * - 首次调用：从 API 拉取全量数据，预计算元数据，缓存 12 小时
+ * - 有效期内：直接返回缓存，零网络开销
+ * - 过期后：静默刷新缓存
+ */
+export async function fetchLinxiProducts(): Promise<{
+  products: LinxiProductWithMeta[];
+  total: number;
+}> {
+  const apiUser = LINXI_CONFIG.apiUser;
+
+  if (!apiUser || !LINXI_CONFIG.apiPwd) {
+    throw new Error(
+      "林夕通信 API 未配置 (LINXI_API_USER / LINXI_API_PWD)，请在 .env 中设置",
+    );
+  }
+
+  /* ===== 缓存命中 ===== */
+  if (isCacheValid(apiUser)) {
+    console.log("[林夕通信Cache] 缓存命中，直接返回");
+    return productsCache!.data;
+  }
+
+  console.log("[林夕通信Cache] 缓存失效或首次请求，开始拉取数据");
+
+  /* ===== 从 API 拉取 ===== */
+  const rawProducts = await fetchProductsFromAPI();
+
+  /* ===== 预计算元数据 ===== */
+  const productsWithMeta = attachMeta(rawProducts);
+
+  /* ===== 写入缓存 ===== */
+  productsCache = {
+    data: { products: productsWithMeta, total: productsWithMeta.length },
+    timestamp: Date.now(),
+    apiUser,
+  };
+
+  console.log(
+    `[林夕通信Cache] 数据刷新完成，共 ${productsWithMeta.length} 件商品，缓存有效期 12 小时`,
+  );
+
+  return productsCache.data;
 }

@@ -3,14 +3,12 @@
 /**
  * 常见问题区域组件（FAQSection）
  *
- * 设计风格：现代化卡片式 FAQ，支持平滑展开/收起动画
- * - 全屏渐变背景 + 顶部装饰光晕
- * - 左栏：标题区 + 分类标签筛选 + 联系引导
- * - 右栏：分组折叠面板，带平滑过渡动画
- * - 悬停/激活状态视觉反馈
- * - 完全响应式
+ * 优化后的设计：左右两栏比例平衡，微圆角风格统一
+ * - 左栏：分类筛选 + 统计信息 + 联系引导（固定宽 300/340px）
+ * - 右栏：FAQ 折叠面板列表（自适应弹性宽度）
+ * - 全局圆角统一为 4-6px（rounded / rounded-md），视觉柔和
+ * - 完全响应式，移动端纵向堆叠
  */
-
 import { useState, useRef, useMemo } from "react";
 import {
   HelpCircle,
@@ -40,7 +38,7 @@ const FAQS: FaqItem[] = [
   {
     category: "号卡产品",
     q: "流量卡是正规手机卡吗？",
-    a: "是的，我们提供的均为三大运营商（移动/联通/电信/广电）官方发行的正规 11 位手机号码卡。支持打电话、发短信、开热点，可在运营商官方 APP 查询套餐余量和在线充值，与营业厅办理的卡没有任何区别。",
+    a: "是的，我们提供的均为四大运营商（移动/联通/电信/广电）官方发行的正规 11 位手机号码卡。支持打电话、发短信、开热点，可在运营商官方 APP 查询套餐余量和在线充值，与营业厅办理的卡没有任何区别。",
   },
   {
     category: "号卡产品",
@@ -51,6 +49,11 @@ const FAQS: FaqItem[] = [
     category: "号卡产品",
     q: "为什么你们的套餐比营业厅便宜这么多？",
     a: "这些套餐是运营商为互联网渠道推出的专属优惠号卡，通过线上办理可节省线下门店租金和人力成本，因此资费更具竞争力。但号卡本身与营业厅办理的完全一致，享受同样的网络质量和服务保障。",
+  },
+  {
+    category: "号卡产品",
+    q: "如何选择适合自己的套餐？",
+    a: "建议根据您的日常流量使用量来选择：轻度用户（刷微信、看新闻）可选 30-60G 套餐；中度用户（刷视频、看直播）可选 80-150G 套餐；重度用户（追剧、下载大文件）建议选择 200G 以上套餐。您也可以联系在线客服，我们会根据您的使用习惯推荐最合适的套餐。",
   },
   {
     category: "订购激活",
@@ -68,6 +71,11 @@ const FAQS: FaqItem[] = [
     a: "办理号卡需要提供收件人姓名、身份证号、收货地址和联系电话。这些信息仅用于运营商实名制开户，全程加密传输，我们不会将您的个人信息用于任何其他用途。",
   },
   {
+    category: "订购激活",
+    q: "下单后可以修改收货信息吗？",
+    a: "订单提交后，在未发货前可以联系客服修改收货地址和联系电话。一旦订单进入配送环节，将无法修改地址。建议下单时仔细核对收货信息，确保快递能准确送达。",
+  },
+  {
     category: "售后保障",
     q: "不想用了可以注销吗？有没有违约金？",
     a: "可以。本平台推荐的套餐大多无合约期限制或不低于 6 个月，支持通过运营商官方 APP 或客服热线（10086/10000/10010）随时办理线上注销，无需前往营业厅，不收取任何违约金。",
@@ -81,6 +89,11 @@ const FAQS: FaqItem[] = [
     category: "售后保障",
     q: "收到卡后不满意可以退吗？",
     a: "号卡属于特殊商品，激活后将无法退货。但下单后至签收激活前，您随时可以取消订单或不激活使用。如果您有任何疑问，建议先联系客服确认套餐详情后再激活。",
+  },
+  {
+    category: "售后保障",
+    q: "号卡信号不好或网速慢怎么办？",
+    a: "首先建议检查手机是否支持该运营商的网络频段，或尝试重启手机、开关飞行模式。如问题持续，可拨打运营商客服热线反馈，运营商将安排技术人员排查基站覆盖情况。若确认是号卡质量问题，可联系我们协助换卡处理。",
   },
 ];
 
@@ -136,10 +149,10 @@ function FaqItem({
 
   return (
     <div
-      className={`group overflow-hidden rounded-2xl border transition-all duration-300 ${
+      className={`group overflow-hidden rounded-md border transition-all duration-300 ${
         isOpen
-          ? "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white shadow-lg shadow-blue-100/50"
-          : "border-gray-100 bg-white shadow-sm hover:border-blue-100 hover:shadow-md hover:shadow-blue-50/50"
+          ? "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white"
+          : "border-gray-100 bg-white hover:border-blue-100"
       }`}
     >
       {/* 问题按钮 */}
@@ -151,9 +164,9 @@ function FaqItem({
       >
         {/* 序号徽章 */}
         <span
-          className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-all duration-200 ${
+          className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-sm text-xs font-bold transition-all duration-200 ${
             isOpen
-              ? "bg-blue-600 text-white shadow-md shadow-blue-200"
+              ? "bg-blue-600 text-white"
               : "bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600"
           }`}
         >
@@ -173,7 +186,7 @@ function FaqItem({
         <span
           className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
             isOpen
-              ? "bg-blue-600 text-white rotate-180 shadow-md shadow-blue-200"
+              ? "bg-blue-600 text-white rotate-180"
               : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600"
           }`}
         >
@@ -188,10 +201,10 @@ function FaqItem({
       >
         <div className="overflow-hidden">
           <div className="px-5 pb-5 pt-1 md:px-6 md:pb-6">
-            <div className="flex items-start gap-3 rounded-xl bg-white/70 p-4 backdrop-blur-sm">
+            <div className="flex items-start gap-3 rounded bg-white/70 p-4 backdrop-blur-sm">
               {cfg && (
                 <div
-                  className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg ${cfg.bg}`}
+                  className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded ${cfg.bg}`}
                 >
                   <cfg.icon className={`size-4 ${cfg.color}`} />
                 </div>
@@ -233,7 +246,6 @@ export default function FAQSection() {
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 顶部标题区 ===== */}
         <div className="mb-12 text-center">
-          {/* 标签徽章 */}
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-600">
             <Sparkles className="size-3.5" />
             常见问题
@@ -246,9 +258,11 @@ export default function FAQSection() {
           </p>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[320px_1fr]">
-          {/* ===== 左栏：筛选 + 分类卡片 + 联系引导 ===== */}
-          <div className="flex flex-col gap-5">
+        {/* ===== 优化后的左右双栏布局 ===== */}
+        {/* 左栏固定宽度 300/340px，右栏弹性填充剩余空间 */}
+        <div className="grid gap-8 lg:grid-cols-[300px_1fr] lg:gap-10 xl:grid-cols-[340px_1fr]">
+          {/* ===== 左栏：筛选 + 统计 + 联系引导 ===== */}
+          <div className="flex flex-col gap-4">
             {/* 分类标签（移动端横向滚动） */}
             <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
               {ALL_CATEGORIES.map((cat) => {
@@ -267,15 +281,15 @@ export default function FAQSection() {
                       setActiveCategory(cat);
                       setOpenIndex(-1);
                     }}
-                    className={`flex shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 lg:w-full ${
+                    className={`flex shrink-0 items-center gap-3 rounded-md border px-4 py-3 text-left transition-all duration-200 lg:w-full ${
                       isActive
-                        ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/50"
-                        : "border-gray-100 bg-white text-gray-700 shadow-sm hover:border-blue-100 hover:bg-blue-50 hover:shadow-md"
+                        ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white"
+                        : "border-gray-100 bg-white text-gray-700 hover:border-blue-100 hover:bg-blue-50"
                     }`}
                   >
                     {/* 图标 */}
                     <div
-                      className={`flex size-9 shrink-0 items-center justify-center rounded-xl transition-all ${
+                      className={`flex size-9 shrink-0 items-center justify-center rounded transition-all ${
                         isActive
                           ? "bg-white/20"
                           : cfg
@@ -294,7 +308,7 @@ export default function FAQSection() {
                       )}
                     </div>
 
-                    {/* 文字 */}
+                    {/* 文字 — 仅桌面端 */}
                     <div className="hidden min-w-0 flex-1 lg:block">
                       <p
                         className={`text-sm font-semibold ${isActive ? "text-white" : "text-gray-800"}`}
@@ -308,9 +322,9 @@ export default function FAQSection() {
                       </p>
                     </div>
 
-                    {/* 数量徽章 */}
+                    {/* 数量徽章 — 仅桌面端 */}
                     <span
-                      className={`ml-auto hidden shrink-0 rounded-lg px-2 py-0.5 text-xs font-bold lg:block ${
+                      className={`ml-auto hidden shrink-0 rounded px-2 py-0.5 text-xs font-bold lg:block ${
                         isActive
                           ? "bg-white/20 text-white"
                           : "bg-gray-100 text-gray-500"
@@ -322,7 +336,7 @@ export default function FAQSection() {
                     {/* 移动端显示分类名 + 数量 */}
                     <span className="text-sm font-medium lg:hidden">{cat}</span>
                     <span
-                      className={`ml-1 rounded-md px-1.5 py-0.5 text-xs font-bold lg:hidden ${
+                      className={`ml-1 rounded px-1.5 py-0.5 text-xs font-bold lg:hidden ${
                         isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
                       }`}
                     >
@@ -334,12 +348,12 @@ export default function FAQSection() {
             </div>
 
             {/* 统计信息 */}
-            <div className="hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm lg:block">
+            <div className="hidden rounded-md border border-gray-100 bg-white p-4 lg:block">
               <div className="grid grid-cols-3 gap-2 text-center">
                 {Object.entries(CATEGORY_CONFIG).map(([cat, cfg]) => (
-                  <div key={cat} className="rounded-xl bg-gray-50 p-3">
+                  <div key={cat} className="rounded bg-gray-50 p-3">
                     <div
-                      className={`mx-auto mb-1.5 flex size-8 items-center justify-center rounded-lg ${cfg.bg}`}
+                      className={`mx-auto mb-1.5 flex size-8 items-center justify-center rounded ${cfg.bg}`}
                     >
                       <cfg.icon className={`size-4 ${cfg.color}`} />
                     </div>
@@ -353,7 +367,7 @@ export default function FAQSection() {
             </div>
 
             {/* 联系引导卡片 */}
-            <div className="mt-auto overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-600 to-blue-700 p-5 shadow-lg shadow-blue-200/50">
+            <div className="overflow-hidden rounded-md border border-blue-100 bg-gradient-to-br from-blue-600 to-blue-700 p-5">
               <div className="mb-1 flex items-center gap-2">
                 <HelpCircle className="size-4 text-blue-200" />
                 <p className="text-sm font-semibold text-white">没有找到答案？</p>
@@ -365,14 +379,14 @@ export default function FAQSection() {
                 <button
                   type="button"
                   onClick={() => modalRef.current?.open()}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition-all hover:bg-blue-50 hover:shadow-md"
+                  className="flex items-center justify-center gap-2 rounded bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50"
                 >
                   <MessageCircle className="size-4" />
                   在线咨询客服
                 </button>
                 <a
                   href="tel:400-xxx-xxxx"
-                  className="flex items-center justify-center gap-2 rounded-xl border border-blue-400/40 bg-blue-500/30 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-blue-500/50"
+                  className="flex items-center justify-center gap-2 rounded border border-blue-400/40 bg-blue-500/30 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-blue-500/50"
                 >
                   <Phone className="size-4" />
                   拨打客服热线
@@ -382,7 +396,7 @@ export default function FAQSection() {
           </div>
 
           {/* ===== 右栏：FAQ 折叠面板列表 ===== */}
-          <div>
+          <div className="min-w-0">
             {/* 当前分类标题 */}
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm font-medium text-gray-500">
@@ -426,7 +440,7 @@ export default function FAQSection() {
 
             {/* 空状态 */}
             {filteredFaqs.length === 0 && (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 py-16">
+              <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-gray-200 bg-gray-50 py-16">
                 <Search className="mb-3 size-10 text-gray-300" />
                 <p className="text-sm font-medium text-gray-500">
                   暂无相关问题

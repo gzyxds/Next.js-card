@@ -13,11 +13,11 @@ export default function Footer() {
             <div className="flex size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
               <Signal className="size-4" />
             </div>
-            <span className="text-base font-bold tracking-tight">
+            <span className="text-lg font-bold tracking-tight">
               流量派
             </span>
           </Link>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-md text-base leading-relaxed text-muted-foreground">
             专注为用户提供正规、优惠、便捷的流量卡办理服务，让上网更自由。
           </p>
         </div>
@@ -26,8 +26,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-4 border-t pt-10">
           {/* 号卡办理 */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">号卡办理</h4>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <h4 className="mb-4 text-base font-semibold">号卡办理</h4>
+            <ul className="space-y-2.5 text-base text-muted-foreground">
               <li>
                 <Link href="/lotml" className="transition-colors hover:text-foreground">
                   号卡联盟
@@ -53,8 +53,8 @@ export default function Footer() {
 
           {/* 快速链接 */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">快速链接</h4>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <h4 className="mb-4 text-base font-semibold">快速链接</h4>
+            <ul className="space-y-2.5 text-base text-muted-foreground">
               <li>
                 <Link href="/" className="transition-colors hover:text-foreground">
                   首页
@@ -80,8 +80,8 @@ export default function Footer() {
 
           {/* 服务支持 */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">服务支持</h4>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <h4 className="mb-4 text-base font-semibold">服务支持</h4>
+            <ul className="space-y-2.5 text-base text-muted-foreground">
               <li>
                 <span className="cursor-pointer transition-colors hover:text-foreground">用户协议</span>
               </li>
@@ -99,7 +99,7 @@ export default function Footer() {
 
           {/* 联系我们 */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">联系我们</h4>
+            <h4 className="mb-4 text-base font-semibold">联系我们</h4>
             {/* 二维码 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
@@ -111,7 +111,7 @@ export default function Footer() {
                     loading="lazy"
                   />
                 </div>
-                <p className="text-[11px] text-muted-foreground">微信咨询</p>
+                <p className="text-xs text-muted-foreground">微信咨询</p>
               </div>
               <div className="text-center">
                 <div className="mx-auto mb-2 aspect-square w-full max-w-[110px] overflow-hidden rounded-lg border bg-white p-3">
@@ -122,13 +122,13 @@ export default function Footer() {
                     loading="lazy"
                   />
                 </div>
-                <p className="text-[11px] text-muted-foreground">客服二维码</p>
+                <p className="text-xs text-muted-foreground">客服二维码</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 border-t pt-6 text-center text-xs text-muted-foreground">
+        <div className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground">
           <p>
             流量派平台仅为信息展示与办理入口，号卡及服务由各大运营商提供。
           </p>

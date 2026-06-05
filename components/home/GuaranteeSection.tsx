@@ -4,6 +4,7 @@ import {
   Users,
   MapPin,
   Phone,
+  BadgeCheck,
 } from "lucide-react";
 
 /** 服务保障区域组件 */
@@ -12,7 +13,7 @@ export default function GuaranteeSection() {
     {
       icon: ShieldCheck,
       title: "官方授权",
-      desc: "所有号卡均来自三大运营商官方渠道，可在官方APP查询套餐详情。",
+      desc: "所有号卡均来自四大运营商官方渠道，可在官方APP查询套餐详情。",
     },
     {
       icon: Users,
@@ -32,33 +33,36 @@ export default function GuaranteeSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-indigo-50/20 to-background" />
+    <section className="bg-white">
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
+        {/* ===== 标题区 ===== */}
         <div className="mb-12 text-center md:mb-14">
+          <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
+            <BadgeCheck className="size-4" />
+            服务承诺
+          </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             用户权益保障
           </h2>
-          <p className="mt-3 text-muted-foreground">
+          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
             您的每一分钱都花得明明白白，每一张卡都用得安安心心
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
+        {/* ===== 四列卡片 ===== */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => (
             <div
               key={item.title}
-              className="flex gap-4 rounded-2xl border bg-card p-5 shadow-sm transition-all hover:shadow-md md:p-6"
+              className="flex flex-col items-center rounded-md border bg-white p-6 text-center transition-colors hover:border-blue-200 hover:bg-blue-50/30 md:p-7"
             >
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
-                <item.icon className="size-5 text-blue-600" />
+              <div className="mb-4 flex size-12 items-center justify-center rounded-md bg-blue-50">
+                <item.icon className="size-6 text-blue-600" />
               </div>
-              <div>
-                <h3 className="mb-1 font-semibold">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {item.desc}
-                </p>
-              </div>
+              <h3 className="mb-2 text-base font-semibold">{item.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {item.desc}
+              </p>
             </div>
           ))}
         </div>

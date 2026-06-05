@@ -217,40 +217,33 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden dark:bg-[#0a0b14]"
+      className="relative overflow-hidden bg-white"
       role="banner"
       aria-label="首页主区域"
-      style={{
-        background: `
-          linear-gradient(135deg, #f0f4ff 0%, #e8eef8 25%, #f5f3ff 50%, #eef2ff 75%, #f0f7ff 100%)
-        `,
-      }}
     >
-      {/* ===== 2026 流行科技感背景装饰层 ===== */}
+      {/* ===== 背景装饰层 ===== */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        {/* 光晕1：右上蓝色大圆 */}
-        <div className="absolute -top-40 -right-32 h-[700px] w-[700px] rounded-full bg-gradient-to-bl from-blue-400/[0.06] via-blue-300/[0.03] to-transparent blur-3xl dark:from-blue-500/[0.08] dark:via-blue-400/[0.04]" />
+        {/* 右上角蓝光晕 */}
+        <div className="absolute -top-40 -right-32 h-[700px] w-[700px] rounded-full bg-blue-50/60 blur-3xl" />
 
-        {/* 光晕2：左下紫色圆 */}
-        <div className="absolute -bottom-40 -left-32 h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-violet-400/[0.05] via-fuchsia-300/[0.02] to-transparent blur-3xl dark:from-violet-500/[0.07] dark:via-fuchsia-400/[0.03]" />
+        {/* 左下角紫色光晕 */}
+        <div className="absolute -bottom-40 -left-32 h-[600px] w-[600px] rounded-full bg-indigo-50/40 blur-3xl" />
 
-        {/* 光晕3：中右青色小圆 — 通信/信号感 */}
-        <div className="absolute top-1/2 -right-20 h-[400px] w-[400px] rounded-full bg-gradient-to-l from-cyan-400/[0.04] to-transparent blur-2xl dark:from-cyan-500/[0.06]" />
+        {/* 中部蓝灰光晕 */}
+        <div className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-100/20 blur-3xl" />
 
-        {/* 光晕4：左上角琥珀暖光 */}
-        <div className="absolute -top-20 left-1/3 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-amber-200/[0.04] to-transparent blur-2xl dark:from-amber-400/[0.04]" />
+        {/* 右侧暖光点 */}
+        <div className="absolute top-1/3 -right-16 h-[300px] w-[300px] rounded-full bg-amber-50/50 blur-2xl" />
 
-        {/* ===== 科技网格纹理（信号/网络感） ===== */}
+        {/* 科技网格纹理 */}
         <div
-          className="absolute inset-0 opacity-[0.015] dark:opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.025]"
           style={{
-            backgroundImage: `
-              radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0)
-            `,
-            backgroundSize: "40px 40px",
+            backgroundImage: "radial-gradient(circle, #3b82f6 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
           }}
         />
       </div>

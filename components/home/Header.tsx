@@ -126,7 +126,7 @@ function DropdownMenu({
       {/* 触发按钮 */}
       <button
         type="button"
-        className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold tracking-wide text-slate-600 transition-all duration-200 group-hover:bg-slate-100 group-hover:text-blue-700"
+        className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-base font-medium tracking-wide text-slate-600 transition-all duration-200 group-hover:bg-slate-100 group-hover:text-blue-700"
       >
         {label}
         <ChevronDown className="size-3.5 text-slate-400 transition-transform duration-300 group-hover:rotate-180 group-hover:text-blue-500" />
@@ -139,7 +139,7 @@ function DropdownMenu({
           <div className="size-3 rotate-45 border-l border-t border-slate-200/60 bg-white" />
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-xl shadow-slate-200/50">
+        <div className="overflow-hidden rounded-md border border-slate-200/60 bg-white">
           {/* 标题行 */}
           {dropdownTitle && (
             <div className="border-b border-slate-100 px-5 py-3">
@@ -158,7 +158,7 @@ function DropdownMenu({
               <Link
                 key={item.href}
                 href={item.href}
-                className="group/item flex items-start gap-4 rounded-xl px-4 py-3 transition-all duration-200 hover:bg-slate-50"
+                className="group/item flex items-start gap-4 rounded-md px-4 py-3 transition-all duration-200 hover:bg-slate-50"
               >
                 {/* 图标 */}
                 <div
@@ -170,7 +170,7 @@ function DropdownMenu({
                 {/* 文字 */}
                 <div className="flex flex-col justify-center">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-semibold text-slate-700 transition-colors group-hover/item:text-blue-700">
+                    <span className="text-sm font-medium text-slate-700 transition-colors group-hover/item:text-blue-700">
                       {item.label}
                     </span>
                     <ArrowRight className="size-3 shrink-0 -translate-x-1 text-blue-400 opacity-0 transition-all duration-200 group-hover/item:translate-x-0 group-hover/item:opacity-100" />
@@ -209,7 +209,7 @@ function MobileDropdownMenu({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+        className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
       >
         <span className="flex items-center gap-2">
           <BadgeCheck className="size-4 text-blue-500" />
@@ -307,7 +307,7 @@ export default function Header() {
               <Link
                 key={item.label}
                 href={item.href!}
-                className="rounded-lg px-3 py-2 text-sm font-semibold tracking-wide text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-blue-700"
+                className="rounded-lg px-3 py-2 text-base font-medium tracking-wide text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-blue-700"
               >
                 {item.label}
               </Link>
@@ -319,7 +319,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Button
             size="sm"
-            className="hidden rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/30 md:inline-flex"
+            className="hidden rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-5 text-base font-semibold text-white transition-all hover:-translate-y-0.5 md:inline-flex"
             asChild
           >
             <Link href="#plans">立即办理</Link>
@@ -354,7 +354,7 @@ export default function Header() {
                   key={item.label}
                   href={item.href!}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                  className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50"
                 >
                   {item.label}
                 </Link>

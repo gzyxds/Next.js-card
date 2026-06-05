@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 
 /** 每次增量加载数量 */
-const STEP = 8;
+const STEP = 10;
 
 interface PlansGridProps {
   products: HaokaProduct[];
@@ -26,7 +26,7 @@ export default function PlansGrid({ products }: PlansGridProps) {
 
   return (
     <>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
         {visible.map((plan) => (
           <ProductCard key={plan.product_id} product={plan} />
         ))}

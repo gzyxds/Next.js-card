@@ -1,26 +1,22 @@
 /**
  * 浩卡联盟商品展示页面/haoka
+ *
+ * 使用服务端预计算元数据（_provider / _location / _duration / _tags），
+ * 避免客户端重复解析 product_name，提升筛选和渲染性能。
  */
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import type { HaokaProduct, Operator, LocationType, DurationType } from "@/lib/api/haokavip";
-import {
-  mapOperator,
-  OPERATOR_LABEL,
-  parseLocation,
-  parseDuration,
-  parseTags,
-} from "@/lib/api/haokavip";
+import type { HaokaProductWithMeta, Operator, DurationType } from "@/lib/api/haokavip";
+import { OPERATOR_LABEL } from "@/lib/api/haokavip";
 import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
 import ProductCard from "@/components/home/ProductCard";
 import {
   Signal,
-  ChevronRight,
   ArrowRight,
   ShoppingCart,
   ShieldCheck,
@@ -32,16 +28,16 @@ import {
 /* ========== 类型定义 ========== */
 
 interface HaokaContentProps {
-  products: HaokaProduct[];
+  products: HaokaProductWithMeta[];
   error: string | null;
 }
 
-/** 商品携带的筛选维度 */
+/** 商品携带的筛选维度（从预计算字段读取） */
 interface ProductMeta {
   provider: Operator;
-  location: LocationType;
+  location: string;
   shipping: string;
-  duration: DurationType;
+  duration: string;
 }
 
 /* ========== 筛选选项常量 ========== */
@@ -189,18 +185,27 @@ function FilterBar({
   );
 }
 
-/* ========== 商品网格 ========== */
+/* ========== 商品网格（支持无限滚动加载） ========== */
+
+/** 每次加载更多时新增的商品数量 */
+const PAGE_SIZE = 12;
 
 function ProductGrid({
   products,
   activeOperator,
   activeLocation,
   activeDuration,
+  displayCount,
+  onLoadMore,
+  hasMore,
 }: {
-  products: HaokaProduct[];
+  products: HaokaProductWithMeta[];
   activeOperator: string;
   activeLocation: string;
   activeDuration: string;
+  displayCount: number;
+  onLoadMore: () => void;
+  hasMore: boolean;
 }) {
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -211,6 +216,32 @@ function ProductGrid({
       return true;
     });
   }, [products, activeOperator, activeLocation, activeDuration]);
+
+  /* ===== 无限滚动观察器 ===== */
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onLoadMore();
+        }
+      },
+      { rootMargin: "200px" } // 提前 200px 触发加载
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [onLoadMore, hasMore]);
+
+  /* ===== 截取当前需要显示的商品 ===== */
+  const visibleProducts = useMemo(
+    () => filtered.slice(0, displayCount),
+    [filtered, displayCount]
+  );
 
   if (filtered.length === 0) {
     return (
@@ -223,26 +254,45 @@ function ProductGrid({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {filtered.map((product) => (
-        <ProductCard
-          key={product.product_id}
-          product={product}
-          provider={mapOperator(product.product_name)}
-        />
-      ))}
+    <div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {visibleProducts.map((product) => (
+          <ProductCard
+            key={product.product_id}
+            product={product}
+            provider={product._provider}
+          />
+        ))}
+      </div>
+
+      {/* 空余加载哨兵元素 */}
+      {hasMore && (
+        <div ref={sentinelRef} className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <span className="inline-block size-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+            正在加载更多套餐...
+          </div>
+        </div>
+      )}
+
+      {/* 已全部加载完毕 */}
+      {!hasMore && filtered.length > PAGE_SIZE && (
+        <p className="py-8 text-center text-sm text-gray-400">
+          已展示全部 {filtered.length} 个套餐
+        </p>
+      )}
     </div>
   );
 }
 
-/* ========== 商品元数据工具 ========== */
+/* ========== 商品元数据工具（从预计算字段读取） ========== */
 
-function getProductMeta(product: HaokaProduct): ProductMeta {
+function getProductMeta(product: HaokaProductWithMeta): ProductMeta {
   return {
-    provider: mapOperator(product.product_name),
-    location: parseLocation(product.product_name).location,
-    shipping: parseLocation(product.product_name).shipping,
-    duration: parseDuration(product.product_name),
+    provider: product._provider,
+    location: product._location,
+    shipping: product._shipping,
+    duration: product._duration,
   };
 }
 
@@ -304,6 +354,8 @@ export default function HaokaContent({ products, error }: HaokaContentProps) {
   const [activeOperator, setActiveOperator] = useState("all");
   const [activeLocation, setActiveLocation] = useState("all");
   const [activeDuration, setActiveDuration] = useState("all");
+  /* ===== 无限滚动分页状态 ===== */
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
 
   /** 计算各维度统计数据 */
   const { operatorCounts, locationOptions, locationCounts } = useMemo(() => {
@@ -331,6 +383,29 @@ export default function HaokaContent({ products, error }: HaokaContentProps) {
     return { operatorCounts: opCounts, locationOptions: locOpts, locationCounts: locCounts };
   }, [products]);
 
+  /** 计算当前筛选条件下的商品总数（用于判断是否还有更多） */
+  const filteredTotal = useMemo(() => {
+    return products.filter((p) => {
+      const meta = getProductMeta(p);
+      if (activeOperator !== "all" && meta.provider !== activeOperator) return false;
+      if (activeLocation !== "all" && meta.location !== activeLocation && meta.shipping !== activeLocation) return false;
+      if (activeDuration !== "all" && meta.duration !== activeDuration) return false;
+      return true;
+    }).length;
+  }, [products, activeOperator, activeLocation, activeDuration]);
+
+  const hasMore = displayCount < filteredTotal;
+
+  /** 加载更多（步长 PAGE_SIZE） */
+  const loadMore = useCallback(() => {
+    setDisplayCount((prev) => Math.min(prev + PAGE_SIZE, filteredTotal));
+  }, [filteredTotal]);
+
+  /** 筛选条件变更时，重置为 PAGE_SIZE */
+  useEffect(() => {
+    setDisplayCount(PAGE_SIZE);
+  }, [activeOperator, activeLocation, activeDuration]);
+
   if (error) return <ErrorPage message={error} />;
 
   return (
@@ -355,6 +430,9 @@ export default function HaokaContent({ products, error }: HaokaContentProps) {
             activeOperator={activeOperator}
             activeLocation={activeLocation}
             activeDuration={activeDuration}
+            displayCount={displayCount}
+            onLoadMore={loadMore}
+            hasMore={hasMore}
           />
         </section>
         <CtaSection />

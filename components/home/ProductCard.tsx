@@ -7,22 +7,23 @@
 "use client";
 
 import Link from "next/link";
-import type { HaokaProduct, Operator } from "@/lib/api/haokavip";
-import { mapOperator, OPERATOR_LABEL, parseTags } from "@/lib/api/haokavip";
+import type { HaokaProduct, HaokaProductWithMeta, Operator } from "@/lib/api/haokavip";
+import { mapOperator, OPERATOR_LABEL } from "@/lib/api/haokavip";
 import { Button } from "@/components/ui/button";
 import { Eye, ChevronRight, Star } from "lucide-react";
 
 /* ========== 商品标签 ========== */
 
 interface ProductTagsProps {
-  name: string;
+  /** 预计算标签列表（优先使用，避免客户端解析） */
+  tags: { text: string; className: string }[];
   max?: number;
 }
 
 /** 商品标签列表（彩色药丸） */
-export function ProductTags({ name, max }: ProductTagsProps) {
-  const tags = max ? parseTags(name).slice(0, max) : parseTags(name);
-  if (tags.length === 0) return null;
+export function ProductTags({ tags, max }: ProductTagsProps) {
+  const displayTags = max ? tags.slice(0, max) : tags;
+  if (displayTags.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1.5">
       {tags.map((tag, i) => (
@@ -109,8 +110,11 @@ export default function ProductCard({ product, provider }: ProductCardProps) {
             <span className="text-[11px] text-gray-400">/月</span>
           </div>
 
-          {/* 标签 */}
-          <ProductTags name={product.product_name} max={4} />
+          {/* 标签（使用预计算数据，避免客户端解析） */}
+          <ProductTags
+            tags={(product as HaokaProductWithMeta)._tags}
+            max={4}
+          />
         </Link>
 
         {/* 分隔线 */}

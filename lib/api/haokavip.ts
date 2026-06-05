@@ -6,6 +6,13 @@
  * 密钥: APP_SECRET 的 UTF-8 编码前 32 字节
  * 请求参数: json_data (AES加密后的Base64字符串)
  * 响应: 纯 JSON, data 无需解密
+ *
+ * ===== 缓存策略 =====
+ * 服务端内存缓存，有效期 12 小时（43200 秒）。
+ * 首次请求从 API 拉取全量商品数据并预计算元数据；
+ * 后续请求直接从缓存返回，大幅提升页面加载速度。
+ * 缓存通过模块级变量实现，服务器进程内全局共享。
+ * 缓存键包含 appId，避免不同配置的冲突。
  */
 import crypto from "crypto";
 
@@ -23,8 +30,33 @@ export interface HaokaProduct {
   [key: string]: unknown;
 }
 
+/**
+ * 扩展商品类型，包含预计算的元数据
+ *
+ * 在服务端抓取时即完成运营商、归属地、时长、标签的解析，
+ * 避免客户端每次渲染都重复解析 product_name。
+ */
+export interface HaokaProductWithMeta extends HaokaProduct {
+  /** 预计算运营商 */
+  _provider: Operator;
+  /** 预计算归属地 */
+  _location: LocationType;
+  /** 预计算可发地区 */
+  _shipping: string;
+  /** 预计算套餐时长 */
+  _duration: DurationType;
+  /** 预计算标签列表 */
+  _tags: { text: string; className: string }[];
+}
+
 /** 运营商枚举 */
 export type Operator = "mobile" | "telecom" | "unicom" | "broadcast" | "unknown";
+
+/** 归属地/可发地区类型 */
+export type LocationType = "全国" | "随机归属地" | "收货地即归属地" | string;
+
+/** 套餐时长类型 */
+export type DurationType = "短期" | "1年" | "2年" | "长期" | "未知";
 
 /** API 商品列表响应结构 */
 interface ProductListResponse {
@@ -40,6 +72,21 @@ interface ProductListResponse {
     };
   };
 }
+
+/* ========== 缓存配置 ========== */
+
+/** 缓存有效期（毫秒），默认 12 小时 */
+const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+
+/** 缓存内容 */
+interface CacheEntry {
+  data: { products: HaokaProductWithMeta[]; total: number };
+  timestamp: number;
+  appId: string;
+}
+
+/** 模块级缓存变量（同进程内共享） */
+let productsCache: CacheEntry | null = null;
 
 /* ========== 加密工具 ========== */
 
@@ -64,20 +111,6 @@ function encrypt(data: unknown, secret: string): string {
   let encrypted = cipher.update(jsonStr, "utf8", "base64");
   encrypted += cipher.final("base64");
   return encrypted;
-}
-
-/**
- * AES-256-ECB 解密
- * @param encryptedBase64 - Base64 编码的加密数据
- * @param secret - APP_SECRET
- * @returns 解密后的 JSON 对象
- */
-function decrypt<T = unknown>(encryptedBase64: string, secret: string): T {
-  const key = deriveKey(secret);
-  const decipher = crypto.createDecipheriv("aes-256-ecb", key, null);
-  let decrypted = decipher.update(encryptedBase64, "base64", "utf8");
-  decrypted += decipher.final("utf8");
-  return JSON.parse(decrypted) as T;
 }
 
 /* ========== 商品数据接口 ========== */
@@ -119,14 +152,48 @@ async function fetchHaokaPage(
 }
 
 /**
+ * 检查缓存是否有效
+ * @param appId - 当前配置的 appId，用于校验缓存一致性
+ */
+function isCacheValid(appId: string): boolean {
+  return (
+    productsCache !== null &&
+    productsCache.appId === appId &&
+    Date.now() - productsCache.timestamp < CACHE_TTL_MS
+  );
+}
+
+/**
+ * 为商品列表预计算元数据
+ *
+ * 在服务端一次性完成所有 product_name 的解析，
+ * 客户端直接使用 _provider / _location / _duration / _tags 字段。
+ */
+function attachMeta(products: HaokaProduct[]): HaokaProductWithMeta[] {
+  return products.map((p) => ({
+    ...p,
+    _provider: mapOperator(p.product_name),
+    _location: parseLocation(p.product_name).location,
+    _shipping: parseLocation(p.product_name).shipping,
+    _duration: parseDuration(p.product_name),
+    _tags: parseTags(p.product_name),
+  }));
+}
+
+/**
  * 获取全部在线商品列表（自动分页获取所有页）
  * POST /open/api/product
  *
  * 请求体: { app_id, json_data: AES加密后的Base64字符串 }
  * 其中 json_data 加密前为: { page, page_size }
+ *
+ * ===== 缓存行为 =====
+ * - 首次调用：从 API 拉取全量数据，预计算元数据，缓存 12 小时
+ * - 有效期内：直接返回缓存，零网络开销
+ * - 过期后：静默刷新，新数据替换旧缓存
  */
 export async function fetchHaokaProducts(): Promise<{
-  products: HaokaProduct[];
+  products: HaokaProductWithMeta[];
   total: number;
 }> {
   const appId = process.env.HAOKAVIP_APP_ID;
@@ -136,12 +203,20 @@ export async function fetchHaokaProducts(): Promise<{
     throw new Error("浩卡联盟 API 未配置 (HAOKAVIP_APP_ID / HAOKAVIP_APP_SECRET)");
   }
 
-  // 先请求第 1 页，获取总页数
+  /* ===== 缓存命中：直接返回 ===== */
+  if (isCacheValid(appId)) {
+    console.log("[HaokaCache] 缓存命中，直接返回");
+    return productsCache!.data;
+  }
+
+  console.log("[HaokaCache] 缓存失效或首次请求，开始拉取数据");
+
+  /* ===== 先请求第 1 页，获取总页数 ===== */
   const firstPage = await fetchHaokaPage(appId, appSecret, 1);
   const totalPage = firstPage.data?.pageInfo?.totalPage || 1;
   const allItems = [...(firstPage.data?.items || [])];
 
-  // 如果有多页，并发请求剩余页
+  /* ===== 如果有多页，并发请求剩余页 ===== */
   if (totalPage > 1) {
     const remainingPages: Promise<ProductListResponse>[] = [];
     for (let p = 2; p <= totalPage; p++) {
@@ -153,10 +228,19 @@ export async function fetchHaokaProducts(): Promise<{
     }
   }
 
-  return {
-    products: allItems,
-    total: firstPage.data?.pageInfo?.total || allItems.length,
+  /* ===== 预计算元数据 ===== */
+  const productsWithMeta = attachMeta(allItems);
+
+  /* ===== 写入缓存 ===== */
+  productsCache = {
+    data: { products: productsWithMeta, total: firstPage.data?.pageInfo?.total || allItems.length },
+    timestamp: Date.now(),
+    appId,
   };
+
+  console.log(`[HaokaCache] 数据刷新完成，共 ${allItems.length} 件商品，缓存有效期 12 小时`);
+
+  return productsCache.data;
 }
 
 /* ========== 运营商工具函数 ========== */
@@ -185,9 +269,6 @@ export const OPERATOR_LABEL: Record<Operator, string> = {
 /** 运营商配置（颜色、图标） */
 /* ========== 商品名称解析函数 ========== */
 
-/** 归属地/可发地区类型 */
-export type LocationType = "全国" | "随机归属地" | "收货地即归属地" | string;
-
 /**
  * 从商品名称提取归属地信息
  * @returns { location, shipping }
@@ -206,9 +287,6 @@ export function parseLocation(name: string): { location: LocationType; shipping:
   }
   return { location: "收货地即归属地", shipping: "全国" };
 }
-
-/** 套餐时长类型 */
-export type DurationType = "短期" | "1年" | "2年" | "长期" | "未知";
 
 /**
  * 从商品名称提取套餐时长

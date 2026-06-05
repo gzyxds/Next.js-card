@@ -4,7 +4,7 @@
  * 展示浩卡联盟平台的多运营商号卡套餐，支持运营商分类筛选。
  * 数据来源：浩卡联盟分销系统 /open/api/product
  */
-import { fetchHaokaProducts, type HaokaProduct } from "@/lib/api/haokavip";
+import { fetchHaokaProducts, type HaokaProductWithMeta } from "@/lib/api/haokavip";
 import HaokaContent from "./HaokaContent";
 
 export const metadata = {
@@ -16,7 +16,7 @@ export const metadata = {
 };
 
 export default async function HaokaPage() {
-  let products: HaokaProduct[] = [];
+  let products: HaokaProductWithMeta[] = [];
   let error: string | null = null;
 
   try {

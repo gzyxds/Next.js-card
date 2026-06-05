@@ -3,12 +3,10 @@
 /**
  * 常见问题区域组件（FAQSection）
  *
- * 左右双栏布局：
- * - 左栏：标题 + 分类概览 + 联系引导
- * - 右栏：折叠手风琴问题列表
- *
- * 配色完全使用 CSS 变量（--primary / --muted / --border 等），无硬编码色值。
- * 外层使用站点标准宽度（containerClass + SITE_WIDTH_STYLE）。
+ * 左右双栏布局，配色风格与 GuaranteeSection 保持一致：
+ * - 背景渐变：via-blue-50/20
+ * - 卡片：bg-card border shadow-sm rounded-2xl
+ * - 图标容器：bg-blue-500/10 + text-blue-600
  */
 
 import { useState } from "react";
@@ -94,21 +92,23 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number>(0);
 
   return (
-    <section id="faq" className="border-t bg-background">
+    <section className="relative overflow-hidden">
+      {/* 背景渐变（与 GuaranteeSection 一致）：via-blue-50/20 */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-blue-50/20 to-background" />
+
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         <div className="grid gap-10 md:grid-cols-[1fr_1.5fr] md:gap-12 lg:gap-16">
           {/* ===== 左栏：标题 + 分类索引 + 联系引导 ===== */}
           <div className="flex flex-col">
-            {/* 标题区 */}
             <div className="mb-8">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-600">
                 <HelpCircle className="size-3.5" />
                 常见问题
               </div>
-              <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 您可能想了解的
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-3 text-muted-foreground">
                 关于号卡产品、订购激活、售后服务的常见疑问，这里都有答案
               </p>
             </div>
@@ -121,13 +121,13 @@ export default function FAQSection() {
                 return (
                   <div
                     key={cat}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 shadow-sm"
+                    className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm"
                   >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Icon className="size-5 text-primary" />
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
+                      <Icon className="size-5 text-blue-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-card-foreground">{cat}</p>
+                      <p className="font-semibold">{cat}</p>
                       <p className="text-xs text-muted-foreground">{cfg.desc}</p>
                     </div>
                     <span className="ml-auto shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -138,25 +138,25 @@ export default function FAQSection() {
               })}
             </div>
 
-            {/* 联系引导 */}
-            <div className="mt-auto rounded-xl border border-border bg-muted/30 p-5">
-              <p className="text-sm font-medium text-foreground">没有找到答案？</p>
-              <p className="mt-1 text-xs text-muted-foreground">
+            {/* 联系引导卡片 */}
+            <div className="mt-auto rounded-2xl border bg-card p-5 shadow-sm">
+              <p className="font-semibold">没有找到答案？</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 联系客服获取一对一帮助
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <a
                   href="#"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
                 >
                   <MessageCircle className="size-3.5" />
                   在线咨询
                 </a>
                 <a
                   href="tel:400-xxx-xxxx"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3.5 py-2 text-xs font-medium text-card-foreground transition-colors hover:bg-muted"
+                  className="inline-flex items-center gap-1.5 rounded-lg border bg-card px-3.5 py-2 text-xs font-medium transition-colors hover:bg-muted"
                 >
-                  <Phone className="size-3.5" />
+                  <Phone className="size-3.5 text-blue-600" />
                   客服热线
                 </a>
               </div>
@@ -172,10 +172,10 @@ export default function FAQSection() {
               return (
                 <div
                   key={idx}
-                  className={`overflow-hidden rounded-xl border transition-all duration-200 ${
+                  className={`overflow-hidden rounded-2xl border bg-card shadow-sm transition-all ${
                     isOpen
-                      ? "border-primary/30 bg-card shadow-sm"
-                      : "border-border bg-card shadow-sm hover:border-muted-foreground/20"
+                      ? "border-blue-200 shadow-md"
+                      : "hover:shadow-md"
                   }`}
                 >
                   <button
@@ -184,11 +184,11 @@ export default function FAQSection() {
                     onClick={() => setOpenIndex(isOpen ? -1 : idx)}
                     aria-expanded={isOpen}
                   >
-                    <span className="flex items-center gap-3 text-sm font-medium text-foreground md:text-base">
+                    <span className="flex items-center gap-3 text-sm font-medium md:text-base">
                       <span
-                        className={`flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold transition-colors ${
+                        className={`flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
                           isOpen
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-blue-600 text-white"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
@@ -200,7 +200,7 @@ export default function FAQSection() {
                     <ChevronDown
                       className={`size-4 shrink-0 transition-all duration-200 ${
                         isOpen
-                          ? "rotate-180 text-primary"
+                          ? "rotate-180 text-blue-600"
                           : "text-muted-foreground"
                       }`}
                     />
@@ -212,10 +212,10 @@ export default function FAQSection() {
                     style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                   >
                     <div className="overflow-hidden">
-                      <div className="border-t border-border/50 px-5 pb-5 pt-3 md:px-6">
+                      <div className="border-t px-5 pb-5 pt-3 md:px-6">
                         <div className="flex items-start gap-3">
                           {CatIcon && (
-                            <CatIcon className="mt-0.5 size-4 shrink-0 text-primary" />
+                            <CatIcon className="mt-0.5 size-4 shrink-0 text-blue-600" />
                           )}
                           <p className="text-sm leading-relaxed text-muted-foreground">
                             {faq.a}

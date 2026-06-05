@@ -3,13 +3,15 @@
 /**
  * 常见问题区域组件（FAQSection）
  *
- * 左右双栏布局，配色风格与 GuaranteeSection 保持一致：
- * - 背景渐变：via-blue-50/20
- * - 卡片：bg-card border shadow-sm rounded-2xl
- * - 图标容器：bg-blue-500/10 + text-blue-600
+ * 设计风格：现代化卡片式 FAQ，支持平滑展开/收起动画
+ * - 全屏渐变背景 + 顶部装饰光晕
+ * - 左栏：标题区 + 分类标签筛选 + 联系引导
+ * - 右栏：分组折叠面板，带平滑过渡动画
+ * - 悬停/激活状态视觉反馈
+ * - 完全响应式
  */
 
-import { useState } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
   HelpCircle,
   ChevronDown,
@@ -18,8 +20,13 @@ import {
   ShieldCheck,
   MessageCircle,
   Phone,
+  Search,
+  Sparkles,
 } from "lucide-react";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
+import CustomerServiceModal, {
+  type CustomerServiceModalHandle,
+} from "@/components/home/CustomerServiceModal";
 
 /* ========== FAQ 数据 ========== */
 
@@ -79,157 +86,359 @@ const FAQS: FaqItem[] = [
 
 /* ========== 分类配置 ========== */
 
-const CATEGORY_CONFIG: Record<string, { icon: typeof HelpCircle; desc: string }> = {
-  "号卡产品": { icon: Smartphone, desc: "了解号卡来源、流量范围及资费优势" },
-  "订购激活": { icon: CreditCard, desc: "下单流程、发货时效及激活方式" },
-  "售后保障": { icon: ShieldCheck, desc: "注销、续约及退换政策" },
+const CATEGORY_CONFIG: Record<
+  string,
+  { icon: typeof HelpCircle; color: string; bg: string; desc: string }
+> = {
+  号卡产品: {
+    icon: Smartphone,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    desc: "了解号卡来源与资费优势",
+  },
+  订购激活: {
+    icon: CreditCard,
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+    desc: "下单流程与激活方式",
+  },
+  售后保障: {
+    icon: ShieldCheck,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    desc: "注销、续约及退换政策",
+  },
 };
 
-/* ========================================================================================== */
+const ALL_CATEGORIES = ["全部", ...Object.keys(CATEGORY_CONFIG)];
+
+/* ========== 单个 FAQ 折叠项 ========== */
+
+/**
+ * 单条 FAQ 折叠展示组件
+ * @param idx - 在当前列表中的序号（用于编号显示）
+ * @param faq - FAQ 数据
+ * @param isOpen - 是否展开
+ * @param onToggle - 点击切换回调
+ */
+function FaqItem({
+  idx,
+  faq,
+  isOpen,
+  onToggle,
+}: {
+  idx: number;
+  faq: FaqItem;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const cfg = CATEGORY_CONFIG[faq.category];
+
+  return (
+    <div
+      className={`group overflow-hidden rounded-2xl border transition-all duration-300 ${
+        isOpen
+          ? "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white shadow-lg shadow-blue-100/50"
+          : "border-gray-100 bg-white shadow-sm hover:border-blue-100 hover:shadow-md hover:shadow-blue-50/50"
+      }`}
+    >
+      {/* 问题按钮 */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="flex w-full items-start gap-4 px-5 py-4 text-left md:px-6 md:py-5"
+      >
+        {/* 序号徽章 */}
+        <span
+          className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-all duration-200 ${
+            isOpen
+              ? "bg-blue-600 text-white shadow-md shadow-blue-200"
+              : "bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600"
+          }`}
+        >
+          {idx + 1}
+        </span>
+
+        {/* 问题文字 */}
+        <span
+          className={`flex-1 text-sm font-medium leading-relaxed transition-colors duration-200 md:text-base ${
+            isOpen ? "text-blue-700" : "text-gray-800 group-hover:text-blue-600"
+          }`}
+        >
+          {faq.q}
+        </span>
+
+        {/* 展开图标 */}
+        <span
+          className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+            isOpen
+              ? "bg-blue-600 text-white rotate-180 shadow-md shadow-blue-200"
+              : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600"
+          }`}
+        >
+          <ChevronDown className="size-4" />
+        </span>
+      </button>
+
+      {/* 答案区域 — CSS grid 过渡实现平滑展开 */}
+      <div
+        className="grid transition-all duration-300 ease-in-out"
+        style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-5 pb-5 pt-1 md:px-6 md:pb-6">
+            <div className="flex items-start gap-3 rounded-xl bg-white/70 p-4 backdrop-blur-sm">
+              {cfg && (
+                <div
+                  className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg ${cfg.bg}`}
+                >
+                  <cfg.icon className={`size-4 ${cfg.color}`} />
+                </div>
+              )}
+              <p className="text-sm leading-relaxed text-gray-600">{faq.a}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ========== 主组件 ========== */
 
 /** 常见问题区域组件 */
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number>(0);
+  const [activeCategory, setActiveCategory] = useState<string>("全部");
+  const modalRef = useRef<CustomerServiceModalHandle>(null);
+
+  /** 按分类筛选后的 FAQ 列表（含原始索引，用于展开状态联动） */
+  const filteredFaqs = useMemo(() => {
+    if (activeCategory === "全部") return FAQS.map((f, i) => ({ ...f, _idx: i }));
+    return FAQS.map((f, i) => ({ ...f, _idx: i })).filter(
+      (f) => f.category === activeCategory
+    );
+  }, [activeCategory]);
 
   return (
     <section className="relative overflow-hidden">
-      {/* 背景渐变（与 GuaranteeSection 一致）：via-blue-50/20 */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-blue-50/20 to-background" />
+      {/* 背景：多层渐变 + 顶部光晕 */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/30 to-white" />
+        <div className="absolute -top-32 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full bg-blue-100/40 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-violet-100/20 blur-3xl" />
+      </div>
 
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
-        <div className="grid gap-10 md:grid-cols-[1fr_1.5fr] md:gap-12 lg:gap-16">
-          {/* ===== 左栏：标题 + 分类索引 + 联系引导 ===== */}
-          <div className="flex flex-col">
-            <div className="mb-8">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-600">
-                <HelpCircle className="size-3.5" />
-                常见问题
-              </div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                您可能想了解的
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                关于号卡产品、订购激活、售后服务的常见疑问，这里都有答案
-              </p>
-            </div>
+        {/* ===== 顶部标题区 ===== */}
+        <div className="mb-12 text-center">
+          {/* 标签徽章 */}
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-600">
+            <Sparkles className="size-3.5" />
+            常见问题
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            您可能想了解的
+          </h2>
+          <p className="mt-3 text-base text-gray-500">
+            关于号卡产品、订购激活、售后服务的常见疑问，这里都有答案
+          </p>
+        </div>
 
-            {/* 分类索引卡片 */}
-            <div className="mb-8 space-y-3">
-              {Object.entries(CATEGORY_CONFIG).map(([cat, cfg]) => {
-                const count = FAQS.filter((f) => f.category === cat).length;
-                const Icon = cfg.icon;
+        <div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[320px_1fr]">
+          {/* ===== 左栏：筛选 + 分类卡片 + 联系引导 ===== */}
+          <div className="flex flex-col gap-5">
+            {/* 分类标签（移动端横向滚动） */}
+            <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
+              {ALL_CATEGORIES.map((cat) => {
+                const isActive = activeCategory === cat;
+                const cfg = CATEGORY_CONFIG[cat];
+                const count =
+                  cat === "全部"
+                    ? FAQS.length
+                    : FAQS.filter((f) => f.category === cat).length;
+
                 return (
-                  <div
+                  <button
                     key={cat}
-                    className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm"
+                    type="button"
+                    onClick={() => {
+                      setActiveCategory(cat);
+                      setOpenIndex(-1);
+                    }}
+                    className={`flex shrink-0 items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 lg:w-full ${
+                      isActive
+                        ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-200/50"
+                        : "border-gray-100 bg-white text-gray-700 shadow-sm hover:border-blue-100 hover:bg-blue-50 hover:shadow-md"
+                    }`}
                   >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
-                      <Icon className="size-5 text-blue-600" />
+                    {/* 图标 */}
+                    <div
+                      className={`flex size-9 shrink-0 items-center justify-center rounded-xl transition-all ${
+                        isActive
+                          ? "bg-white/20"
+                          : cfg
+                            ? cfg.bg
+                            : "bg-gray-100"
+                      }`}
+                    >
+                      {cfg ? (
+                        <cfg.icon
+                          className={`size-4.5 ${isActive ? "text-white" : cfg.color}`}
+                        />
+                      ) : (
+                        <Search
+                          className={`size-4 ${isActive ? "text-white" : "text-gray-400"}`}
+                        />
+                      )}
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold">{cat}</p>
-                      <p className="text-xs text-muted-foreground">{cfg.desc}</p>
+
+                    {/* 文字 */}
+                    <div className="hidden min-w-0 flex-1 lg:block">
+                      <p
+                        className={`text-sm font-semibold ${isActive ? "text-white" : "text-gray-800"}`}
+                      >
+                        {cat}
+                      </p>
+                      <p
+                        className={`mt-0.5 truncate text-xs ${isActive ? "text-white/80" : "text-gray-400"}`}
+                      >
+                        {cfg ? cfg.desc : "查看全部问题"}
+                      </p>
                     </div>
-                    <span className="ml-auto shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                      {count} 题
+
+                    {/* 数量徽章 */}
+                    <span
+                      className={`ml-auto hidden shrink-0 rounded-lg px-2 py-0.5 text-xs font-bold lg:block ${
+                        isActive
+                          ? "bg-white/20 text-white"
+                          : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {count}
                     </span>
-                  </div>
+
+                    {/* 移动端显示分类名 + 数量 */}
+                    <span className="text-sm font-medium lg:hidden">{cat}</span>
+                    <span
+                      className={`ml-1 rounded-md px-1.5 py-0.5 text-xs font-bold lg:hidden ${
+                        isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
                 );
               })}
             </div>
 
+            {/* 统计信息 */}
+            <div className="hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm lg:block">
+              <div className="grid grid-cols-3 gap-2 text-center">
+                {Object.entries(CATEGORY_CONFIG).map(([cat, cfg]) => (
+                  <div key={cat} className="rounded-xl bg-gray-50 p-3">
+                    <div
+                      className={`mx-auto mb-1.5 flex size-8 items-center justify-center rounded-lg ${cfg.bg}`}
+                    >
+                      <cfg.icon className={`size-4 ${cfg.color}`} />
+                    </div>
+                    <p className="text-lg font-bold text-gray-800">
+                      {FAQS.filter((f) => f.category === cat).length}
+                    </p>
+                    <p className="text-xs text-gray-400">{cat}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* 联系引导卡片 */}
-            <div className="mt-auto rounded-2xl border bg-card p-5 shadow-sm">
-              <p className="font-semibold">没有找到答案？</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                联系客服获取一对一帮助
+            <div className="mt-auto overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-600 to-blue-700 p-5 shadow-lg shadow-blue-200/50">
+              <div className="mb-1 flex items-center gap-2">
+                <HelpCircle className="size-4 text-blue-200" />
+                <p className="text-sm font-semibold text-white">没有找到答案？</p>
+              </div>
+              <p className="mb-4 text-xs leading-relaxed text-blue-100">
+                我们的客服团队随时为您提供一对一专属帮助
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => modalRef.current?.open()}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 shadow-sm transition-all hover:bg-blue-50 hover:shadow-md"
                 >
-                  <MessageCircle className="size-3.5" />
-                  在线咨询
-                </a>
+                  <MessageCircle className="size-4" />
+                  在线咨询客服
+                </button>
                 <a
                   href="tel:400-xxx-xxxx"
-                  className="inline-flex items-center gap-1.5 rounded-lg border bg-card px-3.5 py-2 text-xs font-medium transition-colors hover:bg-muted"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-blue-400/40 bg-blue-500/30 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-blue-500/50"
                 >
-                  <Phone className="size-3.5 text-blue-600" />
-                  客服热线
+                  <Phone className="size-4" />
+                  拨打客服热线
                 </a>
               </div>
             </div>
           </div>
 
-          {/* ===== 右栏：FAQ 折叠面板 ===== */}
-          <div className="space-y-2">
-            {FAQS.map((faq, idx) => {
-              const isOpen = openIndex === idx;
-              const CatIcon = CATEGORY_CONFIG[faq.category]?.icon;
-
-              return (
-                <div
-                  key={idx}
-                  className={`overflow-hidden rounded-2xl border bg-card shadow-sm transition-all ${
-                    isOpen
-                      ? "border-blue-200 shadow-md"
-                      : "hover:shadow-md"
-                  }`}
+          {/* ===== 右栏：FAQ 折叠面板列表 ===== */}
+          <div>
+            {/* 当前分类标题 */}
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-500">
+                共{" "}
+                <span className="font-bold text-blue-600">
+                  {filteredFaqs.length}
+                </span>{" "}
+                个问题
+                {activeCategory !== "全部" && (
+                  <span className="ml-1 text-gray-400">· {activeCategory}</span>
+                )}
+              </p>
+              {activeCategory !== "全部" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory("全部");
+                    setOpenIndex(-1);
+                  }}
+                  className="text-xs text-blue-500 hover:text-blue-600 hover:underline"
                 >
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left md:px-6"
-                    onClick={() => setOpenIndex(isOpen ? -1 : idx)}
-                    aria-expanded={isOpen}
-                  >
-                    <span className="flex items-center gap-3 text-sm font-medium md:text-base">
-                      <span
-                        className={`flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
-                          isOpen
-                            ? "bg-blue-600 text-white"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {idx + 1}
-                      </span>
-                      {faq.q}
-                    </span>
+                  查看全部
+                </button>
+              )}
+            </div>
 
-                    <ChevronDown
-                      className={`size-4 shrink-0 transition-all duration-200 ${
-                        isOpen
-                          ? "rotate-180 text-blue-600"
-                          : "text-muted-foreground"
-                      }`}
-                    />
-                  </button>
+            {/* FAQ 列表 */}
+            <div className="space-y-3">
+              {filteredFaqs.map((faq, localIdx) => (
+                <FaqItem
+                  key={faq._idx}
+                  idx={localIdx}
+                  faq={faq}
+                  isOpen={openIndex === faq._idx}
+                  onToggle={() =>
+                    setOpenIndex(openIndex === faq._idx ? -1 : faq._idx)
+                  }
+                />
+              ))}
+            </div>
 
-                  {/* 答案区域 */}
-                  <div
-                    className="grid transition-all duration-200"
-                    style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="border-t px-5 pb-5 pt-3 md:px-6">
-                        <div className="flex items-start gap-3">
-                          {CatIcon && (
-                            <CatIcon className="mt-0.5 size-4 shrink-0 text-blue-600" />
-                          )}
-                          <p className="text-sm leading-relaxed text-muted-foreground">
-                            {faq.a}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {/* 空状态 */}
+            {filteredFaqs.length === 0 && (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 py-16">
+                <Search className="mb-3 size-10 text-gray-300" />
+                <p className="text-sm font-medium text-gray-500">
+                  暂无相关问题
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* ===== 客服弹窗 ===== */}
+      <CustomerServiceModal ref={modalRef} />
     </section>
   );
 }

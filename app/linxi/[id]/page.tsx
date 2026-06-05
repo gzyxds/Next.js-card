@@ -5,7 +5,7 @@
  * 数据来源：号卡极团系统开放接口 /order/api/haoteam/getlist（带服务端内存缓存）。
  */
 import { fetchLinxiProducts, type LinxiProductWithMeta } from "@/lib/api/linxi";
-import LinxiDetailContent from "./LinxiDetailContent";
+import LinxiDetailContent from "@/app/linxi/[id]/LinxiDetailContent";
 
 /**
  * 生成页面 metadata

@@ -80,7 +80,7 @@ const LEFT_MENU = [
     icon: Wifi,
     title: "林夕号卡",
     subtitle: "万千号卡 尽在林夕",
-    href: "/haoka",
+    href: "/linxi",
   },
   {
     icon: Package,
@@ -217,16 +217,42 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-gradient-to-b from-background via-blue-50/10 to-background"
+      className="relative overflow-hidden dark:bg-[#0a0b14]"
       role="banner"
       aria-label="首页主区域"
+      style={{
+        background: `
+          linear-gradient(135deg, #f0f4ff 0%, #e8eef8 25%, #f5f3ff 50%, #eef2ff 75%, #f0f7ff 100%)
+        `,
+      }}
     >
-      {/* 背景装饰 */}
+      {/* ===== 2026 流行科技感背景装饰层 ===== */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        <div className="absolute -top-32 -right-20 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-blue-600/[0.03] via-transparent to-transparent blur-3xl" />
+        {/* 光晕1：右上蓝色大圆 */}
+        <div className="absolute -top-40 -right-32 h-[700px] w-[700px] rounded-full bg-gradient-to-bl from-blue-400/[0.06] via-blue-300/[0.03] to-transparent blur-3xl dark:from-blue-500/[0.08] dark:via-blue-400/[0.04]" />
+
+        {/* 光晕2：左下紫色圆 */}
+        <div className="absolute -bottom-40 -left-32 h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-violet-400/[0.05] via-fuchsia-300/[0.02] to-transparent blur-3xl dark:from-violet-500/[0.07] dark:via-fuchsia-400/[0.03]" />
+
+        {/* 光晕3：中右青色小圆 — 通信/信号感 */}
+        <div className="absolute top-1/2 -right-20 h-[400px] w-[400px] rounded-full bg-gradient-to-l from-cyan-400/[0.04] to-transparent blur-2xl dark:from-cyan-500/[0.06]" />
+
+        {/* 光晕4：左上角琥珀暖光 */}
+        <div className="absolute -top-20 left-1/3 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-amber-200/[0.04] to-transparent blur-2xl dark:from-amber-400/[0.04]" />
+
+        {/* ===== 科技网格纹理（信号/网络感） ===== */}
+        <div
+          className="absolute inset-0 opacity-[0.015] dark:opacity-[0.04]"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0)
+            `,
+            backgroundSize: "40px 40px",
+          }}
+        />
       </div>
 
       <div className={containerClass("py-6 sm:py-8 md:py-10 lg:py-12")} style={SITE_WIDTH_STYLE}>
@@ -502,12 +528,12 @@ export default function HeroSection() {
         </div>
 
         {/* ======================================================================== */}
-        {/* 底部：运营商合作标识 + 数据统计 */}
+        {/* 底部：合作运营商 + 合作品牌 + 数据统计 */}
         {/* ======================================================================== */}
         <div className="mt-4 md:mt-5 overflow-hidden rounded-md border bg-card shadow-sm">
-          <div className="flex flex-col divide-y divide-border sm:flex-row sm:divide-x sm:divide-y-0 md:items-center md:justify-between">
+          <div className="flex flex-col items-center gap-3 md:flex-row md:items-center md:justify-between px-4 sm:px-5 py-3 sm:py-4">
             {/* 运营商标识 */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 sm:py-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 合作运营商
               </span>
@@ -525,17 +551,38 @@ export default function HeroSection() {
               </div>
             </div>
 
+            {/* 合作品牌 */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              {[
+                { src: "/cooperate/中国移动.webp", alt: "中国移动" },
+                { src: "/cooperate/中国联通.webp", alt: "中国联通" },
+                { src: "/cooperate/中国电信.webp", alt: "中国电信" },
+                { src: "/cooperate/中国广电.webp", alt: "中国广电" },
+                { src: "/cooperate/京东物流.webp", alt: "京东物流" },
+                { src: "/cooperate/顺丰速运.webp", alt: "顺丰速运" },
+              ].map((brand) => (
+                <img
+                  key={brand.alt}
+                  src={brand.src}
+                  alt={brand.alt}
+                  loading="lazy"
+                  className="h-8 sm:h-10 w-auto object-contain"
+                  title={brand.alt}
+                />
+              ))}
+            </div>
+
             {/* 数据统计 */}
-            <div className="flex divide-x divide-border px-4 sm:px-4 py-3 sm:py-4 justify-around sm:justify-normal">
-              <div className="flex flex-col items-center px-3 sm:px-4 first:pl-0">
+            <div className="flex gap-5 sm:gap-6">
+              <div className="flex flex-col items-center">
                 <span className="text-base sm:text-lg font-bold text-foreground">100万+</span>
                 <span className="text-[10px] sm:text-xs text-muted-foreground">用户信赖</span>
               </div>
-              <div className="flex flex-col items-center px-3 sm:px-4">
+              <div className="flex flex-col items-center">
                 <span className="text-base sm:text-lg font-bold text-foreground">300+</span>
                 <span className="text-[10px] sm:text-xs text-muted-foreground">城市覆盖</span>
               </div>
-              <div className="flex flex-col items-center px-3 sm:px-4 last:pr-0">
+              <div className="flex flex-col items-center">
                 <span className="text-base sm:text-lg font-bold text-foreground">4.9分</span>
                 <span className="text-[10px] sm:text-xs text-muted-foreground">用户好评</span>
               </div>

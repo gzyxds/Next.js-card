@@ -57,7 +57,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="border-t bg-muted/30">
+    <section className="border-t bg-white">
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         <div className="mb-12 text-center md:mb-14">
           <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">

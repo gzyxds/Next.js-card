@@ -2,7 +2,7 @@
  * 首页入口组件
  *
  * 组合 Header / HeroSection / FeaturesSection / PlansSection /
- * ProcessSection / GuaranteeSection / FAQSection / Footer 等子组件
+ * ProcessSection / GuaranteeSection / FAQSection / CTASection / Footer 等子组件
  */
 
 import Header from "@/components/home/Header";
@@ -12,6 +12,7 @@ import PlansSection from "@/components/home/PlansSection";
 import ProcessSection from "@/components/home/ProcessSection";
 import GuaranteeSection from "@/components/home/GuaranteeSection";
 import FAQSection from "@/components/home/FAQSection";
+import CTASection from "@/components/home/CTASection";
 import Footer from "@/components/home/Footer";
 
 /** 首页入口组件 */
@@ -26,6 +27,7 @@ export default function HomePage() {
         <ProcessSection />
         <GuaranteeSection />
         <FAQSection />
+        <CTASection />
       </main>
       <Footer />
     </div>

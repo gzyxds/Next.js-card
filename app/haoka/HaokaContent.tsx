@@ -412,6 +412,24 @@ export default function HaokaContent({ products, error }: HaokaContentProps) {
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
       <Header />
+
+      {/* ===== 页面 Banner ===== */}
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-12">
+        <div className={containerClass()} style={SITE_WIDTH_STYLE}>
+          <div className="flex items-center gap-3">
+            <Signal className="size-8 text-blue-200" />
+            <div>
+              <h1 className="text-2xl font-bold text-white sm:text-3xl">
+                浩卡联盟套餐大全
+              </h1>
+              <p className="mt-1 text-sm text-blue-100">
+                一级代理直供 · 秒返佣金 · 全国包邮 · 共 {products.length} 款在售套餐
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <main>
         <AdvantagesSection />
         <FilterBar

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import ScrollToTopButton from "@/components/home/ScrollToTopButton";
 import "./globals.css";
 
 /* ========== 字体配置 ========== */
@@ -105,6 +106,7 @@ export default function RootLayout({
         className={`${dmSans.variable} ${jetbrainsMono.variable} font-[family-name:var(--font-sans)] antialiased`}
       >
         {children}
+        <ScrollToTopButton />
       </body>
     </html>
   );

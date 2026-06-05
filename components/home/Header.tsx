@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Store,
   Sparkles,
+  Wifi,
   LayoutGrid,
   ClipboardList,
   MessageCircleQuestion,
@@ -62,6 +63,13 @@ const NAV_ITEMS: NavItem[] = [
         icon: Sparkles,
         iconColor: "text-amber-600 bg-amber-50",
       },
+      {
+        label: "林夕通信",
+        href: "/linxi",
+        desc: "万千号卡，尽在林夕",
+        icon: Wifi,
+        iconColor: "text-green-600 bg-green-50",
+      },
     ],
   },
   {
@@ -91,6 +99,9 @@ const NAV_ITEMS: NavItem[] = [
       },
     ],
   },
+  { label: "代理加盟", href: "/join" },
+  { label: "合作伙伴", href: "/cooperate" },
+  { label: "关于我们", href: "/about" },
 ];
 
 /* ========== 下拉菜单组件 ========== */

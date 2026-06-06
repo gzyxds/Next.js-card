@@ -491,7 +491,7 @@ export default function Header() {
 
       {/* ── 移动端展开菜单 ── */}
       {mobileOpen && (
-        <div className="border-t border-slate-200/60 bg-white md:hidden">
+        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-200/60 bg-white md:hidden">
           {/* ── 导航链接区：按 PC 端顺序混排，双排网格 ── */}
           <div className="px-4 pt-3">
             {/* 分节标题 */}
@@ -549,6 +549,7 @@ export default function Header() {
                       <MobileDropdownMenu
                         key={item.label}
                         label={item.label}
+                        // eslint-disable-next-line react/no-children-prop
                         children={item.children}
                         onClose={closeMobile}
                       />
@@ -581,7 +582,7 @@ export default function Header() {
                 href={CTA_BUTTONS[0].href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               >
                 <LogIn className="size-4" />
                 登入
@@ -590,7 +591,7 @@ export default function Header() {
                 href={CTA_BUTTONS[1].href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-2 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
               >
                 <UserPlus className="size-4" />
                 注册

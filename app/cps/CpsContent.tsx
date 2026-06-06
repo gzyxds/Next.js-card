@@ -101,6 +101,13 @@ function ErrorPage({ message }: { message: string }) {
  * 分类筛选标签栏
  * 水平滚动的药丸标签，选中后高亮
  */
+/**
+ * 分类筛选标签栏
+ *
+ * - 移动端：水平滚动（防止分类过多时换行占用垂直空间）
+ * - 桌面端：自动换行 flex-wrap
+ * - 隐藏滚动条，保持界面简洁
+ */
 function CategoryTabs({
     categories,
     active,
@@ -113,7 +120,7 @@ function CategoryTabs({
     counts: Record<string, number>;
 }) {
     return (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
             {categories.map((cat) => {
                 const isActive = active === cat.key;
                 const config = getCategoryConfig(cat.key);
@@ -124,16 +131,16 @@ function CategoryTabs({
                         key={cat.key}
                         type="button"
                         onClick={() => onChange(cat.key)}
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-300 ${isActive
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300 md:px-4 md:py-2 md:text-sm ${isActive
                             ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20"
                             : "border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                             }`}
                     >
-                        <config.icon className="size-4" />
+                        <config.icon className="size-3.5 md:size-4" />
                         {config.label}
                         {count !== undefined && (
                             <span
-                                className={`ml-0.5 text-xs ${isActive ? "text-white/70" : "text-gray-400"}`}
+                                className={`ml-0.5 text-[10px] md:text-xs ${isActive ? "text-white/70" : "text-gray-400"}`}
                             >
                                 {count}
                             </span>
@@ -360,8 +367,8 @@ function LinkModal({
                     </div>
 
                     {/* 提示文字 */}
-                    <p className="mb-3 text-center text-[10px] leading-relaxed text-gray-400">
-                        手机扫码或复制链接在手机浏览器打开
+                    <p className="mb-3 text-center text-xs leading-relaxed text-gray-400">
+                        微信扫码或复制链接在手机浏览器打开
                     </p>
 
                     {/* 链接 + 复制按钮 */}

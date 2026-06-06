@@ -9,7 +9,7 @@
  * - 联系卡片移动端横向双按钮，节省纵向空间
  * - 全局圆角统一 rounded-md，视觉柔和
  */
-import { useState, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   HelpCircle,
   ChevronDown,
@@ -22,9 +22,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
-import CustomerServiceModal, {
-  type CustomerServiceModalHandle,
-} from "@/components/home/CustomerServiceModal";
 
 /* ========== FAQ 数据 ========== */
 
@@ -220,7 +217,6 @@ function FaqItem({
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number>(0);
   const [activeCategory, setActiveCategory] = useState<string>("全部");
-  const modalRef = useRef<CustomerServiceModalHandle>(null);
 
   /** 按分类筛选后的 FAQ 列表（含原始索引，用于展开状态联动） */
   const filteredFaqs = useMemo(() => {
@@ -360,17 +356,17 @@ export default function FAQSection() {
                       setOpenIndex(-1);
                     }}
                     className={`flex w-full items-center gap-3 rounded-md border px-4 py-2.5 text-left transition-all duration-200 ${isActive
-                        ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm"
-                        : "border-gray-100 bg-white text-gray-700 hover:border-blue-100 hover:bg-blue-50"
+                      ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm"
+                      : "border-gray-100 bg-white text-gray-700 hover:border-blue-100 hover:bg-blue-50"
                       }`}
                   >
                     {/* 图标 */}
                     <div
                       className={`flex size-7 shrink-0 items-center justify-center rounded transition-all ${isActive
-                          ? "bg-white/20"
-                          : cfg
-                            ? cfg.bg
-                            : "bg-gray-100"
+                        ? "bg-white/20"
+                        : cfg
+                          ? cfg.bg
+                          : "bg-gray-100"
                         }`}
                     >
                       {cfg ? (
@@ -401,8 +397,8 @@ export default function FAQSection() {
                     {/* 数量徽章 */}
                     <span
                       className={`shrink-0 rounded px-2 py-0.5 text-xs font-bold ${isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-gray-100 text-gray-500"
+                        ? "bg-white/20 text-white"
+                        : "bg-gray-100 text-gray-500"
                         }`}
                     >
                       {count}
@@ -443,7 +439,7 @@ export default function FAQSection() {
               <div className="flex flex-row gap-2 sm:flex-col">
                 <button
                   type="button"
-                  onClick={() => modalRef.current?.open()}
+                  onClick={() => window.dispatchEvent(new CustomEvent("open-customer-modal"))}
                   className="flex flex-1 items-center justify-center gap-2 rounded bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50 sm:flex-none sm:px-4 sm:py-2.5"
                 >
                   <MessageCircle className="size-4" />
@@ -518,8 +514,6 @@ export default function FAQSection() {
         </div>
       </div>
 
-      {/* ===== 客服弹窗 ===== */}
-      <CustomerServiceModal ref={modalRef} />
     </section>
   );
 }

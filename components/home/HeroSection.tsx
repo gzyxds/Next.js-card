@@ -210,6 +210,13 @@ export default function HeroSection() {
     startAutoPlay();
   }, [startAutoPlay, stopAutoPlay]);
 
+  /* ===== 监听全局自定义事件，允许其他组件（如 FAQSection）触发弹窗 ===== */
+  useEffect(() => {
+    const handler = () => modalRef.current?.open();
+    window.addEventListener("open-customer-modal", handler);
+    return () => window.removeEventListener("open-customer-modal", handler);
+  }, []);
+
   useEffect(() => {
     startAutoPlay();
     return stopAutoPlay;
@@ -348,9 +355,8 @@ export default function HeroSection() {
                 <Link
                   key={slide.id}
                   href="/haoka"
-                  className={`absolute inset-0 block transition-opacity duration-500 ease-in-out ${
-                    index === currentSlide ? "z-[2] opacity-100" : "z-[1] opacity-0"
-                  }`}
+                  className={`absolute inset-0 block transition-opacity duration-500 ease-in-out ${index === currentSlide ? "z-[2] opacity-100" : "z-[1] opacity-0"
+                    }`}
                   aria-hidden={index !== currentSlide}
                 >
                   <Image
@@ -371,9 +377,8 @@ export default function HeroSection() {
                     key={index}
                     type="button"
                     style={{ height: "6px" }}
-                    className={`cursor-pointer rounded-full border-none p-0 transition-all duration-300 ${
-                      index === currentSlide ? "w-5 bg-white" : "w-2 bg-white/40 hover:bg-white/70"
-                    }`}
+                    className={`cursor-pointer rounded-full border-none p-0 transition-all duration-300 ${index === currentSlide ? "w-5 bg-white" : "w-2 bg-white/40 hover:bg-white/70"
+                      }`}
                     aria-label={`切换到第${index + 1}张`}
                     onClick={() => {
                       setCurrentSlide(index);

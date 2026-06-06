@@ -130,9 +130,8 @@ const CustomerServiceModal = forwardRef<CustomerServiceModalHandle, CustomerServ
         {/* ===== 弹窗内容 ===== */}
         <div
           ref={contentRef}
-          className={`relative w-full max-w-[600px] max-h-[92vh] overflow-y-auto rounded-lg bg-white shadow-xl transition-all duration-300 ${
-            isAnimating ? "scale-100" : "scale-95"
-          } dark:bg-gray-800`}
+          className={`relative w-full max-w-[600px] max-h-[92vh] overflow-y-auto rounded-lg bg-white shadow-xl transition-all duration-300 ${isAnimating ? "scale-100" : "scale-95"
+            } dark:bg-gray-800`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* ===== 顶部公告条 ===== */}
@@ -198,7 +197,7 @@ const CustomerServiceModal = forwardRef<CustomerServiceModalHandle, CustomerServ
             <div className="grid grid-cols-2 gap-4 sm:gap-8">
               {/* 微信客服 */}
               <div className="text-center">
-                <div className="mx-auto mb-3 aspect-square w-full max-w-[160px] overflow-hidden rounded-lg border border-gray-200 bg-white p-3 sm:p-5 dark:border-gray-700">
+                <div className="mx-auto mb-3 aspect-square w-full max-w-[160px] overflow-hidden rounded-lg border border-gray-200 bg-white p-3 sm:max-w-[200px] sm:p-5 dark:border-gray-700">
                   <img
                     src={wxQrSrc}
                     alt="微信客服二维码"
@@ -216,7 +215,7 @@ const CustomerServiceModal = forwardRef<CustomerServiceModalHandle, CustomerServ
 
               {/* 公众号 */}
               <div className="text-center">
-                <div className="mx-auto mb-3 aspect-square w-full max-w-[160px] overflow-hidden rounded-lg border border-gray-200 bg-white p-3 sm:p-5 dark:border-gray-700">
+                <div className="mx-auto mb-3 aspect-square w-full max-w-[160px] overflow-hidden rounded-lg border border-gray-200 bg-white p-3 sm:max-w-[200px] sm:p-5 dark:border-gray-700">
                   <img
                     src={publicQrSrc}
                     alt="微信公众号二维码"

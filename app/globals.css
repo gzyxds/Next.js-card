@@ -188,6 +188,39 @@
   }
 }
 
+/* ===== APP 截图无限滚动动画 ===== */
+@keyframes scroll-smooth {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    /*
+     * 滚动距离 = (卡片宽度 + 间距) × 卡片数量
+     * 5 张原始截图 + 5 张副本 = 10 张，实际需要滚动 5 张原始的距离完成一个循环
+     */
+    transform: translateX(calc(-1 * (270px + 1.5rem) * 5));
+  }
+}
+
+.animate-scroll-smooth {
+  animation: scroll-smooth 20s linear infinite;
+}
+
+/* 移动端稍慢动画 */
+@media (max-width: 768px) {
+  .animate-scroll-smooth {
+    animation-duration: 25s;
+  }
+}
+
+/* 尊重用户偏好：减少动画时禁用滚动 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-smooth {
+    animation: none;
+  }
+}
+
 /* ===== 卡券齿孔：模拟票券左右边缘半圆切口 ===== */
 .coupon-notch-left,
 .coupon-notch-right {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,6 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+/** 404 页面 SEO 元数据 */
+export const metadata: Metadata = {
+  title: "页面未找到",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 export default function NotFound() {
   return (
@@ -32,16 +42,15 @@ export default function NotFound() {
             404
           </p>
           <CardTitle className="text-xl font-bold tracking-tight mt-3">
-            Page not found
+            页面未找到
           </CardTitle>
           <CardDescription>
-            The page you&apos;re looking for doesn&apos;t exist or has been
-            moved.
+            您要查找的页面不存在或已被移除。试试浏览我们的热门大流量卡套餐吧。
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
           <Button asChild className="w-full h-11 shadow-md shadow-primary/20">
-            <Link href="/">Go back home</Link>
+            <Link href="/">返回首页</Link>
           </Button>
         </CardContent>
       </Card>

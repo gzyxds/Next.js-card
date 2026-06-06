@@ -20,12 +20,38 @@ export async function generateMetadata({
   const product = products.find((p) => p.productID === Number(id));
 
   if (!product) {
-    return { title: "商品未找到 - 号卡联盟" };
+    return { title: "商品未找到 - 号卡联盟大流量卡" };
   }
 
   return {
-    title: `${product.productName} - 号卡联盟`,
-    description: `${product.productName}，正规一级代理渠道，${product.BackMoneyType}佣金，全国包邮到家`,
+    title: `${product.productName} - 号卡联盟 | 流量卡推荐`,
+    description: `${product.productName}，正规大流量卡一级代理渠道，${product.BackMoneyType}佣金，全国包邮到家`,
+    keywords: [
+      product.productName,
+      "流量卡",
+      "大流量卡",
+      "手机流量卡",
+      "流量卡推荐",
+      "流量卡办理",
+      "172号卡",
+      "号卡联盟",
+    ],
+    alternates: {
+      canonical: `/lotml/${id}`,
+    },
+    other: {
+      "application/ld+json": JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.productName,
+        description: `${product.productName}，正规大流量卡一级代理渠道，${product.BackMoneyType}佣金，全国包邮到家`,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "CNY",
+          availability: "https://schema.org/InStock",
+        },
+      }),
+    },
   };
 }
 

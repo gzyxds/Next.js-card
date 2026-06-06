@@ -48,7 +48,7 @@ export default function GuaranteeSection() {
             服务承诺
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            用户
+            流量卡用户
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               {" "}权益保障
             </span>

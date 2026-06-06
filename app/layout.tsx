@@ -17,13 +17,13 @@ const jetbrainsMono = JetBrains_Mono({
 
 /** 站点名称 */
 const SITE_NAME = "流量派";
-/** 站点描述 */
+/** 站点描述 — 融入核心高搜索指数关键词 */
 const SITE_DESC =
-  "流量派流量卡平台提供电信、联通、移动、广电正规手机号卡在线办理，19元起大流量套餐，全国通用包邮到家，官方授权正规渠道。";
+  "流量派是专业的手机流量卡在线办理平台，提供电信、联通、移动、广电四大运营商正规大流量卡，19元/29元低月租套餐全国通用不限速，官方授权免费申请包邮到家。";
 
 export const metadata: Metadata = {
   title: {
-    default: `${SITE_NAME} | 电信/联通/移动/广电大流量卡在线办理`,
+    default: `${SITE_NAME} | 手机大流量卡在线办理 — 19元/29元低月租流量卡推荐`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESC,
@@ -31,15 +31,22 @@ export const metadata: Metadata = {
     "流量派",
     "流量卡",
     "大流量卡",
+    "手机流量卡",
+    "流量卡推荐",
+    "流量卡办理",
     "19元流量卡",
     "29元流量卡",
+    "9元流量卡",
+    "低月租大流量",
     "电信流量卡",
     "联通流量卡",
     "移动流量卡",
     "广电流量卡",
-    "手机号卡",
+    "纯流量卡",
+    "学生流量卡",
+    "长期套餐流量卡",
     "号卡办理",
-    "极速流量卡",
+    "流量卡代理",
     "浩卡联盟",
   ],
 
@@ -51,11 +58,19 @@ export const metadata: Metadata = {
 
   /* ===== Open Graph ===== */
   openGraph: {
-    title: SITE_NAME,
+    title: `${SITE_NAME} | 手机大流量卡在线办理`,
     description: SITE_DESC,
     type: "website",
     locale: "zh_CN",
     siteName: SITE_NAME,
+    images: [
+      {
+        url: "/HeroSection/hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "流量派 - 手机大流量卡在线办理平台",
+      },
+    ],
   },
 
   /* ===== 其他 SEO ===== */
@@ -69,7 +84,7 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
     },
   },
-  metadataBase: new URL("http://www.urlka.cn"),
+  metadataBase: new URL("https://www.urlka.cn"),
   appleWebApp: {
     capable: true,
     title: SITE_NAME,
@@ -102,6 +117,23 @@ export default function RootLayout({
         {/* 禁止百度转码 */}
         <meta httpEquiv="Cache-Control" content="no-transform" />
         <meta httpEquiv="Cache-Control" content="no-siteapp" />
+        {/* ===== JSON-LD 结构化数据 — Organization Schema ===== */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "流量派",
+              url: "https://www.urlka.cn",
+              logo: "https://wwww.urlka.cn/logo.svg",
+              description: SITE_DESC,
+              sameAs: [
+                "https://www.urlka.cn",
+              ],
+            }),
+          }}
+        />
       </head>
       <body
         className={`${dmSans.variable} ${jetbrainsMono.variable} font-[family-name:var(--font-sans)] antialiased`}

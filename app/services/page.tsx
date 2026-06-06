@@ -8,9 +8,23 @@
 import ServicesContent from "./ServicesContent";
 
 export const metadata = {
-    title: "自助服务",
+    title: "自助服务 | 流量卡查询与办理 — 流量派",
     description:
-        "流量派自助服务导航 — 聚合172号卡、浩卡联盟、林夕通信等多平台常用入口，包含号卡商城、订单查询、代理申请、运营商服务等一站式导航。",
+        "流量派自助服务导航 — 聚合172号卡、浩卡联盟、林夕通信等多平台常用入口，包含大流量卡商城、订单查询、代理申请、运营商服务等一站式导航。",
+    keywords: [
+        "自助服务",
+        "流量卡查询",
+        "流量卡办理",
+        "流量卡",
+        "大流量卡",
+        "号卡商城",
+        "订单查询",
+        "代理申请",
+        "流量派",
+    ],
+    alternates: {
+        canonical: "/services",
+    },
 };
 
 export default function ServicesPage() {

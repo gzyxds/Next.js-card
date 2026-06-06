@@ -20,17 +20,42 @@ export async function generateMetadata({
     const productId = Number(id);
 
     if (isNaN(productId)) {
-        return { title: "商品未找到 - 翼卡云" };
+        return { title: "商品未找到 - 翼卡云大流量卡" };
     }
 
     try {
         const detail = await fetchYkyProductDetail(productId);
         return {
-            title: `${detail.name} - 翼卡云`,
-            description: `${detail.name}，${detail.des || "大流量套餐"}，正规渠道全国包邮到家`,
+            title: `${detail.name} - 翼卡云 | 流量卡推荐`,
+            description: `${detail.name}，${detail.des || "大流量套餐"}，正规大流量卡全国包邮到家`,
+            keywords: [
+                detail.name,
+                "流量卡",
+                "大流量卡",
+                "手机流量卡",
+                "流量卡推荐",
+                "流量卡办理",
+                "翼卡云",
+            ],
+            alternates: {
+                canonical: `/yky/${id}`,
+            },
+            other: {
+                "application/ld+json": JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    name: detail.name,
+                    description: `${detail.name}，${detail.des || "大流量套餐"}，正规大流量卡全国包邮到家`,
+                    offers: {
+                        "@type": "Offer",
+                        priceCurrency: "CNY",
+                        availability: "https://schema.org/InStock",
+                    },
+                }),
+            },
         };
     } catch {
-        return { title: "商品未找到 - 翼卡云" };
+        return { title: "商品未找到 - 翼卡云大流量卡" };
     }
 }
 

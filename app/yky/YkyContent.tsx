@@ -672,7 +672,7 @@ export default function YkyContent({ products, error }: YkyContentProps) {
                         <Signal className="size-8 text-blue-200" />
                         <div>
                             <h1 className="text-2xl font-bold text-white sm:text-3xl">
-                                翼卡云套餐大全
+                                翼卡云大流量卡套餐大全
                             </h1>
                             <p className="mt-1 text-sm text-blue-100">
                                 正规渠道直供 · 多模式返佣 · 全国包邮 · 共 {products.length} 款在售套餐

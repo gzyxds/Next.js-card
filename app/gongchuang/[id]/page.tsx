@@ -21,15 +21,42 @@ export async function generateMetadata({
         const product = products.find((p) => p.goods_id === Number(id));
 
         if (!product) {
-            return { title: "商品未找到 - 共创通信" };
+            return { title: "商品未找到 - 共创通信大流量卡" };
         }
 
         return {
-            title: `${product.goods_name} - 共创通信`,
-            description: `${product.goods_name}，月租¥${product.price}/月，正规号卡全国包邮`,
+            title: `${product.goods_name} - 共创通信 | 流量卡推荐`,
+            description: `${product.goods_name}，月租¥${product.price}/月，正规大流量卡全国包邮`,
+            keywords: [
+                product.goods_name,
+                "流量卡",
+                "大流量卡",
+                "手机流量卡",
+                "流量卡推荐",
+                "流量卡办理",
+                `${product.price}元流量卡`,
+                "共创通信",
+            ],
+            alternates: {
+                canonical: `/gongchuang/${id}`,
+            },
+            other: {
+                "application/ld+json": JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    name: product.goods_name,
+                    description: `${product.goods_name}，月租¥${product.price}/月，正规大流量卡全国包邮`,
+                    offers: {
+                        "@type": "Offer",
+                        price: String(product.price),
+                        priceCurrency: "CNY",
+                        availability: "https://schema.org/InStock",
+                    },
+                }),
+            },
         };
     } catch {
-        return { title: "商品详情 - 共创通信" };
+        return { title: "商品详情 - 共创通信大流量卡" };
     }
 }
 

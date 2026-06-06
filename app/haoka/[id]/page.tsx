@@ -17,13 +17,42 @@ export async function generateMetadata({
   const product = products.find((p) => p.product_id === Number(id));
 
   if (!product) {
-    return { title: "商品未找到 - 浩卡联盟" };
+    return { title: "商品未找到 - 浩卡联盟大流量卡" };
   }
 
   const price = product.product_name.match(/(\d+\.?\d*)元/)?.[1] || "?";
+  /** JSON-LD Product Schema 结构化数据 */
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.product_name,
+    description: `${product.product_name}，月租¥${price}/月，正规大流量卡全国包邮`,
+    offers: {
+      "@type": "Offer",
+      price: price,
+      priceCurrency: "CNY",
+      availability: "https://schema.org/InStock",
+    },
+  };
   return {
-    title: `${product.product_name} - 浩卡联盟`,
-    description: `${product.product_name}，月租¥${price}/月，正规号卡全国包邮`,
+    title: `${product.product_name} - 浩卡联盟 | 流量卡推荐`,
+    description: `${product.product_name}，月租¥${price}/月，正规大流量卡全国包邮`,
+    keywords: [
+      product.product_name.replace(/【.*?】/g, "").trim(),
+      "流量卡",
+      "大流量卡",
+      "手机流量卡",
+      "流量卡推荐",
+      "流量卡办理",
+      `${price}元流量卡`,
+      "浩卡联盟",
+    ],
+    alternates: {
+      canonical: `/haoka/${id}`,
+    },
+    other: {
+      "application/ld+json": JSON.stringify(jsonLd),
+    },
   };
 }
 

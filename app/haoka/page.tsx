@@ -8,11 +8,27 @@ import { fetchHaokaProducts, type HaokaProductWithMeta } from "@/lib/api/haokavi
 import HaokaContent from "./HaokaContent";
 
 export const metadata = {
-  title: "浩卡联盟号卡 | 电信/移动/联通/广电大流量卡精选",
+  title: "浩卡联盟大流量卡 | 19元/29元低月租手机流量卡推荐办理",
   description:
     "浩卡联盟精选号卡，电信/移动/联通/广电19元-39元大流量套餐，全国通用不限速，正规渠道免费申请包邮到家",
-  keywords:
-    "浩卡联盟,流量卡,大流量卡,19元流量卡,29元流量卡,电信流量卡,移动流量卡,联通流量卡,广电流量卡",
+  keywords: [
+    "浩卡联盟",
+    "流量卡",
+    "大流量卡",
+    "手机流量卡",
+    "流量卡推荐",
+    "流量卡办理",
+    "19元流量卡",
+    "29元流量卡",
+    "电信流量卡",
+    "移动流量卡",
+    "联通流量卡",
+    "广电流量卡",
+    "低月租大流量",
+  ],
+  alternates: {
+    canonical: "/haoka",
+  },
 };
 
 export default async function HaokaPage() {

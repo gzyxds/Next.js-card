@@ -96,7 +96,7 @@ export default function WhyChooseSection() {
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               {" "}百万代理{" "}
             </span>
-            选择我们
+            选择流量派流量卡平台
           </h2>
           <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">

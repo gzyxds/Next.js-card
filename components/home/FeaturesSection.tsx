@@ -60,9 +60,9 @@ export default function FeaturesSection() {
             核心优势
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            为什么选择
+            为什么推荐
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              {" "}流量派号卡
+              {" "}流量派大流量卡
             </span>
           </h2>
           <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />

@@ -243,7 +243,7 @@ export default function FAQSection() {
             常见问题
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            您可能想了解的
+            流量卡办理常见问题
           </h2>
           <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">

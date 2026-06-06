@@ -8,9 +8,20 @@
 import DownloadContent from "./DownloadContent";
 
 export const metadata = {
-    title: "下载172号卡APP",
+    title: "下载172号卡APP | 手机大流量卡在线办理 — 流量派",
     description:
-        "下载172号卡APP，体验运营商直签号卡办理、订单管理、高激活率快速提现等核心功能。支持 iOS 与 Android 双平台。",
+        "下载172号卡APP，体验运营商直签大流量卡办理、订单管理、高激活率快速提现等核心功能。支持 iOS 与 Android 双平台。",
+    keywords: [
+        "172号卡",
+        "下载APP",
+        "流量卡",
+        "大流量卡",
+        "号卡办理",
+        "流量卡办理",
+    ],
+    alternates: {
+        canonical: "/download",
+    },
 };
 
 /** 172号卡 APP 下载页面入口 */

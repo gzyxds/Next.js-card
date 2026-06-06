@@ -7,9 +7,20 @@
 import CooperateContent from "./CooperateContent";
 
 export const metadata = {
-  title: "合作伙伴",
+  title: "合作伙伴 | 流量卡代理加盟平台 — 流量派",
   description:
-    "流量派合作伙伴生态 — 与四大运营商、京东物流、顺丰速运等一线品牌深度合作，共建流量卡行业领先平台。",
+    "流量派合作伙伴生态 — 与四大运营商、京东物流、顺丰速运等一线品牌深度合作，共建大流量卡行业领先平台。",
+  keywords: [
+    "流量派",
+    "流量卡",
+    "大流量卡",
+    "流量卡代理",
+    "合作伙伴",
+    "运营商授权",
+  ],
+  alternates: {
+    canonical: "/cooperate",
+  },
 };
 
 export default function CooperatePage() {

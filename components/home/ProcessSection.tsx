@@ -58,9 +58,9 @@ export default function ProcessSection() {
             办理流程
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            四步轻松
+            四步轻松办理
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              {" "}领卡
+              {" "}大流量卡
             </span>
           </h2>
           <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />

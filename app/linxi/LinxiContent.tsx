@@ -575,7 +575,7 @@ export default function LinxiContent({ products, error }: LinxiContentProps) {
             <Signal className="size-8 text-blue-200" />
             <div>
               <h1 className="text-2xl font-bold text-white sm:text-3xl">
-                林夕通信套餐大全
+                林夕通信大流量卡套餐大全
               </h1>
               <p className="mt-1 text-sm text-blue-100">
                 正规渠道直供 · 秒返/次月返佣金 · 全国包邮 · 共 {products.length} 款在售套餐

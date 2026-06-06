@@ -248,6 +248,11 @@ export default function HeroSection() {
       role="banner"
       aria-label="首页主区域"
     >
+      {/* ===== SEO 核心 H1 标题（包含高搜索指数关键词） ===== */}
+      <h1 className="sr-only">
+        流量派 - 手机大流量卡在线办理，电信/联通/移动/广电19元29元低月租大流量卡推荐
+      </h1>
+
       {/* ===== 背景装饰层 ===== */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-32 h-[700px] w-[700px] rounded-full bg-blue-50/60 blur-3xl" />
@@ -361,7 +366,7 @@ export default function HeroSection() {
                 >
                   <Image
                     src={slide.image}
-                    alt={slide.title}
+                    alt={`手机大流量卡推荐 - ${slide.title}`}
                     fill
                     className="object-cover"
                     loading={index === 0 ? "eager" : "lazy"}

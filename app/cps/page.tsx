@@ -8,11 +8,24 @@ import { fetchAllActivities, type JutuikeActivity } from "@/lib/api/jutuike";
 import CpsContent from "./CpsContent";
 
 export const metadata = {
-    title: "生活优惠 | 外卖红包/打车券/电影票/电商返利 - 聚推客联盟",
+    title: "生活优惠 | 外卖红包/打车券/电影票/电商返利 — 流量派CPS联盟",
     description:
         "聚合美团外卖红包、饿了么优惠券、打车出行折扣、连锁餐饮折扣、电影票优惠、生活服务福利、电商返利等一站式生活优惠，省钱又省心",
-    keywords:
-        "生活优惠,外卖红包,美团红包,饿了么优惠券,打车券,电影票优惠,电商返利,本地生活,连锁餐饮折扣",
+    keywords: [
+        "生活优惠",
+        "外卖红包",
+        "美团红包",
+        "饿了么优惠券",
+        "打车券",
+        "电影票优惠",
+        "电商返利",
+        "本地生活",
+        "连锁餐饮折扣",
+        "流量卡",
+    ],
+    alternates: {
+        canonical: "/cps",
+    },
 };
 
 export default async function CpsPage() {

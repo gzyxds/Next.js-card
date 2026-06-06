@@ -20,12 +20,37 @@ export async function generateMetadata({
   const product = products.find((p) => p.id === id);
 
   if (!product) {
-    return { title: "商品未找到 - 林夕通信" };
+    return { title: "商品未找到 - 林夕通信大流量卡" };
   }
 
   return {
-    title: `${product.shop_name} - 林夕通信`,
-    description: `${product.shop_name}，${product.shop_des}，正规渠道全国包邮到家`,
+    title: `${product.shop_name} - 林夕通信 | 流量卡推荐`,
+    description: `${product.shop_name}，${product.shop_des}，正规大流量卡全国包邮到家`,
+    keywords: [
+      product.shop_name,
+      "流量卡",
+      "大流量卡",
+      "手机流量卡",
+      "流量卡推荐",
+      "流量卡办理",
+      "林夕通信",
+    ],
+    alternates: {
+      canonical: `/linxi/${id}`,
+    },
+    other: {
+      "application/ld+json": JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.shop_name,
+        description: `${product.shop_name}，${product.shop_des}，正规大流量卡全国包邮到家`,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "CNY",
+          availability: "https://schema.org/InStock",
+        },
+      }),
+    },
   };
 }
 

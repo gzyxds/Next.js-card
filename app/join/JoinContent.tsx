@@ -68,9 +68,9 @@ function HeroSection() {
 
           {/* 主标题 */}
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
-            流量派
+            流量卡代理
             <span className="relative mx-2 inline-block text-blue-600">
-              代理加盟
+              加盟流量派
               <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-blue-200" />
             </span>
           </h1>

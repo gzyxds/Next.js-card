@@ -40,7 +40,7 @@ export default async function PlansSection() {
             套餐选择
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            多种套餐，灵活选择
+            大流量卡套餐，灵活选择
           </h2>
           <p className="mt-3 text-muted-foreground">
             从日常轻度使用到重度流量消耗，总有一款适合您

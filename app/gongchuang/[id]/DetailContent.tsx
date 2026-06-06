@@ -13,8 +13,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { GongchuangProductWithMeta } from "@/lib/api/gongchuang";
-import { GONGCHUANG_OPERATOR_LABEL, GONGCHUANG_OPERATOR_STYLE } from "@/lib/api/gongchuang";
+import { GONGCHUANG_OPERATOR_LABEL } from "@/lib/api/gongchuang";
 import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
@@ -204,11 +205,10 @@ function ContentStyles() {
 function ProductDetail({ product }: { product: GongchuangProductWithMeta }) {
     const operator = product._operator;
     const ui = OPERATOR_BADGE[operator] || OPERATOR_BADGE.unknown;
-    const opStyle = GONGCHUANG_OPERATOR_STYLE[operator] || GONGCHUANG_OPERATOR_STYLE.unknown;
     const operatorLabel = GONGCHUANG_OPERATOR_LABEL[operator];
 
-    /** 店铺链接 */
-    const shopUrl = "https://haoka.kakatx.com/web/#/?token=MjQ3NDk3fDE3ODA3NTEyNDI3MTRoYW9rYTY2Ng";
+    /** 商品办理链接 */
+    const shopUrl = `https://haoka.kakatx.com/web/#/pages/detail/index1?token=MjQ3NDk3fDE3ODA3NTEyNDI3MTRoYW9rYTY2Ng&goods_id=${product.goods_id}`;
 
     return (
         <div className={containerClass("py-6 lg:py-10")} style={SITE_WIDTH_STYLE}>
@@ -216,12 +216,14 @@ function ProductDetail({ product }: { product: GongchuangProductWithMeta }) {
             <div className="grid gap-6 lg:grid-cols-2">
                 {/* 商品图片 */}
                 <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
-                    <div className="aspect-square overflow-hidden">
+                    <div className="relative aspect-square overflow-hidden">
                         {product.imageUrl ? (
-                            <img
+                            <Image
                                 src={product.imageUrl}
                                 alt={product.goods_name}
-                                className="h-full w-full object-cover"
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 1024px) 100vw, 50vw"
                             />
                         ) : (
                             <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -382,11 +384,15 @@ function ProductDetail({ product }: { product: GongchuangProductWithMeta }) {
                     </div>
                     {/* 套餐详情图 */}
                     {product.tcxq && (
-                        <img
-                            src={product.tcxq}
-                            alt="套餐详情图"
-                            className="mb-4 w-full rounded-lg"
-                        />
+                        <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg">
+                            <Image
+                                src={product.tcxq}
+                                alt="套餐详情图"
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 768px) 100vw, 768px"
+                            />
+                        </div>
                     )}
                     <div
                         className="gongchuang-content text-sm leading-relaxed text-gray-600"
@@ -421,11 +427,15 @@ function ProductDetail({ product }: { product: GongchuangProductWithMeta }) {
                         <div className="h-5 w-1 rounded-full bg-blue-600" />
                         <h2 className="text-base font-bold text-gray-800">实名步骤</h2>
                     </div>
-                    <img
-                        src={product.smbz}
-                        alt="实名步骤图"
-                        className="w-full rounded-lg"
-                    />
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                        <Image
+                            src={product.smbz}
+                            alt="实名步骤图"
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 100vw, 768px"
+                        />
+                    </div>
                 </section>
             )}
 

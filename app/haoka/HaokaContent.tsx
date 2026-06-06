@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback, useReducer } from "react";
 import Link from "next/link";
 import type { HaokaProductWithMeta, Operator, DurationType } from "@/lib/api/haokavip";
 import { OPERATOR_LABEL } from "@/lib/api/haokavip";
@@ -190,6 +190,18 @@ function FilterBar({
 /** 每页加载数量 */
 const PAGE_SIZE = 12;
 
+/** visibleCount reducer：dispatch 稳定引用，无卸载后 setState 问题 */
+type VisibleAction = { type: "reset" } | { type: "loadMore"; maxCount: number };
+function visibleReducer(state: number, action: VisibleAction): number {
+  switch (action.type) {
+    case "reset":
+      return PAGE_SIZE;
+    case "loadMore":
+      return Math.min(state + PAGE_SIZE, action.maxCount);
+  }
+}
+
+/** 浩卡商品卡片网格 */
 function ProductGrid({
   products,
   activeOperator,
@@ -215,12 +227,12 @@ function ProductGrid({
 
   // 筛选条件变化时重置为初始页数
   const filterKey = `${activeOperator}-${activeLocation}-${activeDuration}`;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [visibleCount, dispatchVisible] = useReducer(visibleReducer, PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // 筛选条件变化时重置分页
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    dispatchVisible({ type: "reset" });
   }, [filterKey]);
 
   // 当前展示的商品
@@ -230,7 +242,7 @@ function ProductGrid({
   /* ===== IntersectionObserver 自动加载 ===== */
 
   const loadMore = useCallback(() => {
-    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
+    dispatchVisible({ type: "loadMore", maxCount: filtered.length });
   }, [filtered.length]);
 
   useEffect(() => {
@@ -241,7 +253,7 @@ function ProductGrid({
     const observer = new IntersectionObserver(
       (entries) => {
         // 当哨兵元素进入可视区域时加载更多
-        if (entries[0].isIntersecting) {
+        if (entries[0]?.isIntersecting) {
           loadMore();
         }
       },

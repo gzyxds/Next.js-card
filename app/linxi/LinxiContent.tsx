@@ -6,8 +6,9 @@
  */
 "use client";
 
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback, useReducer } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { LinxiProductWithMeta, LinxiOperator } from "@/lib/api/linxi";
 import { LINXI_OPERATOR_LABEL } from "@/lib/api/linxi";
 import Header from "@/components/home/Header";
@@ -257,12 +258,13 @@ function LinxiProductCard({ product }: { product: LinxiProductWithMeta }) {
       <Link href={`/linxi/${product.id}`} className="block">
         <div className="relative overflow-hidden bg-gray-100 p-2">
           {product.shop_img ? (
-            <div className="aspect-[4/3] overflow-hidden rounded-lg">
-              <img
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <Image
                 src={product.shop_img}
                 alt={product.shop_name}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 768px) 50vw, 25vw"
               />
             </div>
           ) : (
@@ -385,6 +387,17 @@ function LinxiProductCard({ product }: { product: LinxiProductWithMeta }) {
 /** 每页加载数量 */
 const PAGE_SIZE = 12;
 
+/** visibleCount reducer：dispatch 稳定引用，无卸载后 setState 问题 */
+type VisibleAction = { type: "reset" } | { type: "loadMore"; maxCount: number };
+function visibleReducer(state: number, action: VisibleAction): number {
+  switch (action.type) {
+    case "reset":
+      return PAGE_SIZE;
+    case "loadMore":
+      return Math.min(state + PAGE_SIZE, action.maxCount);
+  }
+}
+
 /** 商品网格组件（带无限滚动分页） */
 function ProductGrid({
   products,
@@ -406,12 +419,12 @@ function ProductGrid({
 
   /* ===== 分页状态 ===== */
   const filterKey = `${activeOperator}-${activeDuration}`;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [visibleCount, dispatchVisible] = useReducer(visibleReducer, PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // 筛选条件变化时重置分页
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    dispatchVisible({ type: "reset" });
   }, [filterKey]);
 
   const displayed = filtered.slice(0, visibleCount);
@@ -419,7 +432,7 @@ function ProductGrid({
 
   /* ===== 无限滚动 ===== */
   const loadMore = useCallback(() => {
-    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
+    dispatchVisible({ type: "loadMore", maxCount: filtered.length });
   }, [filtered.length]);
 
   useEffect(() => {
@@ -429,7 +442,7 @@ function ProductGrid({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) loadMore();
+        if (entries[0]?.isIntersecting) loadMore();
       },
       { rootMargin: "200px" },
     );

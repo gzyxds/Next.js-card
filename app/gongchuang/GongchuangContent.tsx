@@ -6,12 +6,12 @@
  */
 "use client";
 
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback, useReducer } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { GongchuangProductWithMeta, GongchuangOperator } from "@/lib/api/gongchuang";
 import {
     GONGCHUANG_OPERATOR_LABEL,
-    GONGCHUANG_OPERATOR_STYLE,
 } from "@/lib/api/gongchuang";
 import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
@@ -182,7 +182,6 @@ function SpecTag({
 
 /** 共创通信商品卡片 */
 function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
-    const opStyle = GONGCHUANG_OPERATOR_STYLE[product._operator] || GONGCHUANG_OPERATOR_STYLE.unknown;
     const operatorLabel = GONGCHUANG_OPERATOR_LABEL[product._operator];
     /** 佣金标签颜色 */
     const comBadgeClass = product.comType === 2
@@ -195,12 +194,13 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
             <Link href={`/gongchuang/${product.goods_id}`} className="block">
                 <div className="relative overflow-hidden bg-gray-100 p-2">
                     {product.imageUrl ? (
-                        <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                            <img
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                            <Image
                                 src={product.imageUrl}
                                 alt={product.goods_name}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                loading="lazy"
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                sizes="(max-width: 768px) 50vw, 25vw"
                             />
                         </div>
                     ) : (
@@ -294,7 +294,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
                             查看详情
                         </Link>
                         <a
-                            href={`https://haoka.kakatx.com/web/#/?token=MjQ3NDk3fDE3ODA3NTEyNDI3MTRoYW9rYTY2Ng`}
+                            href={`https://haoka.kakatx.com/web/#/pages/detail/index1?token=MjQ3NDk3fDE3ODA3NTEyNDI3MTRoYW9rYTY2Ng&goods_id=${product.goods_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-2 text-sm font-normal text-white shadow-sm transition-all duration-200 hover:bg-blue-600/90 hover:shadow-md"
@@ -314,6 +314,17 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
 /** 每页加载数量 */
 const PAGE_SIZE = 12;
 
+/** visibleCount reducer：dispatch 稳定引用，无卸载后 setState 问题 */
+type VisibleAction = { type: "reset" } | { type: "loadMore"; maxCount: number };
+function visibleReducer(state: number, action: VisibleAction): number {
+    switch (action.type) {
+        case "reset":
+            return PAGE_SIZE;
+        case "loadMore":
+            return Math.min(state + PAGE_SIZE, action.maxCount);
+    }
+}
+
 /** 商品网格组件（带无限滚动分页） */
 function ProductGrid({
     products,
@@ -332,12 +343,12 @@ function ProductGrid({
 
     /* ===== 分页状态 ===== */
     const filterKey = activeOperator;
-    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    const [visibleCount, dispatchVisible] = useReducer(visibleReducer, PAGE_SIZE);
     const sentinelRef = useRef<HTMLDivElement>(null);
 
     // 筛选条件变化时重置分页
     useEffect(() => {
-        setVisibleCount(PAGE_SIZE);
+        dispatchVisible({ type: "reset" });
     }, [filterKey]);
 
     const displayed = filtered.slice(0, visibleCount);
@@ -345,7 +356,7 @@ function ProductGrid({
 
     /* ===== 无限滚动 ===== */
     const loadMore = useCallback(() => {
-        setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
+        dispatchVisible({ type: "loadMore", maxCount: filtered.length });
     }, [filtered.length]);
 
     useEffect(() => {
@@ -355,7 +366,7 @@ function ProductGrid({
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting) loadMore();
+                if (entries[0]?.isIntersecting) loadMore();
             },
             { rootMargin: "200px" },
         );

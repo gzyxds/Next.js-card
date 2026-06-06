@@ -8,6 +8,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { HaokaProduct, Operator } from "@/lib/api/haokavip";
 import { mapOperator, OPERATOR_LABEL, parseLocation, parseDuration, parseTags } from "@/lib/api/haokavip";
 import Header from "@/components/home/Header";
@@ -125,8 +126,8 @@ function ProductDetail({ product }: { product: HaokaProduct }) {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* 商品图片 */}
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
-          <div className="aspect-square overflow-hidden">
-            <img src={product.product_image} alt={product.product_name} className="h-full w-full object-cover" />
+          <div className="relative aspect-square overflow-hidden">
+            <Image src={product.product_image} alt={product.product_name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
           </div>
         </div>
 

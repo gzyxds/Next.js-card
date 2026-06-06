@@ -8,6 +8,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
 import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
@@ -384,8 +385,8 @@ function TeamSection() {
 const CONTACTS = [
   {
     icon: Phone,
-    label: "客服电话",
-    value: "400-xxx-xxxx",
+    label: "微信客服",
+    value: "userhlc",
     desc: "工作日 9:00 - 18:00",
     iconColor: "text-blue-600",
     iconBg: "bg-blue-50",
@@ -393,7 +394,7 @@ const CONTACTS = [
   {
     icon: Mail,
     label: "电子邮箱",
-    value: "contact@liuliangpai.com",
+    value: "236749035@qq.com",
     desc: "商务合作请邮件联系",
     iconColor: "text-emerald-600",
     iconBg: "bg-emerald-50",
@@ -447,9 +448,15 @@ function ContactSection() {
         {/* 关注我们 */}
         <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:items-start sm:gap-8">
-            {/* 二维码占位 */}
-            <div className="flex size-28 shrink-0 items-center justify-center rounded-xl border border-gray-100 bg-slate-50">
-              <span className="text-xs text-gray-400">公众号二维码</span>
+            {/* 微信公众号二维码 */}
+            <div className="shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+              <Image
+                src="/wx.png"
+                alt="流量派官方公众号二维码"
+                width={128}
+                height={128}
+                className="size-32 object-contain"
+              />
             </div>
             <div className="text-center sm:text-left">
               <h3 className="text-base font-semibold text-gray-900">关注流量派官方公众号</h3>

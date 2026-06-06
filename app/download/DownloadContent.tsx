@@ -687,7 +687,7 @@ export default function DownloadContent() {
                                         号卡联盟<span className="text-blue-600">APP</span>
                                     </h1>
                                     <p className="max-w-lg text-base leading-relaxed text-slate-500 sm:text-lg">
-                                        亚平科技官方打造的号卡推广平台与流量卡代理平台，
+                                        官方打造的号卡推广平台与流量卡代理平台，
                                         聚合移动流量卡、联通号卡、电信号卡、广电手机卡等全运营商资源，
                                         覆盖流量卡销售、手机卡代理、电话卡分销全品类。
                                     </p>

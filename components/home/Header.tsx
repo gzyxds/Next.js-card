@@ -75,6 +75,7 @@ const NAV_ITEMS: NavItem[] = [
       },
     ],
   },
+  { label: "生活优惠", href: "/cps" },
   {
     label: "套餐指南",
     dropdownTitle: "办理与服务指南",

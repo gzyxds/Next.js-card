@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
 import {
-  Signal,
   Menu,
   X,
   ChevronDown,
@@ -19,6 +19,7 @@ import {
   BadgeCheck,
   UserPlus,
   LogIn,
+  Compass,
 } from "lucide-react";
 
 /* ========== 导航数据结构 ========== */
@@ -103,6 +104,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   { label: "代理加盟", href: "/join" },
   { label: "合作伙伴", href: "/cooperate" },
+  { label: "自助服务", href: "/services" },
   { label: "关于我们", href: "/about" },
 ];
 
@@ -278,9 +280,13 @@ export default function Header() {
       >
         {/* Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-md shadow-blue-600/25">
-            <Signal className="size-5" />
-          </div>
+          <Image
+            src="/logo.svg"
+            alt="流量派 Logo"
+            width={36}
+            height={36}
+            className="size-9"
+          />
           <div className="flex flex-col">
             <span className="text-lg font-extrabold leading-none tracking-tight text-slate-800">
               流量派

@@ -8,11 +8,11 @@
 import ServicesContent from "./ServicesContent";
 
 export const metadata = {
-  title: "自助服务",
-  description:
-    "流量派自助服务导航 — 聚合172号卡、浩卡联盟、林夕通信等多平台常用入口，包含号卡商城、订单查询、代理申请、运营商服务等一站式导航。",
+    title: "自助服务",
+    description:
+        "流量派自助服务导航 — 聚合172号卡、浩卡联盟、林夕通信等多平台常用入口，包含号卡商城、订单查询、代理申请、运营商服务等一站式导航。",
 };
 
 export default function ServicesPage() {
-  return <ServicesContent />;
+    return <ServicesContent />;
 }

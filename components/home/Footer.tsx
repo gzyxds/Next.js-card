@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
-import { Signal } from "lucide-react";
 
 /** 页面底部组件 */
 export default function Footer() {
@@ -10,9 +10,13 @@ export default function Footer() {
         {/* ===== 品牌区域 ===== */}
         <div className="mb-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
-              <Signal className="size-4" />
-            </div>
+            <Image
+              src="/logo.svg"
+              alt="流量派 Logo"
+              width={32}
+              height={32}
+              className="size-8"
+            />
             <span className="text-lg font-bold tracking-tight">
               流量派
             </span>

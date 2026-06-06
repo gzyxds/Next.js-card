@@ -207,6 +207,16 @@
   animation: scroll-smooth 20s linear infinite;
 }
 
+/* 隐藏滚动条但保留滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* 移动端稍慢动画 */
 @media (max-width: 768px) {
   .animate-scroll-smooth {

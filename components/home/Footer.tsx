@@ -157,13 +157,27 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground">
-          <p>
-            流量派平台仅为信息展示与办理入口，号卡及服务由各大运营商提供。
-          </p>
-          <p className="mt-1">
-            &copy; {new Date().getFullYear()} 流量派 版权所有
-          </p>
+        <div className="mt-12 border-t pt-6 text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+            {/* 左侧：版权与声明 */}
+            <div className="text-center sm:text-left">
+              <p>
+                流量派平台仅为信息展示与办理入口，号卡及服务由各大运营商提供。
+              </p>
+              <p className="mt-1">
+                &copy; {new Date().getFullYear()} 流量派 版权所有
+              </p>
+            </div>
+            {/* 右侧：备案号 */}
+            <a
+              href="https://beian.miit.gov.cn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-center transition-colors hover:text-foreground sm:text-right"
+            >
+              赣ICP备2023002309号
+            </a>
+          </div>
         </div>
       </div>
     </footer>

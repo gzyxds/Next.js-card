@@ -5,9 +5,11 @@
  * 数据来源：项目根目录 .md 参考文件中的服务链接。
  * 响应式设计，兼容移动端与桌面端。
  *
- * 设计风格与 JoinContent / AboutContent / CooperateContent 保持一致：
- * 根容器 bg-[#f5f7fa]，Hero 白底 + grid 纹理装饰，
- * 各区块交替 bg-white / bg-slate-50，卡片统一 rounded-2xl。
+ * UI 重设计要点：
+ * - 平台卡片化：每个平台是一张独立大卡，顶部品牌渐变 header 强化识别度
+ * - 服务分级展示：主推服务（商城/代理）用大尺寸 primary 卡，辅助服务（查询/反馈）用小尺寸 secondary 卡
+ * - Hero 区加入平台快捷锚点导航，用户一眼找到目标平台
+ * - 所有平台集中于同一页面区域，无交替背景，靠卡片阴影和间距形成层次
  */
 "use client";
 
@@ -29,10 +31,18 @@ import {
   ArrowRight,
   ExternalLink,
   Sparkles,
-  Layers,
+  Zap,
+  ChevronRight,
+  CreditCard,
+  Award,
+  Cloud,
+  Antenna,
 } from "lucide-react";
 
 /* ========== 类型定义 ========== */
+
+/** 服务入口显示级别 */
+type ServiceLevel = "primary" | "secondary";
 
 /** 单个服务入口 */
 interface ServiceItem {
@@ -46,20 +56,30 @@ interface ServiceItem {
   icon: React.ElementType;
   /** 图标容器颜色类（文字色 + 背景色） */
   iconColor?: string;
+  /**
+   * 展示级别
+   * primary  = 主推服务（大卡，占更多视觉权重）
+   * secondary = 辅助服务（紧凑小卡）
+   */
+  level?: ServiceLevel;
 }
 
 /** 服务平台分组 */
 interface ServicePlatform {
+  /** 平台 ID（用于锚点跳转） */
+  id: string;
   /** 平台名称 */
   name: string;
   /** 平台简介 */
   description: string;
-  /** 品牌强调色（Tailwind 文字色类） */
-  accentColor: string;
-  /** 品牌强调背景色 */
-  accentBg: string;
-  /** 品牌强调边框色 */
-  accentBorder: string;
+  /** 平台图标（用于 Hero 快捷导航及 Header 标识） */
+  icon: React.ElementType;
+  /** 顶部 header 背景色（简洁浅色） */
+  headerBg: string;
+  /** 品牌文字强调色 */
+  accentText: string;
+  /** 装饰圆颜色 */
+  decorColor: string;
   /** 该平台下的服务入口列表 */
   services: ServiceItem[];
 }
@@ -69,11 +89,13 @@ interface ServicePlatform {
 /** 所有自助服务平台数据 */
 const PLATFORMS: ServicePlatform[] = [
   {
+    id: "lotml",
     name: "172号卡",
-    description: "172号卡联盟自助服务，涵盖号卡选购、代理注册、订单追踪等核心功能。",
-    accentColor: "text-blue-600",
-    accentBg: "bg-blue-50",
-    accentBorder: "border-blue-200",
+    description: "172号卡联盟，涵盖号卡选购、代理注册、订单追踪等核心功能",
+    icon: CreditCard,
+    headerBg: "bg-blue-50",
+    accentText: "text-blue-600",
+    decorColor: "bg-blue-100",
     services: [
       {
         label: "号卡商城",
@@ -81,6 +103,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "浏览全量号卡套餐，在线选号下单",
         icon: Store,
         iconColor: "text-blue-600 bg-blue-50",
+        level: "primary",
       },
       {
         label: "代理申请",
@@ -88,13 +111,15 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "免费注册成为代理商，开启推广分佣",
         icon: UserPlus,
         iconColor: "text-emerald-600 bg-emerald-50",
+        level: "primary",
       },
       {
         label: "登录后台",
         href: "https://haoka.lot-ml.com/login.html",
-        desc: "代理商管理后台，查看订单与佣金",
+        desc: "代理商后台，查看订单与佣金",
         icon: LogIn,
         iconColor: "text-violet-600 bg-violet-50",
+        level: "secondary",
       },
       {
         label: "订单查询",
@@ -102,15 +127,18 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "输入手机号查询号卡办理进度",
         icon: Search,
         iconColor: "text-amber-600 bg-amber-50",
+        level: "secondary",
       },
     ],
   },
   {
+    id: "haoka",
     name: "浩卡联盟",
-    description: "浩卡联盟精选品质号卡，提供商城、代理、反馈等一站式服务。",
-    accentColor: "text-rose-600",
-    accentBg: "bg-rose-50",
-    accentBorder: "border-rose-200",
+    description: "浩卡联盟精选品质号卡，商城、代理、反馈等一站式服务",
+    icon: Award,
+    headerBg: "bg-rose-50",
+    accentText: "text-rose-600",
+    decorColor: "bg-rose-100",
     services: [
       {
         label: "号卡商城",
@@ -118,6 +146,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "浩卡精选套餐，品质保障在线办理",
         icon: Store,
         iconColor: "text-rose-600 bg-rose-50",
+        level: "primary",
       },
       {
         label: "代理申请",
@@ -125,6 +154,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "加入浩卡联盟代理，享高额佣金",
         icon: UserPlus,
         iconColor: "text-emerald-600 bg-emerald-50",
+        level: "primary",
       },
       {
         label: "订单查询",
@@ -132,6 +162,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "查询浩卡订单状态与物流信息",
         icon: Search,
         iconColor: "text-amber-600 bg-amber-50",
+        level: "secondary",
       },
       {
         label: "意见反馈",
@@ -139,52 +170,69 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "提交使用反馈，帮助我们优化服务",
         icon: MessageSquare,
         iconColor: "text-sky-600 bg-sky-50",
+        level: "secondary",
       },
     ],
   },
   {
+    id: "linxi",
     name: "林夕通信",
-    description: "林夕通信号卡服务，提供订单查询及三大运营商自助入口。",
-    accentColor: "text-green-600",
-    accentBg: "bg-green-50",
-    accentBorder: "border-green-200",
+    description: "林夕通信号卡服务，提供订单查询及三大运营商自助入口",
+    icon: Antenna,
+    headerBg: "bg-green-50",
+    accentText: "text-green-600",
+    decorColor: "bg-green-100",
     services: [
+      {
+        label: "号卡店铺",
+        href: "https://h5.vip12300.cn/index?k=SGpiazRLQVZSREk9",
+        desc: "林夕号卡商城，在线选号下单",
+        icon: Store,
+        iconColor: "text-green-600 bg-green-50",
+        level: "primary",
+      },
       {
         label: "订单查询",
         href: "https://h5.vip12300.cn/cha?k=SGpiazRLQVZSREk9",
         desc: "林夕号卡专属订单查询通道",
         icon: Search,
         iconColor: "text-green-600 bg-green-50",
+        level: "primary",
       },
       {
-        label: "中国电信查询",
+        label: "中国电信",
         href: "https://pms.189.cn/cljy-ui/xshkzzfw/xshkzzfw_index?shopid=szs-ah&cmpid=szs-ah",
         desc: "中国电信官方号卡订单自助查询",
         icon: Radio,
         iconColor: "text-blue-600 bg-blue-50",
+        level: "secondary",
       },
       {
-        label: "中国移动查询",
+        label: "中国移动",
         href: "https://dev.coc.10086.cn/coc/web/coc2020/cardqueryorder/",
         desc: "中国移动官方号卡订单自助查询",
         icon: Smartphone,
         iconColor: "text-green-600 bg-green-50",
+        level: "secondary",
       },
       {
-        label: "中国联通查询",
+        label: "中国联通",
         href: "https://m.10010.com/myorder/",
         desc: "中国联通官方订单查询入口",
         icon: Wifi,
         iconColor: "text-orange-600 bg-orange-50",
+        level: "secondary",
       },
     ],
   },
   {
+    id: "yky",
     name: "翼卡云",
-    description: "翼卡云流量卡平台，提供在线商城、靓号选购、代理加盟及订单查询等服务。",
-    accentColor: "text-cyan-600",
-    accentBg: "bg-cyan-50",
-    accentBorder: "border-cyan-200",
+    description: "翼卡云流量卡平台，在线商城、靓号选购、代理加盟及订单查询",
+    icon: Cloud,
+    headerBg: "bg-cyan-50",
+    accentText: "text-cyan-600",
+    decorColor: "bg-cyan-100",
     services: [
       {
         label: "在线商城",
@@ -192,13 +240,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "浏览全量流量卡套餐，在线选号下单",
         icon: Store,
         iconColor: "text-cyan-600 bg-cyan-50",
-      },
-      {
-        label: "靓号商城",
-        href: "https://iot.87haoka.cn/shop/#/?indexFirstGroup=1&promoCode=TpImx3gi",
-        desc: "全国手机靓号资源，平台直供",
-        icon: Sparkles,
-        iconColor: "text-amber-600 bg-amber-50",
+        level: "primary",
       },
       {
         label: "代理申请",
@@ -206,6 +248,15 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "申请成为翼卡云代理商，开启推广分佣",
         icon: UserPlus,
         iconColor: "text-emerald-600 bg-emerald-50",
+        level: "primary",
+      },
+      {
+        label: "靓号商城",
+        href: "https://iot.87haoka.cn/shop/#/?indexFirstGroup=1&promoCode=TpImx3gi",
+        desc: "全国手机靓号资源，平台直供",
+        icon: Sparkles,
+        iconColor: "text-amber-600 bg-amber-50",
+        level: "secondary",
       },
       {
         label: "订单查询",
@@ -213,6 +264,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "查询翼卡云订单状态与物流信息",
         icon: Search,
         iconColor: "text-sky-600 bg-sky-50",
+        level: "secondary",
       },
     ],
   },
@@ -225,23 +277,25 @@ const PUBLIC_SERVICES: ServiceItem[] = [
     href: "https://getsimnum.caict.ac.cn",
     desc: "工信部官方服务，查询名下所有手机号卡数量",
     icon: ShieldCheck,
-    iconColor: "text-slate-600 bg-slate-100",
+    iconColor: "text-slate-700 bg-slate-100",
   },
 ];
 
 /* ========== Hero 区 ========== */
 
-/** Hero 宣传区（风格与 JoinContent / AboutContent 一致） */
+/**
+ * Hero 宣传区
+ *
+ * 新增平台快捷锚点导航栏（pill 胶囊式），
+ * 用户可直接点击跳转到对应平台区块，减少滚动寻找的成本。
+ */
 function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-white">
       {/* ===== 背景装饰 ===== */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {/* 右上角大圆（无模糊，与 JoinContent 一致） */}
         <div className="absolute -top-32 -right-32 h-[480px] w-[480px] rounded-full bg-blue-50 blur-3xl" />
-        {/* 左下角小圆 */}
         <div className="absolute -bottom-24 -left-24 h-[360px] w-[360px] rounded-full bg-slate-100 blur-3xl" />
-        {/* 极淡 grid 网格纹理（与 JoinContent / AboutContent 一致） */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -250,20 +304,19 @@ function HeroSection() {
             backgroundSize: "48px 48px",
           }}
         />
-        {/* 右下角同心圆环 */}
         <div className="absolute right-12 bottom-12 size-56 rounded-full border border-blue-100 opacity-60" />
         <div className="absolute right-24 bottom-24 size-32 rounded-full border border-blue-100 opacity-60" />
       </div>
 
       <div className={containerClass("relative py-20 md:py-28")} style={SITE_WIDTH_STYLE}>
-        <div className="mx-auto max-w-2xl text-center">
-          {/* 标签（与项目其他 Hero 保持一致） */}
+        <div className="mx-auto max-w-3xl text-center">
+          {/* 顶部标签 */}
           <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-600">
             <Compass className="size-3.5 text-blue-500" />
             一站直达 · 快捷服务
           </div>
 
-          {/* 主标题（字号与 JoinContent / AboutContent 对齐） */}
+          {/* 主标题 */}
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
             自助服务
             <span className="relative mx-2 inline-block text-blue-600">
@@ -277,25 +330,31 @@ function HeroSection() {
             聚合多平台号卡自助服务入口，号卡办理、订单查询、代理注册一站直达。
           </p>
 
-          {/* CTA 按钮组 */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          {/* ===== 平台快捷锚点导航（核心新增） ===== */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
+            {PLATFORMS.map((platform) => (
+              <a
+                key={platform.id}
+                href={`#${platform.id}`}
+                className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:text-blue-700 hover:shadow-md"
+              >
+                <platform.icon className="size-4" />
+                <span>{platform.name}</span>
+                <ChevronRight className="size-3.5 text-gray-300 transition-colors group-hover:text-blue-400" />
+              </a>
+            ))}
             <a
-              href="#platforms"
-              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200"
+              href="#public"
+              className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-400 hover:text-slate-700 hover:shadow-md"
             >
-              查看服务平台
-              <ArrowRight className="size-4" />
-            </a>
-            <a
-              href="/join"
-              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-7 py-3 text-sm font-medium text-gray-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-600 hover:shadow-md"
-            >
-              加入代理
+              <ShieldCheck className="size-3.5 text-slate-400 transition-colors group-hover:text-slate-600" />
+              <span>公共服务</span>
+              <ChevronRight className="size-3.5 text-gray-300 transition-colors group-hover:text-slate-400" />
             </a>
           </div>
 
-          {/* 核心数据（与 JoinContent / AboutContent 风格一致） */}
-          <div className="mt-12 flex items-center justify-center gap-8 sm:gap-14">
+          {/* 核心统计数据 */}
+          <div className="mt-10 flex items-center justify-center gap-8 sm:gap-14">
             <div className="text-center">
               <div className="text-3xl font-extrabold text-gray-900">{PLATFORMS.length} 大</div>
               <div className="mt-1 text-xs text-gray-400">合作平台</div>
@@ -319,117 +378,283 @@ function HeroSection() {
   );
 }
 
-/* ========== 服务卡片组件 ========== */
+/* ========== 服务入口卡片组件 ========== */
 
 /**
- * 单个服务入口卡片
+ * Primary 级别服务卡片（主推服务）
  *
- * 圆角使用微圆角 rounded-lg，保持轻量现代的视觉感受。
- * 所有链接均为外部链接，使用 target="_blank" 新窗口打开。
+ * 竖向布局，图标居上，文字居中，视觉权重更大。
+ * 用于商城、代理申请等核心转化入口。
  */
-function ServiceCard({ item }: { item: ServiceItem }) {
+function PrimaryServiceCard({ item }: { item: ServiceItem }) {
   return (
     <a
       href={item.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-start gap-4 rounded-lg border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+      className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
     >
-      {/* 图标容器（与项目卡片图标风格一致：size-10 + rounded-xl） */}
+      {/* 悬停时右上角光晕装饰 */}
+      <div className="pointer-events-none absolute -right-6 -top-6 size-20 rounded-full bg-blue-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+      {/* 图标容器 */}
       <div
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-xl",
+          "flex size-14 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
           item.iconColor || "text-slate-600 bg-slate-100"
         )}
       >
-        <item.icon className="size-5" />
+        <item.icon className="size-7" />
       </div>
 
       {/* 文字区域 */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold text-gray-800 transition-colors group-hover:text-blue-700">
+      <div className="relative text-center">
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-sm font-bold text-gray-800 transition-colors group-hover:text-blue-700">
             {item.label}
           </span>
           <ExternalLink className="size-3 shrink-0 text-gray-300 opacity-0 transition-all duration-200 group-hover:text-blue-400 group-hover:opacity-100" />
         </div>
-        <span className="mt-0.5 text-xs leading-relaxed text-gray-400">
-          {item.desc}
-        </span>
+        <p className="mt-1 text-xs leading-relaxed text-gray-400">{item.desc}</p>
+      </div>
+
+      {/* 底部"立即前往"提示（悬停显示） */}
+      <div className="flex items-center gap-1 text-xs font-medium text-blue-600 opacity-0 transition-all duration-200 group-hover:opacity-100">
+        立即前往
+        <ArrowRight className="size-3" />
       </div>
     </a>
   );
 }
 
-/* ========== 平台服务区 ========== */
-
 /**
- * 单个平台服务区域
+ * Secondary 级别服务卡片（辅助服务）
  *
- * 不再内部嵌套额外的 section 背景，背景由外层 div 交替控制，
- * 避免双重背景色冲突。标题区样式与 AdvantagesSection 标题保持一致。
+ * 横向紧凑布局，图标偏小，节省空间。
+ * 用于订单查询、登录后台、意见反馈等辅助功能。
  */
-function PlatformSection({ platform }: { platform: ServicePlatform }) {
+function SecondaryServiceCard({ item }: { item: ServiceItem }) {
   return (
-    <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
-      {/* ===== 区块标题（与项目其他 Section 标题风格一致） ===== */}
-      <div className="mb-12 text-center">
-        <div
-          className={cn(
-            "mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold",
-            platform.accentBg,
-            platform.accentBorder,
-            platform.accentColor
-          )}
-        >
-          <Layers className="size-3.5" />
-          {platform.name}
-        </div>
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          {platform.name} 服务入口
-        </h2>
-        <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
-        <p className="mx-auto mt-4 max-w-xl text-sm text-gray-500">
-          {platform.description}
-        </p>
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center gap-3 rounded-md border border-gray-100 bg-white/70 px-4 py-3.5 transition-all duration-200 hover:border-gray-200 hover:bg-white hover:shadow-sm"
+    >
+      {/* 图标 */}
+      <div
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-lg",
+          item.iconColor || "text-slate-600 bg-slate-100"
+        )}
+      >
+        <item.icon className="size-4" />
       </div>
 
-      {/* ===== 服务卡片网格 ===== */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {platform.services.map((item) => (
-          <ServiceCard key={item.href} item={item} />
-        ))}
+      {/* 文字 */}
+      <div className="min-w-0 flex-1">
+        <span className="text-sm font-semibold text-gray-700 transition-colors group-hover:text-blue-700">
+          {item.label}
+        </span>
+        <p className="truncate text-xs text-gray-400">{item.desc}</p>
+      </div>
+
+      {/* 右侧箭头 */}
+      <ExternalLink className="size-3.5 shrink-0 text-gray-300 transition-colors group-hover:text-blue-400" />
+    </a>
+  );
+}
+
+/* ========== 平台大卡片组件 ========== */
+
+/**
+ * 单个平台大卡片
+ *
+ * 结构：
+ * ┌─────────────────────────────────┐
+ * │  品牌渐变色 Header（平台名+描述）  │
+ * ├─────────────────────────────────┤
+ * │  Primary 服务（大卡 2列网格）     │
+ * ├─────────────────────────────────┤
+ * │  Secondary 服务（小卡列表）       │
+ * └─────────────────────────────────┘
+ *
+ * 通过顶部渐变色差异建立平台识别度，
+ * 通过 primary/secondary 分级建立入口层次感。
+ */
+function PlatformCard({ platform }: { platform: ServicePlatform }) {
+  const primaryServices = platform.services.filter((s) => s.level === "primary");
+  const secondaryServices = platform.services.filter((s) => s.level === "secondary");
+
+  return (
+    <div
+      id={platform.id}
+      className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+    >
+      {/* ===== 品牌简洁 Header ===== */}
+      <div className={`relative overflow-hidden ${platform.headerBg} px-5 py-5 border-b border-gray-100`}>
+        {/* 装饰圆 */}
+        <div className={`pointer-events-none absolute -right-6 -top-6 size-24 rounded-full ${platform.decorColor}`} />
+        <div className={`pointer-events-none absolute -left-4 bottom-0 size-16 rounded-full ${platform.decorColor}`} />
+
+        {/* 平台名 + 描述 */}
+        <div className="relative">
+          <div className="flex items-center gap-2.5">
+            <div className={`flex size-8 items-center justify-center rounded-lg bg-white`}>
+              <platform.icon className={`size-4.5 ${platform.accentText}`} />
+            </div>
+            <h2 className={`text-lg font-bold ${platform.accentText}`}>{platform.name}</h2>
+          </div>
+          <p className="mt-1 text-sm leading-relaxed text-gray-600">
+            {platform.description}
+          </p>
+        </div>
+
+        {/* Header 右侧服务数量徽章 */}
+        <div className={`absolute right-4 top-4 rounded-full bg-white px-2.5 py-0.5 text-xs font-medium ${platform.accentText}`}>
+          {platform.services.length} 项服务
+        </div>
+      </div>
+
+      {/* ===== 卡片内容区 ===== */}
+      <div className="p-5">
+        {/* Primary 服务区：主推卡片，2列网格 */}
+        {primaryServices.length > 0 && (
+          <div>
+            <div className="mb-3 flex items-center gap-1.5">
+              <Zap className="size-3.5 text-amber-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">主要服务</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {primaryServices.map((item) => (
+                <PrimaryServiceCard key={item.href} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Secondary 服务区：辅助列表 */}
+        {secondaryServices.length > 0 && (
+          <div className={primaryServices.length > 0 ? "mt-4" : ""}>
+            {primaryServices.length > 0 && (
+              <div className="mb-3 flex items-center gap-1.5">
+                <Search className="size-3.5 text-gray-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">更多工具</span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {secondaryServices.map((item) => (
+                <SecondaryServiceCard key={item.href} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
+/* ========== 平台服务总区域 ========== */
+
+/**
+ * 全部平台展示区
+ *
+ * 采用响应式网格布局（桌面 2 列，移动单列），
+ * 各平台大卡靠自身渐变 header 区分，无需交替背景。
+ */
+function PlatformsSection() {
+  return (
+    <section className="bg-white" id="platforms">
+      <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
+        {/* 区块标题 */}
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            合作平台服务
+          </h2>
+          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <p className="mx-auto mt-4 max-w-lg text-sm text-gray-500">
+            点击卡片直接跳转，所有服务均为官方入口
+          </p>
+        </div>
+
+        {/* 平台大卡网格：桌面 2 列，移动 1 列 */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {PLATFORMS.map((platform) => (
+            <PlatformCard key={platform.id} platform={platform} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ========== 公共服务区 ========== */
 
-/** 公共服务区域（背景 bg-slate-50，与项目交替区块规范一致） */
+/**
+ * 公共（官方权威）服务区域
+ *
+ * 使用"官方背书"视觉风格：深色徽章 + 渐变卡片，
+ * 强调工信部权威性，与平台商业服务形成区别。
+ */
 function PublicSection() {
   return (
-    <section className="bg-slate-50">
-      <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
-        {/* ===== 区块标题 ===== */}
-        <div className="mb-12 text-center">
-          <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-slate-600">
-            <ShieldCheck className="size-4" />
-            官方服务
+    <section className="bg-white" id="public">
+      <div className={containerClass("py-14 md:py-20")} style={SITE_WIDTH_STYLE}>
+        {/* 区块标题 */}
+        <div className="mb-10 text-center">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-600">
+            <ShieldCheck className="size-3.5" />
+            工信部官方
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             公共服务
           </h2>
-          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-slate-400 to-slate-600" />
           <p className="mx-auto mt-4 max-w-xl text-sm text-gray-500">
-            工信部及运营商官方提供的通用自助服务
+            工信部及运营商官方提供的通用自助服务，权威可信
           </p>
         </div>
 
-        {/* ===== 服务卡片网格 ===== */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* 公共服务卡片：宽卡横向布局，强调权威性 */}
+        <div className="mx-auto max-w-2xl space-y-4">
           {PUBLIC_SERVICES.map((item) => (
-            <ServiceCard key={item.href} item={item} />
+            <a
+              key={item.href}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-5 overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+            >
+              {/* 图标 */}
+              <div
+                className={cn(
+                  "flex size-14 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110",
+                  item.iconColor || "text-slate-600 bg-slate-100"
+                )}
+              >
+                <item.icon className="size-7" />
+              </div>
+
+              {/* 文字 */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-bold text-gray-800 transition-colors group-hover:text-slate-900">
+                    {item.label}
+                  </span>
+                  {/* 官方认证标签 */}
+                  <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">
+                    官方认证
+                  </span>
+                </div>
+                <p className="mt-1 text-sm leading-relaxed text-gray-500">{item.desc}</p>
+              </div>
+
+              {/* 右侧箭头 */}
+              <div className="flex items-center gap-1 text-sm font-medium text-slate-500 transition-colors group-hover:text-slate-700">
+                前往查询
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </a>
           ))}
         </div>
       </div>
@@ -444,7 +669,7 @@ function BottomCTASection() {
   return (
     <section className="bg-white">
       <div className={containerClass("py-14 md:py-20")} style={SITE_WIDTH_STYLE}>
-        <div className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center sm:p-10">
+        <div className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center sm:p-12">
           <h2 className="text-2xl font-bold text-white sm:text-3xl">
             没找到需要的服务？
           </h2>
@@ -481,19 +706,7 @@ export default function ServicesContent() {
       <Header />
       <main>
         <HeroSection />
-
-        {/* ===== 各平台服务区（交替 bg-white / bg-slate-50） ===== */}
-        <div id="platforms">
-          {PLATFORMS.map((platform, index) => (
-            <section
-              key={platform.name}
-              className={index % 2 === 0 ? "bg-white" : "bg-slate-50"}
-            >
-              <PlatformSection platform={platform} />
-            </section>
-          ))}
-        </div>
-
+        <PlatformsSection />
         <PublicSection />
         <BottomCTASection />
       </main>

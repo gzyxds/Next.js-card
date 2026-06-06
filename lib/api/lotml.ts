@@ -21,10 +21,8 @@
  * - 未命中时，跳转到172号卡统一首页（兜底）
  */
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { MemoryCache } from "./cache";
+import pudidMapData from "../data/pudid-map.json";
 
 /* ========== 重新导出客户端安全的类型和工具函数 ========== */
 // 服务端代码可以直接使用这些导出，与 lotml-utils.ts 保持一致
@@ -80,20 +78,10 @@ const LOTML_CONFIG = {
   orderBaseUrl: "https://haokawx.lot-ml.com/h5orderEn/index",
 };
 
-/* ========== pudID 映射表（构建时生成） ========== */
+/* ========== pudID 映射表（构建时打包） ========== */
 
-/** productID → pudID 静态映射（来自 lib/data/pudid-map.json） */
-let pudidMap: Record<string, string> = {};
-try {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  pudidMap = JSON.parse(
-    readFileSync(join(__dirname, "..", "data", "pudid-map.json"), "utf-8"),
-  );
-} catch {
-  // pudid-map.json 不存在时静默降级，所有商品使用店铺首页兜底
-  console.warn("[172号卡] pudid-map.json 未找到，办理链接将使用兜底首页");
-}
+/** productID → pudID 静态映射（来自 lib/data/pudid-map.json，构建时内联） */
+const pudidMap: Record<string, string> = pudidMapData;
 
 /* ========== 接口响应类型 ========== */
 

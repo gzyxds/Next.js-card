@@ -5,8 +5,9 @@
  * 数据来源：项目根目录 .md 参考文件中的服务链接。
  * 响应式设计，兼容移动端与桌面端。
  *
- * 设计风格与 CooperateContent / AboutContent 保持一致：
- * 白底为主、slate-50 交替背景、卡片式网格布局。
+ * 设计风格与 JoinContent / AboutContent / CooperateContent 保持一致：
+ * 根容器 bg-[#f5f7fa]，Hero 白底 + grid 纹理装饰，
+ * 各区块交替 bg-white / bg-slate-50，卡片统一 rounded-2xl。
  */
 "use client";
 
@@ -27,7 +28,8 @@ import {
   ShieldCheck,
   ArrowRight,
   ExternalLink,
-  Star,
+  Sparkles,
+  Layers,
 } from "lucide-react";
 
 /* ========== 类型定义 ========== */
@@ -42,7 +44,7 @@ interface ServiceItem {
   desc: string;
   /** lucide 图标组件 */
   icon: React.ElementType;
-  /** 图标容器颜色类 */
+  /** 图标容器颜色类（文字色 + 背景色） */
   iconColor?: string;
 }
 
@@ -52,7 +54,7 @@ interface ServicePlatform {
   name: string;
   /** 平台简介 */
   description: string;
-  /** 品牌强调色（Tailwind 类） */
+  /** 品牌强调色（Tailwind 文字色类） */
   accentColor: string;
   /** 品牌强调背景色 */
   accentBg: string;
@@ -177,9 +179,46 @@ const PLATFORMS: ServicePlatform[] = [
       },
     ],
   },
+  {
+    name: "翼卡云",
+    description: "翼卡云流量卡平台，提供在线商城、靓号选购、代理加盟及订单查询等服务。",
+    accentColor: "text-cyan-600",
+    accentBg: "bg-cyan-50",
+    accentBorder: "border-cyan-200",
+    services: [
+      {
+        label: "在线商城",
+        href: "https://iot.87haoka.cn/shop#/?promoCode=TpImx3gi&indexFirstGroup=2",
+        desc: "浏览全量流量卡套餐，在线选号下单",
+        icon: Store,
+        iconColor: "text-cyan-600 bg-cyan-50",
+      },
+      {
+        label: "靓号商城",
+        href: "https://iot.87haoka.cn/shop/#/?indexFirstGroup=1&promoCode=TpImx3gi",
+        desc: "全国手机靓号资源，平台直供",
+        icon: Sparkles,
+        iconColor: "text-amber-600 bg-amber-50",
+      },
+      {
+        label: "代理申请",
+        href: "https://iot.87haoka.cn/r/02237888",
+        desc: "申请成为翼卡云代理商，开启推广分佣",
+        icon: UserPlus,
+        iconColor: "text-emerald-600 bg-emerald-50",
+      },
+      {
+        label: "订单查询",
+        href: "https://iot.87haoka.cn/shop#/pages-sub/login/index?promoCode=TpImx3gi",
+        desc: "查询翼卡云订单状态与物流信息",
+        icon: Search,
+        iconColor: "text-sky-600 bg-sky-50",
+      },
+    ],
+  },
 ];
 
-/** 公共服务入口 */
+/** 公共服务入口列表 */
 const PUBLIC_SERVICES: ServiceItem[] = [
   {
     label: "一证通查",
@@ -192,40 +231,40 @@ const PUBLIC_SERVICES: ServiceItem[] = [
 
 /* ========== Hero 区 ========== */
 
-/** Hero 宣传区 */
+/** Hero 宣传区（风格与 JoinContent / AboutContent 一致） */
 function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-white">
       {/* ===== 背景装饰 ===== */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {/* 左上角大圆 */}
-        <div className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full bg-blue-50 blur-3xl" />
-        {/* 右下角光晕 */}
-        <div className="absolute -bottom-24 -right-24 h-[400px] w-[400px] rounded-full bg-indigo-50/60 blur-3xl" />
-        {/* 极淡网格纹理 */}
+        {/* 右上角大圆（无模糊，与 JoinContent 一致） */}
+        <div className="absolute -top-32 -right-32 h-[480px] w-[480px] rounded-full bg-blue-50 blur-3xl" />
+        {/* 左下角小圆 */}
+        <div className="absolute -bottom-24 -left-24 h-[360px] w-[360px] rounded-full bg-slate-100 blur-3xl" />
+        {/* 极淡 grid 网格纹理（与 JoinContent / AboutContent 一致） */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
-              "radial-gradient(circle, #3b82f6 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
+              "linear-gradient(#1d4ed8 1px, transparent 1px), linear-gradient(to right, #1d4ed8 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
           }}
         />
         {/* 右下角同心圆环 */}
-        <div className="absolute right-16 bottom-16 size-40 rounded-full border border-blue-100 opacity-40" />
-        <div className="absolute right-24 bottom-24 size-24 rounded-full border border-blue-100 opacity-40" />
+        <div className="absolute right-12 bottom-12 size-56 rounded-full border border-blue-100 opacity-60" />
+        <div className="absolute right-24 bottom-24 size-32 rounded-full border border-blue-100 opacity-60" />
       </div>
 
       <div className={containerClass("relative py-20 md:py-28")} style={SITE_WIDTH_STYLE}>
         <div className="mx-auto max-w-2xl text-center">
-          {/* 标签 */}
+          {/* 标签（与项目其他 Hero 保持一致） */}
           <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-600">
             <Compass className="size-3.5 text-blue-500" />
             一站直达 · 快捷服务
           </div>
 
-          {/* 主标题 */}
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+          {/* 主标题（字号与 JoinContent / AboutContent 对齐） */}
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
             自助服务
             <span className="relative mx-2 inline-block text-blue-600">
               导航
@@ -234,25 +273,45 @@ function HeroSection() {
           </h1>
 
           {/* 副标题 */}
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-gray-500 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-gray-500 sm:text-lg">
             聚合多平台号卡自助服务入口，号卡办理、订单查询、代理注册一站直达。
           </p>
 
-          {/* CTA 按钮 */}
+          {/* CTA 按钮组 */}
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="#platforms"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/30"
+              className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-md shadow-blue-200 transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200"
             >
               查看服务平台
               <ArrowRight className="size-4" />
             </a>
             <a
               href="/join"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-slate-200 px-7 py-3 text-sm font-medium text-slate-600 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-7 py-3 text-sm font-medium text-gray-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-600 hover:shadow-md"
             >
               加入代理
             </a>
+          </div>
+
+          {/* 核心数据（与 JoinContent / AboutContent 风格一致） */}
+          <div className="mt-12 flex items-center justify-center gap-8 sm:gap-14">
+            <div className="text-center">
+              <div className="text-3xl font-extrabold text-gray-900">{PLATFORMS.length} 大</div>
+              <div className="mt-1 text-xs text-gray-400">合作平台</div>
+            </div>
+            <div className="h-8 w-px bg-gray-200" />
+            <div className="text-center">
+              <div className="text-3xl font-extrabold text-gray-900">
+                {PLATFORMS.reduce((acc, p) => acc + p.services.length, 0) + PUBLIC_SERVICES.length}+
+              </div>
+              <div className="mt-1 text-xs text-gray-400">自助服务入口</div>
+            </div>
+            <div className="h-8 w-px bg-gray-200" />
+            <div className="text-center">
+              <div className="text-3xl font-extrabold text-gray-900">全程</div>
+              <div className="mt-1 text-xs text-gray-400">在线自助</div>
+            </div>
           </div>
         </div>
       </div>
@@ -265,7 +324,7 @@ function HeroSection() {
 /**
  * 单个服务入口卡片
  *
- * 使用 Card 样式的外链卡片，hover 时轻微上浮并显示箭头图标。
+ * 圆角使用微圆角 rounded-lg，保持轻量现代的视觉感受。
  * 所有链接均为外部链接，使用 target="_blank" 新窗口打开。
  */
 function ServiceCard({ item }: { item: ServiceItem }) {
@@ -276,10 +335,10 @@ function ServiceCard({ item }: { item: ServiceItem }) {
       rel="noopener noreferrer"
       className="group flex items-start gap-4 rounded-lg border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
     >
-      {/* 图标 */}
+      {/* 图标容器（与项目卡片图标风格一致：size-10 + rounded-xl） */}
       <div
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-lg",
+          "flex size-10 shrink-0 items-center justify-center rounded-xl",
           item.iconColor || "text-slate-600 bg-slate-100"
         )}
       >
@@ -307,69 +366,64 @@ function ServiceCard({ item }: { item: ServiceItem }) {
 /**
  * 单个平台服务区域
  *
- * 包含平台标题横幅 + 4 列响应式服务卡片网格。
+ * 不再内部嵌套额外的 section 背景，背景由外层 div 交替控制，
+ * 避免双重背景色冲突。标题区样式与 AdvantagesSection 标题保持一致。
  */
 function PlatformSection({ platform }: { platform: ServicePlatform }) {
   return (
-    <section className="bg-white">
-      <div className={containerClass("py-14 md:py-20")} style={SITE_WIDTH_STYLE}>
-        {/* ===== 平台标题横幅 ===== */}
+    <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
+      {/* ===== 区块标题（与项目其他 Section 标题风格一致） ===== */}
+      <div className="mb-12 text-center">
         <div
           className={cn(
-            "mb-8 flex flex-col gap-2 rounded-lg border p-5 sm:flex-row sm:items-center sm:justify-between",
+            "mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold",
             platform.accentBg,
-            platform.accentBorder
+            platform.accentBorder,
+            platform.accentColor
           )}
         >
-          <div>
-            <h2 className={cn("text-xl font-bold", platform.accentColor)}>
-              {platform.name}
-            </h2>
-            <p className="mt-1 text-sm text-gray-500">{platform.description}</p>
-          </div>
-          {/* 平台标签 */}
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1 self-start rounded-full px-3 py-1 text-xs font-medium",
-              platform.accentBg,
-              platform.accentColor
-            )}
-          >
-            <Star className="size-3" />
-            {platform.services.length} 项服务
-          </span>
+          <Layers className="size-3.5" />
+          {platform.name}
         </div>
-
-        {/* ===== 服务卡片网格 ===== */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {platform.services.map((item) => (
-            <ServiceCard key={item.href} item={item} />
-          ))}
-        </div>
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          {platform.name} 服务入口
+        </h2>
+        <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+        <p className="mx-auto mt-4 max-w-xl text-sm text-gray-500">
+          {platform.description}
+        </p>
       </div>
-    </section>
+
+      {/* ===== 服务卡片网格 ===== */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {platform.services.map((item) => (
+          <ServiceCard key={item.href} item={item} />
+        ))}
+      </div>
+    </div>
   );
 }
 
 /* ========== 公共服务区 ========== */
 
-/** 公共服务区域 */
+/** 公共服务区域（背景 bg-slate-50，与项目交替区块规范一致） */
 function PublicSection() {
   return (
     <section className="bg-slate-50">
-      <div className={containerClass("py-14 md:py-20")} style={SITE_WIDTH_STYLE}>
-        {/* ===== 标题横幅 ===== */}
-        <div className="mb-8 flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">公共服务</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              工信部及运营商官方提供的通用自助服务
-            </p>
+      <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
+        {/* ===== 区块标题 ===== */}
+        <div className="mb-12 text-center">
+          <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <ShieldCheck className="size-4" />
+            官方服务
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1 self-start rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-            <ShieldCheck className="size-3" />
-            {PUBLIC_SERVICES.length} 项服务
-          </span>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            公共服务
+          </h2>
+          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <p className="mx-auto mt-4 max-w-xl text-sm text-gray-500">
+            工信部及运营商官方提供的通用自助服务
+          </p>
         </div>
 
         {/* ===== 服务卡片网格 ===== */}
@@ -423,17 +477,20 @@ function BottomCTASection() {
 /** 自助服务导航页面完整内容 */
 export default function ServicesContent() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f5f7fa]">
       <Header />
       <main>
         <HeroSection />
 
-        {/* ===== 各平台服务区（交替背景色） ===== */}
+        {/* ===== 各平台服务区（交替 bg-white / bg-slate-50） ===== */}
         <div id="platforms">
           {PLATFORMS.map((platform, index) => (
-            <div key={platform.name} className={index % 2 === 1 ? "bg-slate-50" : "bg-white"}>
+            <section
+              key={platform.name}
+              className={index % 2 === 0 ? "bg-white" : "bg-slate-50"}
+            >
               <PlatformSection platform={platform} />
-            </div>
+            </section>
           ))}
         </div>
 

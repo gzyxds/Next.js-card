@@ -11,6 +11,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { YkyProductDetail, YkyOperator } from "@/lib/api/yky";
 import {
     mapYkyOperator,
@@ -40,7 +41,6 @@ import {
     Star,
     Zap,
     MapPin,
-    Users,
     BadgeCheck,
 } from "lucide-react";
 
@@ -224,10 +224,12 @@ function ProductDetail({ product }: { product: YkyProductDetail }) {
                 <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
                     <div className="relative aspect-square overflow-hidden">
                         {product.tips ? (
-                            <img
+                            <Image
                                 src={product.tips}
                                 alt={product.name}
-                                className="h-full w-full object-cover"
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 1024px) 100vw, 50vw"
                             />
                         ) : (
                             <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -377,13 +379,15 @@ function ProductDetail({ product }: { product: YkyProductDetail }) {
                     </div>
                     <div className="space-y-3">
                         {product.details.map((imgUrl, i) => (
-                            <img
-                                key={i}
-                                src={imgUrl}
-                                alt={`${product.name} 详情图 ${i + 1}`}
-                                className="w-full rounded-lg object-cover"
-                                loading="lazy"
-                            />
+                            <div key={i} className="relative aspect-video w-full overflow-hidden rounded-lg">
+                                <Image
+                                    src={imgUrl}
+                                    alt={`${product.name} 详情图 ${i + 1}`}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 768px"
+                                />
+                            </div>
                         ))}
                     </div>
                 </section>

@@ -7,8 +7,9 @@
  */
 "use client";
 
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback, useReducer } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { YkyProductWithMeta, YkyOperator } from "@/lib/api/yky";
 import { YKY_OPERATOR_LABEL } from "@/lib/api/yky";
 import Header from "@/components/home/Header";
@@ -254,14 +255,6 @@ const OPERATOR_OVERLAY: Record<string, string> = {
     unknown: "bg-gray-500/80 text-white",
 };
 
-const OPERATOR_BADGE: Record<string, string> = {
-    mobile: "bg-green-50 text-green-700 border-green-200",
-    telecom: "bg-blue-50 text-blue-700 border-blue-200",
-    unicom: "bg-orange-50 text-orange-700 border-orange-200",
-    broadcast: "bg-purple-50 text-purple-700 border-purple-200",
-    unknown: "bg-gray-50 text-gray-700 border-gray-200",
-};
-
 /* ========== 规格参数标签 ========== */
 
 /**
@@ -295,8 +288,6 @@ function SpecTag({
 function YkyProductCard({ product }: { product: YkyProductWithMeta }) {
     const overlayClass =
         OPERATOR_OVERLAY[product._operator] || OPERATOR_OVERLAY.unknown;
-    const badgeClass =
-        OPERATOR_BADGE[product._operator] || OPERATOR_BADGE.unknown;
     const operatorLabel = YKY_OPERATOR_LABEL[product._operator];
     // 使用优惠月租作为展示价格
     const displayPrice = product.favourMonthFee || product.monthFee;
@@ -307,12 +298,13 @@ function YkyProductCard({ product }: { product: YkyProductWithMeta }) {
             <Link href={`/yky/${product.id}`} className="block">
                 <div className="relative overflow-hidden bg-gray-100 p-2">
                     {product.tips ? (
-                        <div className="aspect-[4/3] overflow-hidden rounded-lg">
-                            <img
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                            <Image
                                 src={product.tips}
                                 alt={product.name}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                loading="lazy"
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                sizes="(max-width: 768px) 50vw, 25vw"
                             />
                         </div>
                     ) : (
@@ -426,6 +418,17 @@ function YkyProductCard({ product }: { product: YkyProductWithMeta }) {
 /** 每页加载数量 */
 const PAGE_SIZE = 12;
 
+/** visibleCount reducer：dispatch 稳定引用，无卸载后 setState 问题 */
+type VisibleAction = { type: "reset" } | { type: "loadMore"; maxCount: number };
+function visibleReducer(state: number, action: VisibleAction): number {
+  switch (action.type) {
+    case "reset":
+      return PAGE_SIZE;
+    case "loadMore":
+      return Math.min(state + PAGE_SIZE, action.maxCount);
+  }
+}
+
 /** 商品网格组件（带无限滚动分页） */
 function ProductGrid({
     products,
@@ -460,12 +463,12 @@ function ProductGrid({
 
     /* ===== 分页状态 ===== */
     const filterKey = `${activeCategory}-${activeOperator}-${activeRegion}-${activeDuration}`;
-    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    const [visibleCount, dispatchVisible] = useReducer(visibleReducer, PAGE_SIZE);
     const sentinelRef = useRef<HTMLDivElement>(null);
 
     // 筛选条件变化时重置分页
     useEffect(() => {
-        setVisibleCount(PAGE_SIZE);
+        dispatchVisible({ type: "reset" });
     }, [filterKey]);
 
     const displayed = filtered.slice(0, visibleCount);
@@ -473,7 +476,7 @@ function ProductGrid({
 
     /* ===== 无限滚动 ===== */
     const loadMore = useCallback(() => {
-        setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
+        dispatchVisible({ type: "loadMore", maxCount: filtered.length });
     }, [filtered.length]);
 
     useEffect(() => {
@@ -483,7 +486,7 @@ function ProductGrid({
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting) loadMore();
+                if (entries[0]?.isIntersecting) loadMore();
             },
             { rootMargin: "200px" },
         );

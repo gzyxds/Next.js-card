@@ -77,7 +77,7 @@ export default async function YkyDetailPage({
         try {
             // 优先使用详情接口获取完整数据（含佣金信息）
             product = await fetchYkyProductDetail(productId);
-        } catch (e) {
+        } catch {
             // 详情接口失败时，回退到列表缓存中查找
             try {
                 const result = await fetchYkyProducts();

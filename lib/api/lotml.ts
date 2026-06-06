@@ -239,7 +239,10 @@ export async function fetchLotMLProducts(): Promise<{
   const rawProducts = await fetchProductsFromAPI();
 
   /* ===== 仅保留上架商品 ===== */
-  const activeProducts = rawProducts.filter((p) => p.flag === true);
+  const activeProducts = rawProducts
+    .filter((p) => p.flag === true)
+    /* 按 productID 降序排列（新上架商品在前，无上架时间字段时用 ID 近似） */
+    .sort((a, b) => b.productID - a.productID);
 
   /* ===== 预计算元数据 ===== */
   const productsWithMeta = attachMeta(activeProducts);

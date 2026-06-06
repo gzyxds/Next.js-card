@@ -15,6 +15,7 @@
  * 缓存键包含 appId，避免不同配置的冲突。
  */
 import crypto from "crypto";
+import { MemoryCache } from "./cache";
 
 /* ========== 类型定义 ========== */
 
@@ -75,18 +76,11 @@ interface ProductListResponse {
 
 /* ========== 缓存配置 ========== */
 
-/** 缓存有效期（毫秒），默认 12 小时 */
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
-
-/** 缓存内容 */
-interface CacheEntry {
-  data: { products: HaokaProductWithMeta[]; total: number };
-  timestamp: number;
-  appId: string;
-}
-
-/** 模块级缓存变量（同进程内共享） */
-let productsCache: CacheEntry | null = null;
+/** 模块级缓存实例（同进程内共享，TTL 12 小时） */
+const productsCache = new MemoryCache<{
+  products: HaokaProductWithMeta[];
+  total: number;
+}>("HaokaCache");
 
 /* ========== 加密工具 ========== */
 
@@ -151,17 +145,6 @@ async function fetchHaokaPage(
   return result;
 }
 
-/**
- * 检查缓存是否有效
- * @param appId - 当前配置的 appId，用于校验缓存一致性
- */
-function isCacheValid(appId: string): boolean {
-  return (
-    productsCache !== null &&
-    productsCache.appId === appId &&
-    Date.now() - productsCache.timestamp < CACHE_TTL_MS
-  );
-}
 
 /**
  * 为商品列表预计算元数据
@@ -204,10 +187,8 @@ export async function fetchHaokaProducts(): Promise<{
   }
 
   /* ===== 缓存命中：直接返回 ===== */
-  if (isCacheValid(appId)) {
-    console.log("[HaokaCache] 缓存命中，直接返回");
-    return productsCache!.data;
-  }
+  const cached = productsCache.get(appId);
+  if (cached) return cached;
 
   console.log("[HaokaCache] 缓存失效或首次请求，开始拉取数据");
 
@@ -232,15 +213,13 @@ export async function fetchHaokaProducts(): Promise<{
   const productsWithMeta = attachMeta(allItems);
 
   /* ===== 写入缓存 ===== */
-  productsCache = {
-    data: { products: productsWithMeta, total: firstPage.data?.pageInfo?.total || allItems.length },
-    timestamp: Date.now(),
-    appId,
+  const result = {
+    products: productsWithMeta,
+    total: firstPage.data?.pageInfo?.total || allItems.length,
   };
+  productsCache.set(result, appId, allItems.length);
 
-  console.log(`[HaokaCache] 数据刷新完成，共 ${allItems.length} 件商品，缓存有效期 12 小时`);
-
-  return productsCache.data;
+  return result;
 }
 
 /* ========== 运营商工具函数 ========== */
@@ -307,7 +286,7 @@ export function parseTags(name: string): { text: string; className: string }[] {
   const { location } = parseLocation(name);
   tags.push({
     text: location,
-    className: "bg-green-50 text-green-600 border-green-100",
+    className: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-800",
   });
 
   // 流量标签
@@ -315,7 +294,7 @@ export function parseTags(name: string): { text: string; className: string }[] {
   if (flow) {
     tags.push({
       text: flow[0],
-      className: "bg-blue-50 text-blue-600 border-blue-100",
+      className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800",
     });
   }
 
@@ -323,38 +302,59 @@ export function parseTags(name: string): { text: string; className: string }[] {
   if (/\d+\s*分钟/.test(name)) {
     tags.push({
       text: "含通话",
-      className: "bg-purple-50 text-purple-600 border-purple-100",
+      className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800",
     });
   }
 
   // 配送标签
   if (/京东/.test(name)) {
-    tags.push({ text: "京东快递", className: "bg-orange-50 text-orange-600 border-orange-100" });
+    tags.push({
+      text: "京东快递",
+      className: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-800",
+    });
   } else {
-    tags.push({ text: "免费包邮", className: "bg-orange-50 text-orange-600 border-orange-100" });
+    tags.push({
+      text: "免费包邮",
+      className: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-800",
+    });
   }
 
   // 首月免租
   if (/免租|免月/.test(name)) {
-    tags.push({ text: "首月免租", className: "bg-red-50 text-red-500 border-red-100" });
+    tags.push({
+      text: "首月免租",
+      className: "bg-red-50 text-red-600 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800",
+    });
   }
 
-  // 激活方式
+  /* ===== 激活方式 ===== */
   if (/自主激活/.test(name)) {
-    tags.push({ text: "自主激活", className: "bg-cyan-50 text-cyan-600 border-cyan-100" });
+    tags.push({
+      text: "自主激活",
+      className: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800",
+    });
   } else if (/快递激活/.test(name)) {
-    tags.push({ text: "快递激活", className: "bg-cyan-50 text-cyan-600 border-cyan-100" });
+    tags.push({
+      text: "快递激活",
+      className: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800",
+    });
   }
 
   // 先激活后发货
   if (/先激活/.test(name)) {
-    tags.push({ text: "先激活后发货", className: "bg-yellow-50 text-yellow-600 border-yellow-100" });
+    tags.push({
+      text: "先激活后发货",
+      className: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-400 dark:border-yellow-800",
+    });
   }
 
-  // 套餐时长
+  /* ===== 套餐时长 ===== */
   const dur = parseDuration(name);
   if (dur !== "未知") {
-    tags.push({ text: dur, className: "bg-teal-50 text-teal-600 border-teal-100" });
+    tags.push({
+      text: dur,
+      className: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/40 dark:text-teal-400 dark:border-teal-800",
+    });
   }
 
   // 年龄限制
@@ -362,7 +362,7 @@ export function parseTags(name: string): { text: string; className: string }[] {
   if (ageMatch) {
     tags.push({
       text: `${ageMatch[1]}-${ageMatch[2]}岁`,
-      className: "bg-gray-50 text-gray-500 border-gray-100",
+      className: "bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700",
     });
   }
 

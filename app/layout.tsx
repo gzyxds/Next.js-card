@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
   description: SITE_DESC,
   keywords: [
+    "流量派",
     "流量卡",
     "大流量卡",
     "19元流量卡",
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
     },
   },
-  metadataBase: new URL("https://next-card.example.com"),
+  metadataBase: new URL("http://www.urlka.cn"),
   appleWebApp: {
     capable: true,
     title: SITE_NAME,
@@ -83,8 +84,8 @@ export const metadata: Metadata = {
   /* ===== 其他 ===== */
   applicationName: SITE_NAME,
   referrer: "origin-when-cross-origin",
-  creator: "浩卡联盟",
-  publisher: "浩卡联盟",
+  creator: "流量派",
+  publisher: "流量派",
 };
 
 export default function RootLayout({

@@ -16,6 +16,7 @@
  * 后续请求直接从缓存返回，大幅提升页面加载速度。
  */
 import { createHash } from "node:crypto";
+import { MemoryCache } from "./cache";
 
 /* ========== 类型定义 ========== */
 
@@ -276,30 +277,12 @@ function md5(str: string): string {
 
 /* ========== 缓存 ========== */
 
-/** 缓存有效期（毫秒），默认 12 小时 */
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+/** 模块级缓存实例（服务进程内全局共享，TTL 12 小时） */
+const productsCache = new MemoryCache<{
+  products: LinxiProductWithMeta[];
+  total: number;
+}>("林夕通信Cache");
 
-/** 缓存条目 */
-interface CacheEntry {
-  data: { products: LinxiProductWithMeta[]; total: number };
-  timestamp: number;
-  apiUser: string;
-}
-
-/** 模块级缓存变量（服务进程内全局共享） */
-let productsCache: CacheEntry | null = null;
-
-/**
- * 检查缓存是否有效
- * @param apiUser - 当前配置的 apiUser，用于校验缓存一致性
- */
-function isCacheValid(apiUser: string): boolean {
-  return (
-    productsCache !== null &&
-    productsCache.apiUser === apiUser &&
-    Date.now() - productsCache.timestamp < CACHE_TTL_MS
-  );
-}
 
 /**
  * 为商品列表批量预计算元数据
@@ -384,10 +367,8 @@ export async function fetchLinxiProducts(): Promise<{
   }
 
   /* ===== 缓存命中 ===== */
-  if (isCacheValid(apiUser)) {
-    console.log("[林夕通信Cache] 缓存命中，直接返回");
-    return productsCache!.data;
-  }
+  const cached = productsCache.get(apiUser);
+  if (cached) return cached;
 
   console.log("[林夕通信Cache] 缓存失效或首次请求，开始拉取数据");
 
@@ -398,15 +379,8 @@ export async function fetchLinxiProducts(): Promise<{
   const productsWithMeta = attachMeta(rawProducts);
 
   /* ===== 写入缓存 ===== */
-  productsCache = {
-    data: { products: productsWithMeta, total: productsWithMeta.length },
-    timestamp: Date.now(),
-    apiUser,
-  };
+  const result = { products: productsWithMeta, total: productsWithMeta.length };
+  productsCache.set(result, apiUser, productsWithMeta.length);
 
-  console.log(
-    `[林夕通信Cache] 数据刷新完成，共 ${productsWithMeta.length} 件商品，缓存有效期 12 小时`,
-  );
-
-  return productsCache.data;
+  return result;
 }

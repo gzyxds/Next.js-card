@@ -3,11 +3,11 @@
 /**
  * 常见问题区域组件（FAQSection）
  *
- * 优化后的设计：左右两栏比例平衡，微圆角风格统一
- * - 左栏：分类筛选 + 统计信息 + 联系引导（固定宽 300/340px）
- * - 右栏：FAQ 折叠面板列表（自适应弹性宽度）
- * - 全局圆角统一为 4-6px（rounded / rounded-md），视觉柔和
- * - 完全响应式，移动端纵向堆叠
+ * 左右双栏布局，移动端 FAQ 列表优先显示：
+ * - 移动端：FAQ 折叠面板在上 → 分类筛选 + 联系引导在下
+ * - 桌面端：左栏分类筛选 + 联系引导（300/340px）| 右栏 FAQ 列表（弹性填充）
+ * - 联系卡片移动端横向双按钮，节省纵向空间
+ * - 全局圆角统一 rounded-md，视觉柔和
  */
 import { useState, useRef, useMemo } from "react";
 import {
@@ -149,46 +149,42 @@ function FaqItem({
 
   return (
     <div
-      className={`group overflow-hidden rounded-md border transition-all duration-300 ${
-        isOpen
-          ? "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white"
-          : "border-gray-100 bg-white hover:border-blue-100"
-      }`}
+      className={`group overflow-hidden rounded-md border transition-all duration-300 ${isOpen
+        ? "border-blue-200 bg-gradient-to-br from-blue-50/60 to-white"
+        : "border-gray-100 bg-white hover:border-blue-100"
+        }`}
     >
       {/* 问题按钮 */}
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
-        className="flex w-full items-start gap-4 px-5 py-4 text-left md:px-6 md:py-5"
+        className="flex w-full items-start gap-3 px-4 py-3.5 text-left sm:gap-4 sm:px-5 sm:py-4 md:px-6 md:py-5"
       >
         {/* 序号徽章 */}
         <span
-          className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-sm text-xs font-bold transition-all duration-200 ${
-            isOpen
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600"
-          }`}
+          className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-sm text-xs font-bold transition-all duration-200 ${isOpen
+            ? "bg-blue-600 text-white"
+            : "bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600"
+            }`}
         >
           {idx + 1}
         </span>
 
         {/* 问题文字 */}
         <span
-          className={`flex-1 text-sm font-medium leading-relaxed transition-colors duration-200 md:text-base ${
-            isOpen ? "text-blue-700" : "text-gray-800 group-hover:text-blue-600"
-          }`}
+          className={`flex-1 text-sm font-medium leading-relaxed transition-colors duration-200 md:text-base ${isOpen ? "text-blue-700" : "text-gray-800 group-hover:text-blue-600"
+            }`}
         >
           {faq.q}
         </span>
 
         {/* 展开图标 */}
         <span
-          className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
-            isOpen
-              ? "bg-blue-600 text-white rotate-180"
-              : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600"
-          }`}
+          className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${isOpen
+            ? "bg-blue-600 text-white rotate-180"
+            : "bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600"
+            }`}
         >
           <ChevronDown className="size-4" />
         </span>
@@ -200,7 +196,7 @@ function FaqItem({
         style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          <div className="px-5 pb-5 pt-1 md:px-6 md:pb-6">
+          <div className="px-4 pb-4 pt-1 sm:px-5 sm:pb-5 md:px-6 md:pb-6">
             <div className="flex items-start gap-3 rounded bg-white/70 p-4 backdrop-blur-sm">
               {cfg && (
                 <div
@@ -245,26 +241,108 @@ export default function FAQSection() {
 
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 顶部标题区 ===== */}
-        <div className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-xs font-semibold text-blue-600">
-            <Sparkles className="size-3.5" />
+        <div className="mb-12 text-center md:mb-14">
+          <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
+            <Sparkles className="size-4" />
             常见问题
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             您可能想了解的
           </h2>
-          <p className="mt-3 text-base text-gray-500">
+          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             关于号卡产品、订购激活、售后服务的常见疑问，这里都有答案
           </p>
         </div>
 
-        {/* ===== 优化后的左右双栏布局 ===== */}
-        {/* 左栏固定宽度 300/340px，右栏弹性填充剩余空间 */}
-        <div className="grid gap-8 lg:grid-cols-[300px_1fr] lg:gap-10 xl:grid-cols-[340px_1fr]">
-          {/* ===== 左栏：筛选 + 统计 + 联系引导 ===== */}
-          <div className="flex flex-col gap-4">
-            {/* 分类标签（移动端横向滚动） */}
-            <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0">
+        {/* ===== 分类筛选栏（移动端/平板顶部横排） ===== */}
+        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:pb-0 lg:hidden">
+          {ALL_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat;
+            const cfg = CATEGORY_CONFIG[cat];
+            const count =
+              cat === "全部"
+                ? FAQS.length
+                : FAQS.filter((f) => f.category === cat).length;
+
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setActiveCategory(cat);
+                  setOpenIndex(-1);
+                }}
+                className={`flex shrink-0 items-center gap-3 rounded-md border px-4 py-1.5 text-left transition-all duration-200 ${isActive
+                  ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm"
+                  : "border-gray-100 bg-white text-gray-700 hover:border-blue-100 hover:bg-blue-50"
+                  }`}
+              >
+                {/* 图标 */}
+                <div
+                  className={`flex size-7 shrink-0 items-center justify-center rounded transition-all ${isActive
+                    ? "bg-white/20"
+                    : cfg
+                      ? cfg.bg
+                      : "bg-gray-100"
+                    }`}
+                >
+                  {cfg ? (
+                    <cfg.icon
+                      className={`size-4 ${isActive ? "text-white" : cfg.color}`}
+                    />
+                  ) : (
+                    <Search
+                      className={`size-4 ${isActive ? "text-white" : "text-gray-400"}`}
+                    />
+                  )}
+                </div>
+
+                {/* 文字 + 描述 — 仅 sm 及以上 */}
+                <div className="hidden min-w-0 flex-1 sm:block">
+                  <p
+                    className={`text-sm font-semibold ${isActive ? "text-white" : "text-gray-800"}`}
+                  >
+                    {cat}
+                  </p>
+                  <p
+                    className={`mt-0.5 truncate text-xs ${isActive ? "text-white/80" : "text-gray-400"}`}
+                  >
+                    {cfg ? cfg.desc : "查看全部问题"}
+                  </p>
+                </div>
+
+                {/* 数量徽章 — 仅 sm 及以上 */}
+                <span
+                  className={`ml-auto hidden shrink-0 rounded px-2 py-0.5 text-xs font-bold sm:block ${isActive
+                    ? "bg-white/20 text-white"
+                    : "bg-gray-100 text-gray-500"
+                    }`}
+                >
+                  {count}
+                </span>
+
+                {/* 移动端仅显示分类名 + 数量 */}
+                <span className="text-sm font-medium sm:hidden">{cat}</span>
+                <span
+                  className={`ml-1 rounded px-1.5 py-0.5 text-xs font-bold sm:hidden ${isActive
+                    ? "bg-white/20 text-white"
+                    : "bg-gray-100 text-gray-500"
+                    }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ===== 左右双栏（移动端 FAQ 优先显示） ===== */}
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[300px_1fr] lg:gap-10 xl:grid-cols-[340px_1fr]">
+          {/* ===== 左栏：统计 + 联系引导（移动端置于 FAQ 下方） ===== */}
+          <div className="order-2 flex flex-col gap-4 lg:order-none">
+            {/* 分类标签 — 仅桌面端左侧竖排 */}
+            <div className="hidden flex-col gap-2 lg:flex">
               {ALL_CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat;
                 const cfg = CATEGORY_CONFIG[cat];
@@ -281,25 +359,23 @@ export default function FAQSection() {
                       setActiveCategory(cat);
                       setOpenIndex(-1);
                     }}
-                    className={`flex shrink-0 items-center gap-3 rounded-md border px-4 py-3 text-left transition-all duration-200 lg:w-full ${
-                      isActive
-                        ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white"
+                    className={`flex w-full items-center gap-3 rounded-md border px-4 py-2.5 text-left transition-all duration-200 ${isActive
+                        ? "border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm"
                         : "border-gray-100 bg-white text-gray-700 hover:border-blue-100 hover:bg-blue-50"
-                    }`}
+                      }`}
                   >
                     {/* 图标 */}
                     <div
-                      className={`flex size-9 shrink-0 items-center justify-center rounded transition-all ${
-                        isActive
+                      className={`flex size-7 shrink-0 items-center justify-center rounded transition-all ${isActive
                           ? "bg-white/20"
                           : cfg
                             ? cfg.bg
                             : "bg-gray-100"
-                      }`}
+                        }`}
                     >
                       {cfg ? (
                         <cfg.icon
-                          className={`size-4.5 ${isActive ? "text-white" : cfg.color}`}
+                          className={`size-4 ${isActive ? "text-white" : cfg.color}`}
                         />
                       ) : (
                         <Search
@@ -308,8 +384,8 @@ export default function FAQSection() {
                       )}
                     </div>
 
-                    {/* 文字 — 仅桌面端 */}
-                    <div className="hidden min-w-0 flex-1 lg:block">
+                    {/* 文字 + 描述 */}
+                    <div className="min-w-0 flex-1">
                       <p
                         className={`text-sm font-semibold ${isActive ? "text-white" : "text-gray-800"}`}
                       >
@@ -322,23 +398,12 @@ export default function FAQSection() {
                       </p>
                     </div>
 
-                    {/* 数量徽章 — 仅桌面端 */}
+                    {/* 数量徽章 */}
                     <span
-                      className={`ml-auto hidden shrink-0 rounded px-2 py-0.5 text-xs font-bold lg:block ${
-                        isActive
+                      className={`shrink-0 rounded px-2 py-0.5 text-xs font-bold ${isActive
                           ? "bg-white/20 text-white"
                           : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {count}
-                    </span>
-
-                    {/* 移动端显示分类名 + 数量 */}
-                    <span className="text-sm font-medium lg:hidden">{cat}</span>
-                    <span
-                      className={`ml-1 rounded px-1.5 py-0.5 text-xs font-bold lg:hidden ${
-                        isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
-                      }`}
+                        }`}
                     >
                       {count}
                     </span>
@@ -367,7 +432,7 @@ export default function FAQSection() {
             </div>
 
             {/* 联系引导卡片 */}
-            <div className="overflow-hidden rounded-md border border-blue-100 bg-gradient-to-br from-blue-600 to-blue-700 p-5">
+            <div className="overflow-hidden rounded-md border border-blue-100 bg-gradient-to-br from-blue-600 to-blue-700 p-4 sm:p-5">
               <div className="mb-1 flex items-center gap-2">
                 <HelpCircle className="size-4 text-blue-200" />
                 <p className="text-sm font-semibold text-white">没有找到答案？</p>
@@ -375,28 +440,30 @@ export default function FAQSection() {
               <p className="mb-4 text-xs leading-relaxed text-blue-100">
                 我们的客服团队随时为您提供一对一专属帮助
               </p>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-2 sm:flex-col">
                 <button
                   type="button"
                   onClick={() => modalRef.current?.open()}
-                  className="flex items-center justify-center gap-2 rounded bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50"
+                  className="flex flex-1 items-center justify-center gap-2 rounded bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50 sm:flex-none sm:px-4 sm:py-2.5"
                 >
                   <MessageCircle className="size-4" />
-                  在线咨询客服
+                  <span className="sm:hidden">在线咨询</span>
+                  <span className="hidden sm:inline">在线咨询客服</span>
                 </button>
                 <a
                   href="tel:400-xxx-xxxx"
-                  className="flex items-center justify-center gap-2 rounded border border-blue-400/40 bg-blue-500/30 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-blue-500/50"
+                  className="flex flex-1 items-center justify-center gap-2 rounded border border-blue-400/40 bg-blue-500/30 px-3 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-blue-500/50 sm:flex-none sm:px-4 sm:py-2.5"
                 >
                   <Phone className="size-4" />
-                  拨打客服热线
+                  <span className="sm:hidden">电话咨询</span>
+                  <span className="hidden sm:inline">拨打客服热线</span>
                 </a>
               </div>
             </div>
           </div>
 
-          {/* ===== 右栏：FAQ 折叠面板列表 ===== */}
-          <div className="min-w-0">
+          {/* ===== 右栏：FAQ 折叠面板列表（移动端优先显示） ===== */}
+          <div className="order-1 min-w-0 lg:order-none">
             {/* 当前分类标题 */}
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm font-medium text-gray-500">
@@ -424,7 +491,7 @@ export default function FAQSection() {
             </div>
 
             {/* FAQ 列表 */}
-            <div className="space-y-3">
+            <div className="space-y-2.5 sm:space-y-3">
               {filteredFaqs.map((faq, localIdx) => (
                 <FaqItem
                   key={faq._idx}

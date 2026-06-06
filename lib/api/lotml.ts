@@ -24,6 +24,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { MemoryCache } from "./cache";
 
 /* ========== 重新导出客户端安全的类型和工具函数 ========== */
 // 服务端代码可以直接使用这些导出，与 lotml-utils.ts 保持一致
@@ -106,18 +107,11 @@ interface ProductListResponse {
 
 /* ========== 缓存 ========== */
 
-/** 缓存有效期（毫秒），默认 12 小时 */
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000;
-
-/** 缓存条目 */
-interface CacheEntry {
-  data: { products: LotMLProductWithMeta[]; total: number };
-  timestamp: number;
-  userId: string;
-}
-
-/** 模块级缓存变量（服务进程内全局共享） */
-let productsCache: CacheEntry | null = null;
+/** 模块级缓存实例（服务进程内全局共享，TTL 12 小时） */
+const productsCache = new MemoryCache<{
+  products: LotMLProductWithMeta[];
+  total: number;
+}>("172号卡Cache");
 
 /* ========== 签名工具 ========== */
 
@@ -207,17 +201,6 @@ async function fetchProductsFromAPI(): Promise<LotMLProduct[]> {
   return result.data || [];
 }
 
-/**
- * 检查产品缓存是否有效
- * @param userId - 当前配置的 userId，用于校验缓存一致性
- */
-function isCacheValid(userId: string): boolean {
-  return (
-    productsCache !== null &&
-    productsCache.userId === userId &&
-    Date.now() - productsCache.timestamp < CACHE_TTL_MS
-  );
-}
 
 /**
  * 为商品列表批量预计算元数据
@@ -259,10 +242,8 @@ export async function fetchLotMLProducts(): Promise<{
   }
 
   /* ===== 缓存命中 ===== */
-  if (isCacheValid(userId)) {
-    console.log("[172号卡Cache] 缓存命中，直接返回");
-    return productsCache!.data;
-  }
+  const cached = productsCache.get(userId);
+  if (cached) return cached;
 
   console.log("[172号卡Cache] 缓存失效或首次请求，开始拉取数据");
 
@@ -276,15 +257,8 @@ export async function fetchLotMLProducts(): Promise<{
   const productsWithMeta = attachMeta(activeProducts);
 
   /* ===== 写入缓存 ===== */
-  productsCache = {
-    data: { products: productsWithMeta, total: productsWithMeta.length },
-    timestamp: Date.now(),
-    userId,
-  };
+  const result = { products: productsWithMeta, total: productsWithMeta.length };
+  productsCache.set(result, userId, productsWithMeta.length);
 
-  console.log(
-    `[172号卡Cache] 数据刷新完成，共 ${productsWithMeta.length} 件在售商品，缓存有效期 12 小时`,
-  );
-
-  return productsCache.data;
+  return result;
 }

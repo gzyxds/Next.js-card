@@ -45,8 +45,14 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="bg-white">
-      <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
+    <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/30 via-white to-white">
+      {/* ===== 装饰光晕 ===== */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-blue-100/40 blur-3xl"
+      />
+
+      <div className={containerClass("relative py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 标题区 ===== */}
         <div className="mb-12 text-center md:mb-14">
           <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
@@ -54,25 +60,31 @@ export default function FeaturesSection() {
             核心优势
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            为什么选择流量派号卡
+            为什么选择
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {" "}流量派号卡
+            </span>
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             聚焦用户真实需求，打造省心、省钱、省力的流量解决方案
           </p>
         </div>
 
-        {/* ===== 优势卡片 3x2 ===== */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {/* ===== 优势卡片 移动端2列 / 桌面端3列 ===== */}
+        <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3">
           {features.map((f) => (
             <div
               key={f.title}
-              className="group flex flex-col items-center rounded-md border bg-white p-6 text-center transition-colors hover:border-blue-200 hover:bg-blue-50/20 md:p-7"
+              className="group flex flex-col items-center rounded-md border border-blue-100/60 bg-gradient-to-b from-white to-blue-50/20 p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-md sm:p-6 md:p-7"
             >
-              <div className="mb-4 flex size-12 items-center justify-center rounded-md bg-blue-50">
+              {/* 图标容器 */}
+              <div className="mb-4 flex size-12 items-center justify-center rounded-md bg-gradient-to-br from-blue-50 to-indigo-50 transition-transform duration-300 group-hover:scale-110">
                 <f.icon className="size-6 text-blue-600" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">{f.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              {/* 标题与描述 */}
+              <h3 className="mb-2 text-base font-semibold sm:text-lg">{f.title}</h3>
+              <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
                 {f.desc}
               </p>
             </div>

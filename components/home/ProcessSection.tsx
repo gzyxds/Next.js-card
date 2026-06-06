@@ -39,65 +39,79 @@ export default function ProcessSection() {
   ];
 
   return (
-    <section id="process" className="bg-white">
-      {/* ===== 顶部标题区 ===== */}
-      <div className={containerClass("pt-16 md:pt-24")} style={SITE_WIDTH_STYLE}>
+    <section id="process" className="relative overflow-hidden bg-gradient-to-b from-white via-white to-blue-50/30">
+      {/* ===== 装饰光晕 ===== */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-20 right-0 h-72 w-72 translate-x-1/3 rounded-full bg-blue-100/30 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 left-0 h-64 w-64 -translate-x-1/3 rounded-full bg-indigo-100/20 blur-3xl"
+      />
+
+      <div className={containerClass("relative py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
+        {/* ===== 标题区 ===== */}
         <div className="mb-12 text-center md:mb-14">
           <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-600">
             <ClipboardCheck className="size-4" />
             办理流程
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            四步轻松领卡
+            四步轻松
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {" "}领卡
+            </span>
           </h2>
-          <p className="mt-3 text-muted-foreground">
+          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             全程线上办理，无需线下排队，平均3天即可用上新卡
           </p>
         </div>
 
-        {/* ===== 步骤卡片区 ===== */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* ===== 步骤卡片区 移动端2列×2行 / 桌面端4列 ===== */}
+        <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
           {steps.map((step, idx) => (
             <div key={step.num} className="relative">
-              <div className="flex flex-col items-center text-center">
-                {/* 图标 */}
-                <div className="mb-4 flex size-14 items-center justify-center rounded-md bg-blue-50">
+              <div className="group flex flex-col items-center rounded-md border border-blue-100/60 bg-gradient-to-b from-white to-blue-50/20 p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-md sm:p-6">
+                {/* 图标容器 */}
+                <div className="mb-4 flex size-12 items-center justify-center rounded-md bg-gradient-to-br from-blue-50 to-indigo-50 transition-transform duration-300 group-hover:scale-110">
                   <step.icon className="size-6 text-blue-600" />
                 </div>
                 {/* 步骤编号 */}
-                <span className="mb-2 rounded-sm bg-blue-100 px-3 py-0.5 text-xs font-bold text-blue-700">
+                <span className="mb-2 rounded-full bg-blue-100 px-3 py-0.5 text-xs font-bold text-blue-700">
                   步骤 {step.num}
                 </span>
-                <h3 className="mb-1 text-lg font-semibold">{step.title}</h3>
-                <p className="max-w-[240px] text-sm leading-relaxed text-muted-foreground">
+                <h3 className="mb-1 text-base font-semibold sm:text-lg">{step.title}</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
                   {step.desc}
                 </p>
               </div>
 
-              {/* 步骤间连接线（仅桌面端） */}
+              {/* 步骤间连接线（仅桌面端4列模式可见） */}
               {idx < steps.length - 1 && (
                 <div className="hidden lg:block">
-                  <div className="absolute top-7 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] border-t border-dashed border-slate-200" />
-                  <ChevronRight className="absolute top-5 right-[-0.8rem] size-4 text-slate-300" />
+                  <div className="absolute top-6 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] border-t border-dashed border-blue-200" />
+                  <ChevronRight className="absolute top-4 right-[-0.8rem] size-4 text-blue-300" />
                 </div>
               )}
             </div>
           ))}
         </div>
-      </div>
 
-      {/* ===== 底部白色区域：完成提示 ===== */}
-      <div className={containerClass("pb-16 md:pb-24 pt-12 md:pt-16")} style={SITE_WIDTH_STYLE}>
-        <div className="flex flex-col items-center gap-6 rounded-md border border-slate-200 bg-slate-50 p-8 text-center sm:flex-row sm:text-left md:p-10">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-md bg-blue-100">
-            <Clock className="size-6 text-blue-600" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold">平均 3 天即可用上新卡</h3>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              从在线选卡到自主激活，全程线上完成。无需线下排队、无需复杂手续，
-              京东/EMS 极速配送，让您足不出户畅享高速流量。
-            </p>
+        {/* ===== 底部完成提示 ===== */}
+        <div className="mt-12 sm:mt-14">
+          <div className="flex flex-col items-center gap-5 rounded-md border border-blue-100/60 bg-gradient-to-br from-blue-50/40 via-white to-indigo-50/30 p-6 text-center shadow-sm sm:flex-row sm:text-left sm:p-8 md:p-10">
+            <div className="flex size-14 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-100 to-indigo-100">
+              <Clock className="size-6 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">平均 3 天即可用上新卡</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                从在线选卡到自主激活，全程线上完成。无需线下排队、无需复杂手续，
+                京东/EMS 极速配送，让您足不出户畅享高速流量。
+              </p>
+            </div>
           </div>
         </div>
       </div>

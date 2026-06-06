@@ -46,27 +46,31 @@ interface CategoryConfig {
     label: string;
     icon: React.ElementType;
     color: string;
+    /** 卡券卡片背景渐变色 */
+    cardBg: string;
+    /** 卡券装饰圆颜色 */
+    decorColor: string;
 }
 
 /* ========== 分类配置 ========== */
 
 /** 分类对应的图标和颜色映射 */
 const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
-    all: { label: "全部", icon: Gift, color: "text-slate-600 bg-slate-100" },
-    "美团": { label: "美团", icon: Store, color: "text-yellow-600 bg-yellow-50" },
-    "饿了么": { label: "饿了么", icon: UtensilsCrossed, color: "text-blue-600 bg-blue-50" },
-    "打车出行": { label: "出行", icon: Car, color: "text-green-600 bg-green-50" },
-    "连锁餐饮": { label: "连锁餐饮", icon: Coffee, color: "text-orange-600 bg-orange-50" },
-    "电影票": { label: "电影", icon: Film, color: "text-purple-600 bg-purple-50" },
-    "本地生活": { label: "生活服务", icon: Gift, color: "text-teal-600 bg-teal-50" },
-    "电商": { label: "电商", icon: ShoppingBag, color: "text-rose-600 bg-rose-50" },
+    all: { label: "全部", icon: Gift, color: "text-slate-500 bg-slate-50", cardBg: "from-white to-gray-50/50", decorColor: "bg-slate-100/40" },
+    "美团": { label: "美团", icon: Store, color: "text-yellow-600 bg-yellow-50/50", cardBg: "from-white to-yellow-50/30", decorColor: "bg-yellow-200/20" },
+    "饿了么": { label: "饿了么", icon: UtensilsCrossed, color: "text-blue-600 bg-blue-50/50", cardBg: "from-white to-blue-50/30", decorColor: "bg-blue-200/20" },
+    "打车出行": { label: "出行", icon: Car, color: "text-green-600 bg-green-50/50", cardBg: "from-white to-green-50/30", decorColor: "bg-green-200/20" },
+    "连锁餐饮": { label: "连锁餐饮", icon: Coffee, color: "text-orange-600 bg-orange-50/50", cardBg: "from-white to-orange-50/30", decorColor: "bg-orange-200/20" },
+    "电影票": { label: "电影", icon: Film, color: "text-purple-600 bg-purple-50/50", cardBg: "from-white to-purple-50/30", decorColor: "bg-purple-200/20" },
+    "本地生活": { label: "生活服务", icon: Gift, color: "text-teal-600 bg-teal-50/50", cardBg: "from-white to-teal-50/30", decorColor: "bg-teal-200/20" },
+    "电商": { label: "电商", icon: ShoppingBag, color: "text-rose-600 bg-rose-50/50", cardBg: "from-white to-rose-50/30", decorColor: "bg-rose-200/20" },
 };
 
 /* ========== 工具函数 ========== */
 
 /** 获取分类显示配置，未知分类返回默认样式 */
 function getCategoryConfig(key: string): CategoryConfig {
-    return CATEGORY_CONFIG[key] || { label: key, icon: Gift, color: "text-slate-600 bg-slate-100" };
+    return CATEGORY_CONFIG[key] || { label: key, icon: Gift, color: "text-slate-500 bg-slate-50", cardBg: "from-white to-gray-50/50", decorColor: "bg-slate-100/40" };
 }
 
 /* ========== 子组件 ========== */
@@ -139,8 +143,11 @@ function CategoryTabs({
 }
 
 /**
- * 活动卡片
- * 展示活动图标、名称、描述，点击获取推广链接
+ * 活动卡片 — 卡券风格
+ *
+ * 参考经典票券造型：左右两侧半圆齿孔 + 虚线分割，
+ * 上部为分类专属渐变色区域，下部为白色操作区域。
+ * 不同分类展示不同配色，增强视觉辨识度。
  */
 function ActivityCard({
     activity,
@@ -155,66 +162,86 @@ function ActivityCard({
     const catConfig = getCategoryConfig(activity.cate_name || "");
 
     return (
-        <div className="group flex flex-col rounded-lg border border-gray-200/60 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-md sm:p-5">
-            {/* ===== 图标 + 分类标签 ===== */}
-            <div className="mb-3 flex items-start justify-between">
-                {/* 活动图标 */}
-                <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg bg-gray-50 sm:size-14">
-                    {activity.icon ? (
-                        <img
-                            src={activity.icon}
-                            alt={activity.act_name}
-                            className="size-10 object-contain sm:size-12"
-                            loading="lazy"
-                        />
-                    ) : (
-                        <Gift className="size-6 text-gray-300" />
+        <div className="group relative flex flex-col overflow-visible rounded-lg border border-gray-200/60 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-md">
+            {/* ===== 上半区：分类渐变背景 + 活动信息 ===== */}
+            <div className={`relative overflow-hidden rounded-t-lg bg-gradient-to-br ${catConfig.cardBg} px-4 pb-5 pt-4 sm:px-5 sm:pb-6`}>
+                {/* 装饰圆：右上角 */}
+                <div className={`pointer-events-none absolute -right-5 -top-5 size-24 rounded-full ${catConfig.decorColor}`} />
+                {/* 装饰圆：左侧中部 */}
+                <div className={`pointer-events-none absolute -left-4 top-1/2 size-14 rounded-full ${catConfig.decorColor}`} />
+
+                {/* 图标 + 分类标签 */}
+                <div className="relative mb-3 flex items-start justify-between">
+                    {/* 活动图标 */}
+                    <div className="flex size-11 items-center justify-center overflow-hidden rounded-lg bg-white/80 shadow-sm backdrop-blur-sm sm:size-12">
+                        {activity.icon ? (
+                            <img
+                                src={activity.icon}
+                                alt={activity.act_name}
+                                className="size-9 object-contain sm:size-10"
+                                loading="lazy"
+                            />
+                        ) : (
+                            <Gift className="size-5 text-gray-300" />
+                        )}
+                    </div>
+
+                    {/* 分类徽章 */}
+                    {activity.cate_name && (
+                        <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${catConfig.color}`}
+                        >
+                            <catConfig.icon className="size-3" />
+                            {catConfig.label}
+                        </span>
                     )}
                 </div>
 
-                {/* 分类徽章 */}
-                {activity.cate_name && (
-                    <span
-                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${catConfig.color}`}
-                    >
-                        <catConfig.icon className="size-3" />
-                        {catConfig.label}
-                    </span>
-                )}
+                {/* 活动名称 */}
+                <h3 className="mb-1 line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
+                    {activity.act_name}
+                </h3>
+
+                {/* 活动描述 */}
+                <p className="line-clamp-2 text-xs leading-relaxed text-gray-500">
+                    {activity.desc || "暂无描述"}
+                </p>
             </div>
 
-            {/* ===== 活动名称 ===== */}
-            <h3 className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
-                {activity.act_name}
-            </h3>
+            {/* ===== 卡券齿孔分割线：左右半圆齿孔 + 虚线 ===== */}
+            <div className="relative z-10 flex items-center">
+                {/* 左侧半圆齿孔（模拟票券边缘切口） */}
+                <div className="coupon-notch-left" />
+                {/* 中间虚线 */}
+                <div className="flex-1 border-t border-dashed border-gray-200/80" />
+                {/* 右侧半圆齿孔（模拟票券边缘切口） */}
+                <div className="coupon-notch-right" />
+            </div>
 
-            {/* ===== 活动描述 ===== */}
-            <p className="mb-3 flex-1 line-clamp-2 text-xs leading-relaxed text-gray-500">
-                {activity.desc || "暂无描述"}
-            </p>
-
-            {/* ===== 操作按钮 ===== */}
-            <button
-                type="button"
-                onClick={() => onOpen(activity.act_id)}
-                disabled={isLoading}
-                className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-all duration-300 ${isLoading
-                    ? "cursor-not-allowed bg-gray-100 text-gray-400"
-                    : "border border-gray-300 bg-white text-gray-700 shadow-sm hover:border-gray-400 hover:bg-gray-50 hover:shadow"
-                    }`}
-            >
-                {isLoading ? (
-                    <>
-                        <RefreshCw className="size-4 animate-spin" />
-                        获取中...
-                    </>
-                ) : (
-                    <>
-                        立即参与
-                        <ExternalLink className="size-3.5" />
-                    </>
-                )}
-            </button>
+            {/* ===== 下半区：白色背景 + 操作按钮 ===== */}
+            <div className="px-4 py-3 sm:px-5">
+                <button
+                    type="button"
+                    onClick={() => onOpen(activity.act_id)}
+                    disabled={isLoading}
+                    className={`flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-300 ${isLoading
+                            ? "cursor-not-allowed bg-gray-100 text-gray-400"
+                            : "hover:border-gray-400 hover:bg-gray-50 hover:shadow"
+                        }`}
+                >
+                    {isLoading ? (
+                        <>
+                            <RefreshCw className="size-4 animate-spin" />
+                            获取中...
+                        </>
+                    ) : (
+                        <>
+                            立即参与
+                            <ExternalLink className="size-3.5" />
+                        </>
+                    )}
+                </button>
+            </div>
         </div>
     );
 }
@@ -481,13 +508,13 @@ export default function CpsContent({
             <Header />
 
             {/* ===== Hero Banner ===== */}
-            <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-14 md:py-18">
+            <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-10 sm:py-14 md:py-20">
                 <div className={containerClass()} style={SITE_WIDTH_STYLE}>
                     <div className="mx-auto max-w-2xl text-center">
                         {/* 标签 */}
                         <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-medium text-blue-100 backdrop-blur-sm">
                             <Gift className="size-4" />
-                            聚推客联盟 · CPS 优惠聚合
+                            流量派 · 优惠聚合
                         </div>
 
                         {/* 标题 */}
@@ -505,8 +532,8 @@ export default function CpsContent({
 
             <main>
                 {/* ===== 分类筛选栏 ===== */}
-                <section className={containerClass("py-6")} style={SITE_WIDTH_STYLE}>
-                    <div className="rounded-lg bg-white p-4 shadow-sm">
+                <section className={containerClass("py-4 sm:py-6")} style={SITE_WIDTH_STYLE}>
+                    <div className="rounded-lg bg-white p-3 sm:p-4 shadow-sm">
                         <CategoryTabs
                             categories={displayCategories}
                             active={activeCategory}
@@ -520,7 +547,7 @@ export default function CpsContent({
                 <section className={containerClass("pb-16")} style={SITE_WIDTH_STYLE}>
                     {filteredActivities.length === 0 ? (
                         /* 空状态 */
-                        <div className="flex flex-col items-center py-20 text-center">
+                        <div className="flex flex-col items-center py-16 sm:py-20 text-center">
                             <Gift className="mb-4 size-12 text-gray-300" />
                             <p className="text-base font-medium text-gray-500">暂无该分类的优惠活动</p>
                             <p className="mt-1 text-sm text-gray-400">请尝试切换其他分类</p>
@@ -528,7 +555,7 @@ export default function CpsContent({
                     ) : (
                         <>
                             {/* 结果计数 */}
-                            <p className="mb-4 text-xs text-gray-400">
+                            <p className="mb-4 text-xs sm:text-sm text-gray-400">
                                 共 {filteredActivities.length} 项活动
                             </p>
 
@@ -548,7 +575,7 @@ export default function CpsContent({
                 </section>
 
                 {/* ===== 底部 CTA ===== */}
-                <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-12">
+                <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-10 sm:py-14 md:py-16">
                     <div className="mx-auto max-w-2xl px-4 text-center">
                         <h2 className="mb-3 text-2xl font-bold text-white sm:text-3xl">
                             更多优惠，尽在流量派

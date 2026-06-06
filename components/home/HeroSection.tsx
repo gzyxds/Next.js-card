@@ -65,13 +65,13 @@ const CAROUSEL_SLIDES = [
 /* ========== 左侧垂直菜单 ========== */
 
 const LEFT_MENU = [
-  { icon: Smartphone, title: "172号卡", subtitle: "店铺口碑4.98", href: "#" },
-  { icon: CreditCard, title: "浩卡联盟", subtitle: "号卡精选商城", href: "#" },
+  { icon: Smartphone, title: "172号卡", subtitle: "店铺口碑4.98", href: "/lotml" },
+  { icon: CreditCard, title: "浩卡联盟", subtitle: "号卡精选商城", href: "/haoka" },
   { icon: Wifi, title: "林夕号卡", subtitle: "万千号卡 尽在林夕", href: "/linxi" },
-  { icon: Package, title: "办业务", subtitle: "流量业务 数据业务", href: "#" },
-  { icon: Tag, title: "选号码", subtitle: "普通号码 5G畅享卡", href: "/haoka" },
-  { icon: ShoppingCart, title: "挑配件", subtitle: "手机配件 智能家居", href: "#" },
-  { icon: UserCircle, title: "我的移动", subtitle: "商品订单 账单查询", href: "#" },
+  { icon: Package, title: "生活优惠", subtitle: "外卖红包、打车券、电影票折扣", href: "/cps" },
+  { icon: Tag, title: "代理加盟", subtitle: "零门槛 · 高佣金 · 全国招募", href: "/join" },
+  { icon: ShoppingCart, title: "自助服务", subtitle: "一站直达 · 快捷服务", href: "/services" },
+  { icon: UserCircle, title: "关于我们", subtitle: "携手共赢 · 信赖之选", href: "#" },
 ];
 
 /* ========== 核心优势 2x2 ========== */
@@ -90,14 +90,14 @@ const RIGHT_LINKS = [
     icon: UserPlus,
     label: "代理申请",
     subtitle: "成为合作伙伴",
-    href: "https://haoka.lot-ml.com/plugreg.html?agentid=90925",
+    href: "https://s.haokavip.com/u/3792476",
     isExternal: true,
   },
   {
     icon: LogIn,
     label: "登入后台",
     subtitle: "代理商管理系统",
-    href: "https://haoka.lot-ml.com/login.html",
+    href: "https://www.haokavip.com/page.html#/register?code=1698006",
     isExternal: true,
   },
   {

@@ -26,11 +26,11 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* ===== 4 列均匀导航 ===== */}
+        {/* ===== 导航区域：4 列布局，与 Header 菜单栏对应 ===== */}
         <div className="grid grid-cols-2 gap-4 sm:gap-8 lg:grid-cols-4 border-t pt-10">
-          {/* 号卡办理 */}
+          {/* 号卡平台 */}
           <div>
-            <h4 className="mb-4 text-base font-semibold">号卡办理</h4>
+            <h4 className="mb-4 text-base font-semibold">号卡平台</h4>
             <ul className="space-y-2.5 text-base text-muted-foreground">
               <li>
                 <Link href="/lotml" className="transition-colors hover:text-foreground">
@@ -43,8 +43,35 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/yky" className="transition-colors hover:text-foreground">
+                  翼卡云
+                </Link>
+              </li>
+              <li>
                 <Link href="/linxi" className="transition-colors hover:text-foreground">
                   林夕通信
+                </Link>
+              </li>
+              <li>
+                <Link href="/gongchuang" className="transition-colors hover:text-foreground">
+                  共创通信
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* 功能服务 */}
+          <div>
+            <h4 className="mb-4 text-base font-semibold">功能服务</h4>
+            <ul className="space-y-2.5 text-base text-muted-foreground">
+              <li>
+                <Link href="/cps" className="transition-colors hover:text-foreground">
+                  生活优惠
+                </Link>
+              </li>
+              <li>
+                <Link href="/download" className="transition-colors hover:text-foreground">
+                  下载 APP
                 </Link>
               </li>
               <li>
@@ -52,51 +79,47 @@ export default function Footer() {
                   代理加盟
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* 快速链接 */}
-          <div>
-            <h4 className="mb-4 text-base font-semibold">快速链接</h4>
-            <ul className="space-y-2.5 text-base text-muted-foreground">
               <li>
-                <Link href="/" className="transition-colors hover:text-foreground">
-                  首页
-                </Link>
-              </li>
-              <li>
-                <Link href="#plans" className="transition-colors hover:text-foreground">
-                  套餐介绍
-                </Link>
-              </li>
-              <li>
-                <Link href="#process" className="transition-colors hover:text-foreground">
-                  办理流程
-                </Link>
-              </li>
-              <li>
-                <Link href="#faq" className="transition-colors hover:text-foreground">
-                  常见问题
+                <Link href="/services" className="transition-colors hover:text-foreground">
+                  自助服务
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* 服务支持 */}
+          {/* 关于与合作 */}
           <div>
-            <h4 className="mb-4 text-base font-semibold">服务支持</h4>
+            <h4 className="mb-4 text-base font-semibold">关于与合作</h4>
             <ul className="space-y-2.5 text-base text-muted-foreground">
               <li>
-                <span className="cursor-pointer transition-colors hover:text-foreground">用户协议</span>
+                <Link href="/about" className="transition-colors hover:text-foreground">
+                  关于我们
+                </Link>
               </li>
               <li>
-                <span className="cursor-pointer transition-colors hover:text-foreground">隐私政策</span>
+                <Link href="/cooperate" className="transition-colors hover:text-foreground">
+                  合作伙伴
+                </Link>
               </li>
               <li>
-                <span className="cursor-pointer transition-colors hover:text-foreground">售后服务</span>
+                <a
+                  href="https://urlnet.cn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-foreground"
+                >
+                  艺创官网
+                </a>
               </li>
               <li>
-                <span className="cursor-pointer transition-colors hover:text-foreground">投诉建议</span>
+                <a
+                  href="https://www.cnai.art"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-foreground"
+                >
+                  艺创 AI
+                </a>
               </li>
             </ul>
           </div>
@@ -107,23 +130,25 @@ export default function Footer() {
             {/* 二维码 */}
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <div className="mx-auto mb-2 aspect-square w-full max-w-[110px] overflow-hidden rounded-lg border bg-white p-3">
-                  <img
+                <div className="relative mx-auto mb-2 aspect-square w-full max-w-[110px] overflow-hidden rounded-lg border bg-white p-3">
+                  <Image
                     src="/wx.png"
                     alt="微信客服二维码"
-                    className="size-full object-contain"
-                    loading="lazy"
+                    fill
+                    className="object-contain"
+                    sizes="110px"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">微信咨询</p>
               </div>
               <div className="text-center">
-                <div className="mx-auto mb-2 aspect-square w-full max-w-[110px] overflow-hidden rounded-lg border bg-white p-3">
-                  <img
+                <div className="relative mx-auto mb-2 aspect-square w-full max-w-[110px] overflow-hidden rounded-lg border bg-white p-3">
+                  <Image
                     src="/weixin.png"
                     alt="客服二维码"
-                    className="size-full object-contain"
-                    loading="lazy"
+                    fill
+                    className="object-contain"
+                    sizes="110px"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">客服二维码</p>

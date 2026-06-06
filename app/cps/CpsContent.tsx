@@ -10,6 +10,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import type { JutuikeActivity } from "@/lib/api/jutuike";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
+import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
 import {
@@ -27,7 +29,6 @@ import {
     X,
     Copy,
     Check,
-    Smartphone,
 } from "lucide-react";
 
 /* ========== 类型定义 ========== */
@@ -50,27 +51,29 @@ interface CategoryConfig {
     cardBg: string;
     /** 卡券装饰圆颜色 */
     decorColor: string;
+    /** 链接弹窗头部渐变色（与分类主题一致） */
+    headerGradient: string;
 }
 
 /* ========== 分类配置 ========== */
 
 /** 分类对应的图标和颜色映射 */
 const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
-    all: { label: "全部", icon: Gift, color: "text-slate-500 bg-slate-50", cardBg: "from-white to-gray-50/50", decorColor: "bg-slate-100/40" },
-    "美团": { label: "美团", icon: Store, color: "text-yellow-600 bg-yellow-50/50", cardBg: "from-white to-yellow-50/30", decorColor: "bg-yellow-200/20" },
-    "饿了么": { label: "饿了么", icon: UtensilsCrossed, color: "text-blue-600 bg-blue-50/50", cardBg: "from-white to-blue-50/30", decorColor: "bg-blue-200/20" },
-    "打车出行": { label: "出行", icon: Car, color: "text-green-600 bg-green-50/50", cardBg: "from-white to-green-50/30", decorColor: "bg-green-200/20" },
-    "连锁餐饮": { label: "连锁餐饮", icon: Coffee, color: "text-orange-600 bg-orange-50/50", cardBg: "from-white to-orange-50/30", decorColor: "bg-orange-200/20" },
-    "电影票": { label: "电影", icon: Film, color: "text-purple-600 bg-purple-50/50", cardBg: "from-white to-purple-50/30", decorColor: "bg-purple-200/20" },
-    "本地生活": { label: "生活服务", icon: Gift, color: "text-teal-600 bg-teal-50/50", cardBg: "from-white to-teal-50/30", decorColor: "bg-teal-200/20" },
-    "电商": { label: "电商", icon: ShoppingBag, color: "text-rose-600 bg-rose-50/50", cardBg: "from-white to-rose-50/30", decorColor: "bg-rose-200/20" },
+    all: { label: "全部", icon: Gift, color: "text-slate-500 bg-slate-50", cardBg: "from-white to-gray-50/50", decorColor: "bg-slate-100/40", headerGradient: "from-slate-500 to-slate-600" },
+    "美团": { label: "美团", icon: Store, color: "text-yellow-600 bg-yellow-50/50", cardBg: "from-white to-yellow-50/30", decorColor: "bg-yellow-200/20", headerGradient: "from-yellow-500 to-orange-500" },
+    "饿了么": { label: "饿了么", icon: UtensilsCrossed, color: "text-blue-600 bg-blue-50/50", cardBg: "from-white to-blue-50/30", decorColor: "bg-blue-200/20", headerGradient: "from-blue-500 to-cyan-500" },
+    "打车出行": { label: "出行", icon: Car, color: "text-green-600 bg-green-50/50", cardBg: "from-white to-green-50/30", decorColor: "bg-green-200/20", headerGradient: "from-green-500 to-emerald-500" },
+    "连锁餐饮": { label: "连锁餐饮", icon: Coffee, color: "text-orange-600 bg-orange-50/50", cardBg: "from-white to-orange-50/30", decorColor: "bg-orange-200/20", headerGradient: "from-orange-500 to-red-500" },
+    "电影票": { label: "电影", icon: Film, color: "text-purple-600 bg-purple-50/50", cardBg: "from-white to-purple-50/30", decorColor: "bg-purple-200/20", headerGradient: "from-purple-500 to-pink-500" },
+    "本地生活": { label: "生活服务", icon: Gift, color: "text-teal-600 bg-teal-50/50", cardBg: "from-white to-teal-50/30", decorColor: "bg-teal-200/20", headerGradient: "from-teal-500 to-cyan-500" },
+    "电商": { label: "电商", icon: ShoppingBag, color: "text-rose-600 bg-rose-50/50", cardBg: "from-white to-rose-50/30", decorColor: "bg-rose-200/20", headerGradient: "from-rose-500 to-pink-500" },
 };
 
 /* ========== 工具函数 ========== */
 
 /** 获取分类显示配置，未知分类返回默认样式 */
 function getCategoryConfig(key: string): CategoryConfig {
-    return CATEGORY_CONFIG[key] || { label: key, icon: Gift, color: "text-slate-500 bg-slate-50", cardBg: "from-white to-gray-50/50", decorColor: "bg-slate-100/40" };
+    return CATEGORY_CONFIG[key] || { label: key, icon: Gift, color: "text-slate-500 bg-slate-50", cardBg: "from-white to-gray-50/50", decorColor: "bg-slate-100/40", headerGradient: "from-slate-500 to-slate-600" };
 }
 
 /* ========== 子组件 ========== */
@@ -175,11 +178,13 @@ function ActivityCard({
                     {/* 活动图标 */}
                     <div className="flex size-11 items-center justify-center overflow-hidden rounded-lg bg-white/80 shadow-sm backdrop-blur-sm sm:size-12">
                         {activity.icon ? (
-                            <img
+                            <Image
                                 src={activity.icon}
                                 alt={activity.act_name}
+                                width={40}
+                                height={40}
                                 className="size-9 object-contain sm:size-10"
-                                loading="lazy"
+                                unoptimized
                             />
                         ) : (
                             <Gift className="size-5 text-gray-300" />
@@ -225,8 +230,8 @@ function ActivityCard({
                     onClick={() => onOpen(activity.act_id)}
                     disabled={isLoading}
                     className={`flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-300 ${isLoading
-                            ? "cursor-not-allowed bg-gray-100 text-gray-400"
-                            : "hover:border-gray-400 hover:bg-gray-50 hover:shadow"
+                        ? "cursor-not-allowed bg-gray-100 text-gray-400"
+                        : "hover:border-gray-400 hover:bg-gray-50 hover:shadow"
                         }`}
                 >
                     {isLoading ? (
@@ -254,6 +259,8 @@ interface LinkModalData {
     actName: string;
     /** 推广链接 */
     url: string;
+    /** 活动分类名（用于匹配弹窗渐变色） */
+    cateName: string;
 }
 
 /**
@@ -262,6 +269,9 @@ interface LinkModalData {
  * 聚推客联盟的推广链接主要为移动端（微信小程序/H5）设计，
  * PC 端直接打开体验较差。因此桌面端显示二维码 + 复制链接，
  * 引导用户用手机扫码或复制链接到手机浏览器打开。
+ *
+ * 弹窗头部渐变色根据活动分类自动匹配（如美团→黄色系、饿了么→蓝色系），
+ * 与 ActivityCard 的分类配色保持一致。
  */
 function LinkModal({
     data,
@@ -272,6 +282,9 @@ function LinkModal({
 }) {
     const [copied, setCopied] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
+
+    /** 获取当前活动的分类配置（含渐变色） */
+    const catConfig = getCategoryConfig(data.cateName || "");
 
     /** 点击遮罩关闭 */
     const handleBackdropClick = (e: React.MouseEvent) => {
@@ -294,15 +307,7 @@ function LinkModal({
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            // fallback: 选中文本
-            const input = document.createElement("input");
-            input.value = data.url;
-            document.body.appendChild(input);
-            input.select();
-            document.execCommand("copy");
-            document.body.removeChild(input);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            alert("复制失败，请手动复制链接");
         }
     };
 
@@ -315,93 +320,80 @@ function LinkModal({
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
             onClick={handleBackdropClick}
         >
-            {/* ===== 弹窗卡片 ===== */}
+            {/* ===== 弹窗卡片：340px 定宽，紧凑布局趋近正方形 ===== */}
             <div
                 ref={modalRef}
-                className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl"
+                className="relative w-[340px] overflow-hidden rounded-2xl bg-white shadow-2xl"
             >
-                {/* 关闭按钮 */}
+                {/* ===== 关闭按钮 ===== */}
                 <button
                     type="button"
                     onClick={onClose}
-                    className="absolute right-3 top-3 z-10 rounded-full p-1.5 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
+                    className="absolute right-3 top-3 z-10 rounded-full bg-white/20 p-1.5 text-white/80 backdrop-blur-sm transition-all hover:bg-white/30 hover:text-white"
                 >
-                    <X className="size-5" />
+                    <X className="size-4" />
                 </button>
 
-                {/* ===== 头部 ===== */}
-                <div className="bg-gradient-to-r from-blue-400 to-indigo-400 px-6 py-8 text-center">
-                    <Smartphone className="mx-auto mb-3 size-10 text-white/80" />
-                    <h3 className="mb-1 text-lg font-bold text-white">请使用手机参与</h3>
-                    <p className="text-sm text-blue-100">
-                        该活动仅支持手机端，请扫码或复制链接
-                    </p>
+                {/* ===== 头部：分类渐变色，极简一行 ===== */}
+                <div className={`flex items-center gap-2.5 bg-gradient-to-br ${catConfig.headerGradient} px-5 py-3.5`}>
+                    <catConfig.icon className="size-5 text-white/80" />
+                    <h3 className="text-sm font-bold text-white">扫码参与活动</h3>
                 </div>
 
-                {/* ===== 内容区 ===== */}
-                <div className="px-6 py-6">
-                    {/* 活动名称 */}
-                    <p className="mb-4 text-center text-sm font-medium text-gray-700">
+                {/* ===== 内容区：二维码为主体，辅助元素极简 ===== */}
+                <div className="flex flex-col items-center px-5 pb-4 pt-4">
+                    {/* 活动名称（单行截断） */}
+                    <p className="mb-3 line-clamp-1 w-full text-center text-xs font-medium text-gray-500">
                         {data.actName}
                     </p>
 
-                    {/* 二维码 */}
-                    <div className="mb-4 flex justify-center">
-                        <div className="rounded-xl border-2 border-gray-100 p-3">
-                            <img
-                                src={qrUrl}
-                                alt="扫码参与活动"
-                                className="size-44"
-                            />
-                        </div>
+                    {/* 二维码：大尺寸填充横向空间 */}
+                    <div className="mb-3 rounded-xl border-2 border-gray-100 p-2">
+                        <Image
+                            src={qrUrl}
+                            alt="扫码参与活动"
+                            width={192}
+                            height={192}
+                            className="size-48"
+                            unoptimized
+                        />
                     </div>
 
-                    {/* 提示 */}
-                    <p className="mb-4 text-center text-xs text-gray-400">
-                        使用手机摄像头扫码，或复制下方链接在手机浏览器打开
+                    {/* 提示文字 */}
+                    <p className="mb-3 text-center text-[10px] leading-relaxed text-gray-400">
+                        手机扫码或复制链接在手机浏览器打开
                     </p>
 
                     {/* 链接 + 复制按钮 */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full items-center gap-2">
                         <input
                             type="text"
                             readOnly
                             value={data.url}
-                            className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs text-gray-600 outline-none"
+                            className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[11px] text-gray-600 outline-none transition-colors focus:border-gray-300"
                             onFocus={(e) => e.target.select()}
                         />
                         <button
                             type="button"
                             onClick={handleCopy}
-                            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${copied
+                            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium transition-all ${copied
                                 ? "bg-green-500 text-white"
-                                : "bg-blue-600 text-white hover:bg-blue-700"
+                                : "bg-gray-800 text-white hover:bg-gray-700"
                                 }`}
                         >
                             {copied ? (
                                 <>
-                                    <Check className="size-4" />
+                                    <Check className="size-3.5" />
                                     已复制
                                 </>
                             ) : (
                                 <>
-                                    <Copy className="size-4" />
+                                    <Copy className="size-3.5" />
                                     复制
                                 </>
                             )}
                         </button>
                     </div>
-
-                    {/* 如果用户在手机上，仍然可以点击打开 */}
-                    <a
-                        href={data.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-500 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-                    >
-                        在浏览器中打开
-                        <ExternalLink className="size-3.5" />
-                    </a>
                 </div>
             </div>
         </div>
@@ -484,8 +476,8 @@ export default function CpsContent({
 
                 /* ===== 桌面端：弹二维码 / 移动端：直接打开 ===== */
                 if (isDesktop) {
-                    // 桌面端 → 弹出二维码弹窗
-                    setModalData({ actName, url: link });
+                    // 桌面端 → 弹出二维码弹窗（传入分类以匹配渐变色）
+                    setModalData({ actName, url: link, cateName: act?.cate_name || "" });
                 } else {
                     // 移动端 → 直接打开
                     window.open(link, "_blank", "noopener,noreferrer");
@@ -584,20 +576,20 @@ export default function CpsContent({
                             海量号卡套餐 + 生活优惠，一站式推广赚钱
                         </p>
                         <div className="flex flex-wrap items-center justify-center gap-3">
-                            <a
+                            <Link
                                 href="/haoka"
                                 className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-blue-600 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
                             >
                                 查看号卡套餐
                                 <ArrowRight className="size-4" />
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 href="/join"
                                 className="inline-flex items-center gap-2 rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white transition-all hover:border-white hover:bg-white/10"
                             >
                                 加入代理
                                 <ArrowRight className="size-4" />
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </section>

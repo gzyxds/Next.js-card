@@ -6,7 +6,7 @@
  */
 
 /** 站点标准内容宽度（像素值） */
-export const SITE_WIDTH = 1450;
+export const SITE_WIDTH = 1550;
 
 /** 站点标准内容宽度 style 对象（用于组件内联样式） */
 export const SITE_WIDTH_STYLE = { maxWidth: SITE_WIDTH } as const;

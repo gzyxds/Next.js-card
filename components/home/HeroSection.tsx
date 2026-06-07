@@ -54,21 +54,21 @@ const MIN_SWIPE_DISTANCE = 50;
 const CAROUSEL_SLIDES = [
   {
     id: 1,
-    image: "/HeroSection/hero.jpg",
+    image: "/HeroSection/hero-4.png",
     title: "超大流量套餐",
     subtitle: "月租低至19元，畅享高速5G网络",
     tag: "热门推荐",
   },
   {
     id: 2,
-    image: "/HeroSection/hero-3.png",
+    image: "/HeroSection/hero.jpg",
     title: "全国通用流量",
     subtitle: "不限APP、不限速，去哪都能用",
     tag: "爆款套餐",
   },
   {
     id: 3,
-    image: "/HeroSection/hero-2.jpg",
+    image: "/HeroSection/hero-3.png",
     title: "官方正规号卡",
     subtitle: "运营商直发，实名认证，安全可靠",
     tag: "品质保障",
@@ -113,7 +113,7 @@ const LEFT_MENU: LeftMenuItem[] = [
     href: "/lotml",
     children: [
       { icon: Globe, label: "在线办理", href: "/lotml", isExternal: false },
-      { icon: Store, label: "号卡商城", href: "/lotml", isExternal: false },
+      { icon: Store, label: "号卡商城", href: "https://haokawx.lot-ml.com/ProductEn/Index/1a654e0b341cadd2", isExternal: true },
       { icon: UserPlus, label: "代理申请", href: "https://haoka.lot-ml.com/plugreg.html?agentid=90925", isExternal: true },
       { icon: LogIn, label: "登入后台", href: "https://haoka.lot-ml.com/login.html", isExternal: true },
     ],
@@ -482,8 +482,9 @@ export default function HeroSection() {
 
         {/* ======================================================================== */}
         {/* 主体三栏：lg 三列 | md 两列（左菜单+轮播 / 右侧）| <md 单列               */}
+        {/* 使用 h-full + items-stretch 确保三栏高度一致                           */}
         {/* ======================================================================== */}
-        <div className="grid gap-4 md:gap-5 md:grid-cols-[200px_1fr_260px] lg:grid-cols-[220px_1fr_280px] lg:items-stretch">
+        <div className="grid gap-2.5 md:gap-3 md:grid-cols-[200px_1fr_260px] md:items-stretch lg:grid-cols-[220px_1fr_280px] lg:items-stretch">
 
           {/* -------------------------------------------------------------------- */}
           {/* 左侧：垂直业务导航菜单（md+ 均显示）                                   */}
@@ -524,7 +525,7 @@ export default function HeroSection() {
                       <Link
                         href={item.href}
                         className={[
-                          "flex items-center gap-2.5 px-3.5 py-2 transition-colors lg:gap-3 lg:px-4",
+                          "flex items-center gap-2.5 px-3.5 py-1.5 transition-colors lg:gap-3 lg:px-4",
                           isActive ? "bg-blue-50/80" : "hover:bg-blue-50/70",
                         ].join(" ")}
                       >
@@ -535,7 +536,7 @@ export default function HeroSection() {
                           <Icon className="size-3.5 text-blue-600 lg:size-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium lg:text-sm">{item.title}</p>
+                          <p className="text-xs font-normal lg:text-sm">{item.title}</p>
                           <p className="hidden truncate text-[11px] text-muted-foreground lg:block">
                             {item.subtitle}
                           </p>
@@ -565,7 +566,7 @@ export default function HeroSection() {
                   key={item.title}
                   className={[
                     /* 定位：相对于外层 relative 容器，top-0 bottom-0 = 与导航栏等高 */
-                    "absolute top-0 bottom-0 left-full z-50 ml-2",
+                    "absolute top-0 bottom-0 left-full z-50",
                     /* 宽度：md 360px / lg 400px */
                     "w-[360px] lg:w-[400px]",
                     /* 动画：translate + scale + opacity + visibility */
@@ -583,11 +584,8 @@ export default function HeroSection() {
                     menuLeaveTimer.current = setTimeout(() => setActiveMenu(null), 120);
                   }}
                 >
-                  {/* 左侧三角箭头指引（垂直居中） */}
-                  <div className="absolute -left-1.5 top-1/2 size-3 -translate-y-1/2 rotate-45 border-b-0 border-l border-t border-gray-100/80 bg-white shadow-[-1px_1px_2px_rgba(0,0,0,0.04)]" />
-
                   {/* 弹窗主体：h-full 撑满 + flex 布局 + 内容溢出滚动 */}
-                  <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-100/90 bg-white/90 shadow-[0_0_0_1px_rgba(59,130,246,0.05),0_4px_8px_-2px_rgba(0,0,0,0.08),0_16px_32px_-8px_rgba(0,0,0,0.07)] backdrop-blur-md">
+                  <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_0_0_1px_rgba(59,130,246,0.05),0_4px_8px_-2px_rgba(0,0,0,0.08),0_16px_32px_-8px_rgba(0,0,0,0.07)]">
 
                     {/* 内容区：flex-1 + overflow-y-auto */}
                     <div className="flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:thin] [scrollbar-color:rgba(59,130,246,0.2)_transparent]">
@@ -658,13 +656,13 @@ export default function HeroSection() {
           </div>
 
           {/* -------------------------------------------------------------------- */}
-          {/* 中间：轮播主视觉（全端显示）                                           */}
+          {/* 中间：轮播主视觉（全端显示），降低最大高度使整体更紧凑                  */}
           {/* -------------------------------------------------------------------- */}
-          <div className="flex flex-col lg:h-full">
-            {/* 轮播图 */}
+          <div className="flex flex-col h-full">
+            {/* 轮播图，最大高度 280px（原 320px）使三栏整体更紧凑 */}
             <div
-              className="relative overflow-hidden rounded-md lg:flex-1"
-              style={{ minHeight: "clamp(160px, 30vw, 320px)" }}
+              className="relative overflow-hidden rounded-md flex-1"
+              style={{ minHeight: "clamp(160px, 28vw, 280px)" }}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               onMouseEnter={stopAutoPlay}
@@ -745,9 +743,9 @@ export default function HeroSection() {
           </div>
 
           {/* -------------------------------------------------------------------- */}
-          {/* 右侧：核心优势 + 快捷入口 + 运营商底栏（md+ 显示）                     */}
+          {/* 右侧：核心优势 + 快捷入口 + 运营商底栏（md+ 显示），h-full 撑满等高      */}
           {/* -------------------------------------------------------------------- */}
-          <div className="hidden md:flex md:flex-col md:gap-4 lg:h-full lg:gap-5">
+          <div className="hidden md:flex md:flex-col md:gap-3 md:h-full lg:gap-4">
             {/* 核心优势 2x2 */}
             <div>
               <div className="mb-3 flex items-center gap-2">

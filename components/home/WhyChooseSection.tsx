@@ -83,7 +83,10 @@ const SUPPORTS = [
 /** 为什么选择我们 */
 export default function WhyChooseSection() {
   return (
-    <section id="why-choose" className="bg-white">
+    <section
+      id="why-choose"
+      className="relative bg-[url('/background/background-6.png')] bg-cover bg-center bg-no-repeat"
+    >
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 标题区 ===== */}
         <div className="mb-12 text-center md:mb-14">

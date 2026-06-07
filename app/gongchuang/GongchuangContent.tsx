@@ -31,6 +31,7 @@ import {
     User,
     Clock,
 } from "lucide-react";
+import ClaimTicker from "@/components/ClaimTicker";
 
 /* ========== Props 类型 ========== */
 
@@ -110,8 +111,8 @@ function FilterRow({
                         key={opt.key}
                         onClick={() => onChange(opt.key)}
                         className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
-                                ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
-                                : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
+                            ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
+                            : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
                             }`}
                     >
                         {opt.label}
@@ -194,7 +195,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
             <Link href={`/gongchuang/${product.goods_id}`} className="block">
                 <div className="relative overflow-hidden bg-gray-100 p-2">
                     {product.imageUrl ? (
-                        <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                        <div className="relative aspect-square overflow-hidden rounded-lg">
                             <Image
                                 src={product.imageUrl}
                                 alt={product.goods_name}
@@ -204,17 +205,17 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
                             />
                         </div>
                     ) : (
-                        <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-gradient-to-br from-gray-50 to-gray-100">
+                        <div className="flex aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-gray-50 to-gray-100">
                             <Signal className="size-12 text-gray-300" />
                         </div>
                     )}
 
                     {/* 运营商标签（左上角毛玻璃） */}
                     <div className={`absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs backdrop-blur-sm ${product._operator === "mobile" ? "bg-green-500/80 text-white" :
-                            product._operator === "telecom" ? "bg-blue-500/80 text-white" :
-                                product._operator === "unicom" ? "bg-orange-500/80 text-white" :
-                                    product._operator === "broadcast" ? "bg-purple-500/80 text-white" :
-                                        "bg-gray-500/80 text-white"
+                        product._operator === "telecom" ? "bg-blue-500/80 text-white" :
+                            product._operator === "unicom" ? "bg-orange-500/80 text-white" :
+                                product._operator === "broadcast" ? "bg-purple-500/80 text-white" :
+                                    "bg-gray-500/80 text-white"
                         }`}>
                         <Signal className="size-3" />
                         <span className="font-medium">{operatorLabel}</span>
@@ -522,6 +523,7 @@ export default function GongchuangContent({ products, error }: GongchuangContent
             <main className="flex-1">
                 {/* 平台优势 */}
                 <AdvantagesSection />
+                <ClaimTicker />
 
                 {/* 错误提示 */}
                 {error && <ErrorBanner error={error} />}

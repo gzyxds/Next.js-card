@@ -45,12 +45,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/30 via-white to-white">
-      {/* ===== 装饰光晕 ===== */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-blue-100/40 blur-3xl"
-      />
+    <section className="relative overflow-hidden bg-[url('/background/background-10.png')] bg-cover bg-center bg-no-repeat">
 
       <div className={containerClass("relative py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 标题区 ===== */}

@@ -30,6 +30,7 @@ import {
   User,
   Clock,
 } from "lucide-react";
+import ClaimTicker from "@/components/ClaimTicker";
 
 /* ========== Props 类型 ========== */
 
@@ -86,20 +87,25 @@ function AdvantagesSection() {
 
   return (
     <section className={containerClass("pt-6")} style={SITE_WIDTH_STYLE}>
-      <h3 className="mb-4 text-lg font-medium text-gray-800">
+      <h3 className="mb-3 text-base font-medium text-gray-800 sm:mb-4 sm:text-lg">
         林夕通信号卡平台优势
       </h3>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 移动端双排，桌面端四列 */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {items.map((item) => (
           <div
             key={item.title}
-            className="rounded-lg bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+            className="rounded-lg bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-5"
           >
-            <div className="mb-2 flex items-center gap-2 text-blue-600">
-              <item.icon className="size-5" />
-              <span className="font-semibold text-gray-800">{item.title}</span>
+            <div className="mb-1.5 flex items-center gap-2 text-blue-600 sm:mb-2">
+              <item.icon className="size-4 shrink-0 sm:size-5" />
+              <span className="text-sm font-semibold text-gray-800 sm:text-base">
+                {item.title}
+              </span>
             </div>
-            <p className="text-sm leading-relaxed text-gray-500">{item.desc}</p>
+            <p className="text-xs leading-relaxed text-gray-400 sm:text-sm sm:text-gray-500">
+              {item.desc}
+            </p>
           </div>
         ))}
       </div>
@@ -137,11 +143,10 @@ function FilterRow({
           <button
             key={opt.key}
             onClick={() => onChange(opt.key)}
-            className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${
-              isActive
-                ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
-                : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
-            }`}
+            className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
+              ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
+              : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
+              }`}
           >
             {opt.label}
             {count !== undefined && (
@@ -258,7 +263,7 @@ function LinxiProductCard({ product }: { product: LinxiProductWithMeta }) {
       <Link href={`/linxi/${product.id}`} className="block">
         <div className="relative overflow-hidden bg-gray-100 p-2">
           {product.shop_img ? (
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+            <div className="relative aspect-square overflow-hidden rounded-lg">
               <Image
                 src={product.shop_img}
                 alt={product.shop_name}
@@ -268,7 +273,7 @@ function LinxiProductCard({ product }: { product: LinxiProductWithMeta }) {
               />
             </div>
           ) : (
-            <div className="aspect-[4/3] rounded-lg bg-gradient-to-br from-gray-50 to-gray-100" />
+            <div className="aspect-square rounded-lg bg-gradient-to-br from-gray-50 to-gray-100" />
           )}
 
           {/* 运营商标签（左上角毛玻璃） */}
@@ -582,15 +587,15 @@ export default function LinxiContent({ products, error }: LinxiContentProps) {
       <Header />
 
       {/* ===== 页面 Banner ===== */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-12">
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-8 sm:py-12">
         <div className={containerClass()} style={SITE_WIDTH_STYLE}>
           <div className="flex items-center gap-3">
-            <Signal className="size-8 text-blue-200" />
+            <Signal className="size-6 shrink-0 text-blue-200 sm:size-8" />
             <div>
-              <h1 className="text-2xl font-bold text-white sm:text-3xl">
+              <h1 className="text-xl font-bold text-white sm:text-2xl lg:text-3xl">
                 林夕通信大流量卡套餐大全
               </h1>
-              <p className="mt-1 text-sm text-blue-100">
+              <p className="mt-1 text-xs text-blue-100 sm:text-sm">
                 正规渠道直供 · 秒返/次月返佣金 · 全国包邮 · 共 {products.length} 款在售套餐
               </p>
             </div>
@@ -601,6 +606,7 @@ export default function LinxiContent({ products, error }: LinxiContentProps) {
       <main className="flex-1">
         {/* 平台优势 */}
         <AdvantagesSection />
+        <ClaimTicker />
 
         {/* 错误提示 */}
         {error && <ErrorBanner error={error} />}

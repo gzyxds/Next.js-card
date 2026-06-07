@@ -92,7 +92,7 @@ export default function ProductCard({ product, provider }: ProductCardProps) {
       {/* ===== 图片区域 ===== */}
       <Link href={`/haoka/${product.product_id}`} className="block">
         {product.product_image ? (
-          <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-800 dark:to-gray-800/60 p-2 sm:p-3">
+          <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-800 dark:to-gray-800/60 p-2 sm:p-3">
             <img
               src={product.product_image}
               alt={product.product_name}
@@ -110,7 +110,7 @@ export default function ProductCard({ product, provider }: ProductCardProps) {
           </div>
         ) : (
           /* 无图片占位 */
-          <div className="flex aspect-[4/3] w-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800/60">
+          <div className="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800/60">
             <span className="text-xs text-gray-400 dark:text-gray-600">暂无图片</span>
           </div>
         )}

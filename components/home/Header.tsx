@@ -27,6 +27,7 @@ import {
   Handshake,
   Wrench,
   Info,
+  HelpCircle,
 } from "lucide-react";
 
 /* ========== 导航数据结构 ========== */
@@ -117,6 +118,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "合作伙伴", href: "/cooperate", icon: Handshake, iconColor: "text-sky-600 bg-sky-50" },
   { label: "自助服务", href: "/services", icon: Wrench, iconColor: "text-slate-600 bg-slate-100" },
   { label: "关于我们", href: "/about", icon: Info, iconColor: "text-rose-600 bg-rose-50" },
+  { label: "常见问题", href: "/faq", icon: HelpCircle, iconColor: "text-teal-600 bg-teal-50" },
   {
     label: "合作产品",
     dropdownTitle: "生态合作产品",

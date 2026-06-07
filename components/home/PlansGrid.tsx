@@ -1,8 +1,8 @@
 /**
  * 套餐网格组件（客户端交互）
  *
- * 默认显示 10 个商品，每次点击「加载更多」再增加 10 个。
- * 响应式断点渐进：移动端 2 列 → 平板 3 列 → 桌面 4 列 → 大屏 5 列
+ * 默认显示 8 个商品，每次点击「加载更多」再增加 8 个。
+ * 响应式断点渐进：移动端 2 列 → 平板 3 列 → 桌面 4 列
  */
 "use client";
 
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 
 /** 每次增量加载数量 */
-const STEP = 10;
+const STEP = 8;
 
 interface PlansGridProps {
   products: HaokaProduct[];
@@ -27,8 +27,8 @@ export default function PlansGrid({ products }: PlansGridProps) {
 
   return (
     <>
-      {/* 渐进式响应网格：2→3→4→5 列 */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5 xl:grid-cols-5">
+      {/* 渐进式响应网格：2→3→4 列 */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
         {visible.map((plan) => (
           <ProductCard key={plan.product_id} product={plan} />
         ))}

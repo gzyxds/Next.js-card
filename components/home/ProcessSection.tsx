@@ -39,16 +39,8 @@ export default function ProcessSection() {
   ];
 
   return (
-    <section id="process" className="relative overflow-hidden bg-gradient-to-b from-white via-white to-blue-50/30">
-      {/* ===== 装饰光晕 ===== */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-20 right-0 h-72 w-72 translate-x-1/3 rounded-full bg-blue-100/30 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-32 left-0 h-64 w-64 -translate-x-1/3 rounded-full bg-indigo-100/20 blur-3xl"
-      />
+    <section id="process" className="relative overflow-hidden bg-[url('/background/background-6.png')] bg-cover bg-center bg-no-repeat">
+
 
       <div className={containerClass("relative py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 标题区 ===== */}
@@ -88,12 +80,9 @@ export default function ProcessSection() {
                 </p>
               </div>
 
-              {/* 步骤间连接线（仅桌面端4列模式可见） */}
+              {/* 步骤间连接线（仅桌面端4列模式可见，跨越gap居中） */}
               {idx < steps.length - 1 && (
-                <div className="hidden lg:block">
-                  <div className="absolute top-6 left-[calc(50%+2.5rem)] w-[calc(100%-5rem)] border-t border-dashed border-blue-200" />
-                  <ChevronRight className="absolute top-4 right-[-0.8rem] size-4 text-blue-300" />
-                </div>
+                <div className="absolute top-1/2 left-full hidden h-px w-5 -translate-y-1/2 border-t-2 border-dashed border-blue-300 lg:block" />
               )}
             </div>
           ))}

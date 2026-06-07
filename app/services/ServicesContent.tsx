@@ -37,6 +37,7 @@ import {
   Award,
   Cloud,
   Antenna,
+  RefreshCw,
 } from "lucide-react";
 
 /* ========== 类型定义 ========== */
@@ -98,6 +99,14 @@ const PLATFORMS: ServicePlatform[] = [
     decorColor: "bg-blue-100",
     services: [
       {
+        label: "在线办理",
+        href: "/lotml",
+        desc: "浏览 172 号卡精选套餐，站内一键办理",
+        icon: Smartphone,
+        iconColor: "text-blue-600 bg-blue-50",
+        level: "primary",
+      },
+      {
         label: "号卡商城",
         href: "https://h5.lot-ml.com/ProductEn/Index/1a654e0b341cadd2",
         desc: "浏览全量号卡套餐，在线选号下单",
@@ -111,7 +120,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "免费注册成为代理商，开启推广分佣",
         icon: UserPlus,
         iconColor: "text-emerald-600 bg-emerald-50",
-        level: "primary",
+        level: "secondary",
       },
       {
         label: "登录后台",
@@ -141,6 +150,14 @@ const PLATFORMS: ServicePlatform[] = [
     decorColor: "bg-rose-100",
     services: [
       {
+        label: "在线办理",
+        href: "/haoka",
+        desc: "浩卡精选套餐，站内快速办理下单",
+        icon: Smartphone,
+        iconColor: "text-rose-600 bg-rose-50",
+        level: "primary",
+      },
+      {
         label: "号卡商城",
         href: "https://mp.yapingkeji.com/#/pages/sales_index/my_store?mall_id=AUEQSwr8rvmcWnFhf%2Fnf0g%3D%3D",
         desc: "浩卡精选套餐，品质保障在线办理",
@@ -154,7 +171,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "加入浩卡联盟代理，享高额佣金",
         icon: UserPlus,
         iconColor: "text-emerald-600 bg-emerald-50",
-        level: "primary",
+        level: "secondary",
       },
       {
         label: "订单查询",
@@ -172,17 +189,33 @@ const PLATFORMS: ServicePlatform[] = [
         iconColor: "text-sky-600 bg-sky-50",
         level: "secondary",
       },
+      {
+        label: "登录后台",
+        href: "https://www.haokavip.com/page.html#/login",
+        desc: "浩卡代理商后台，查看订单与佣金",
+        icon: LogIn,
+        iconColor: "text-violet-600 bg-violet-50",
+        level: "secondary",
+      },
     ],
   },
   {
     id: "linxi",
     name: "林夕通信",
-    description: "林夕通信号卡服务，提供订单查询及三大运营商自助入口",
+    description: "林夕通信号卡服务，涵盖号卡选购、代理申请、订单查询及三大运营商自助入口",
     icon: Antenna,
     headerBg: "bg-green-50",
     accentText: "text-green-600",
     decorColor: "bg-green-100",
     services: [
+      {
+        label: "在线办理",
+        href: "/linxi",
+        desc: "林夕号卡精选套餐，站内快速办理下单",
+        icon: Smartphone,
+        iconColor: "text-green-600 bg-green-50",
+        level: "primary",
+      },
       {
         label: "号卡店铺",
         href: "https://h5.vip12300.cn/index?k=SGpiazRLQVZSREk9",
@@ -192,12 +225,28 @@ const PLATFORMS: ServicePlatform[] = [
         level: "primary",
       },
       {
+        label: "代理申请",
+        href: "https://h5.vip12300.cn/agent/reg.php?code=6GE6QUOM",
+        desc: "申请成为林夕代理商，开启推广分佣",
+        icon: UserPlus,
+        iconColor: "text-emerald-600 bg-emerald-50",
+        level: "secondary",
+      },
+      {
         label: "订单查询",
         href: "https://h5.vip12300.cn/cha?k=SGpiazRLQVZSREk9",
         desc: "林夕号卡专属订单查询通道",
         icon: Search,
         iconColor: "text-green-600 bg-green-50",
-        level: "primary",
+        level: "secondary",
+      },
+      {
+        label: "登录后台",
+        href: "https://h5.vip12300.cn/agent/login",
+        desc: "林夕代理商后台，查看订单与佣金",
+        icon: LogIn,
+        iconColor: "text-violet-600 bg-violet-50",
+        level: "secondary",
       },
       {
         label: "中国电信",
@@ -235,8 +284,16 @@ const PLATFORMS: ServicePlatform[] = [
     decorColor: "bg-cyan-100",
     services: [
       {
+        label: "在线办理",
+        href: "/yky",
+        desc: "翼卡云流量卡精选套餐，站内快速办理",
+        icon: Smartphone,
+        iconColor: "text-cyan-600 bg-cyan-50",
+        level: "primary",
+      },
+      {
         label: "在线商城",
-        href: "https://iot.87haoka.cn/shop#/?promoCode=TpImx3gi&indexFirstGroup=2",
+        href: "https://iot.87haoka.cn/s/TpImx3gi",
         desc: "浏览全量流量卡套餐，在线选号下单",
         icon: Store,
         iconColor: "text-cyan-600 bg-cyan-50",
@@ -248,7 +305,7 @@ const PLATFORMS: ServicePlatform[] = [
         desc: "申请成为翼卡云代理商，开启推广分佣",
         icon: UserPlus,
         iconColor: "text-emerald-600 bg-emerald-50",
-        level: "primary",
+        level: "secondary",
       },
       {
         label: "靓号商城",
@@ -266,20 +323,121 @@ const PLATFORMS: ServicePlatform[] = [
         iconColor: "text-sky-600 bg-sky-50",
         level: "secondary",
       },
+      {
+        label: "登录后台",
+        href: "https://iot.87haoka.cn/admin",
+        desc: "翼卡云代理商后台管理入口",
+        icon: LogIn,
+        iconColor: "text-violet-600 bg-violet-50",
+        level: "secondary",
+      },
+    ],
+  },
+  {
+    id: "gongchuang",
+    name: "共创通信",
+    description: "共创号卡分销平台，涵盖号卡选购、代理加盟、订单查询等核心功能",
+    icon: CreditCard,
+    headerBg: "bg-amber-50",
+    accentText: "text-amber-600",
+    decorColor: "bg-amber-100",
+    services: [
+      {
+        label: "在线办理",
+        href: "/gongchuang",
+        desc: "共创号卡精选套餐，站内快速办理下单",
+        icon: Smartphone,
+        iconColor: "text-amber-600 bg-amber-50",
+        level: "primary",
+      },
+      {
+        label: "号卡商城",
+        href: "https://haoka.kakatx.com/web/#/?token=MjQ3NDk3fDE3ODA4MjAwNTQ3MDVoYW9rYTY2Ng",
+        desc: "共创号卡商城，在线选号下单办理",
+        icon: Store,
+        iconColor: "text-amber-600 bg-amber-50",
+        level: "primary",
+      },
+      {
+        label: "代理申请",
+        href: "https://haoka.kakatx.com/register?inviteCode=ZKG58800",
+        desc: "申请成为共创代理商，享高额佣金",
+        icon: UserPlus,
+        iconColor: "text-emerald-600 bg-emerald-50",
+        level: "secondary",
+      },
+      {
+        label: "登录后台",
+        href: "https://haoka.kakatx.com/index",
+        desc: "共创代理商后台，查看订单与佣金",
+        icon: LogIn,
+        iconColor: "text-violet-600 bg-violet-50",
+        level: "secondary",
+      },
+      {
+        label: "订单查询",
+        href: "https://haoka.kakatx.com/web/#/pages/order/index1",
+        desc: "查询共创订单状态与物流信息",
+        icon: Search,
+        iconColor: "text-sky-600 bg-sky-50",
+        level: "secondary",
+      },
     ],
   },
 ];
 
-/** 公共服务入口列表 */
-const PUBLIC_SERVICES: ServiceItem[] = [
-  {
-    label: "一证通查",
-    href: "https://getsimnum.caict.ac.cn",
-    desc: "工信部官方服务，查询名下所有手机号卡数量",
-    icon: ShieldCheck,
-    iconColor: "text-slate-700 bg-slate-100",
-  },
-];
+/** 公共服务（官方权威）平台数据，统一使用 PlatformCard 布局 */
+const PUBLIC_PLATFORM: ServicePlatform = {
+  id: "public",
+  name: "公共服务",
+  description: "工信部及运营商官方提供的通用自助服务，权威可信",
+  icon: ShieldCheck,
+  headerBg: "bg-slate-50",
+  accentText: "text-slate-600",
+  decorColor: "bg-slate-100",
+  services: [
+    {
+      label: "一证通查",
+      href: "https://getsimnum.caict.ac.cn/",
+      desc: "工信部官方服务，查询名下所有手机号卡数量",
+      icon: ShieldCheck,
+      iconColor: "text-slate-700 bg-slate-100",
+      level: "primary",
+    },
+    {
+      label: "携号转网查询",
+      href: "https://getsimnum.caict.ac.cn/m/",
+      desc: "工信部官方服务，查询手机号是否支持携号转网",
+      icon: RefreshCw,
+      iconColor: "text-indigo-600 bg-indigo-50",
+      level: "primary",
+    },
+    {
+      label: "中国移动订单查询",
+      href: "https://dev.coc.10086.cn/coc/web/coc2020/cardqueryorder/",
+      desc: "中国移动官方号卡订单自助查询",
+      icon: Smartphone,
+      iconColor: "text-green-600 bg-green-50",
+      level: "secondary",
+    },
+    {
+      label: "中国联通订单查询",
+      href: "https://m.10010.com/myorder/",
+      desc: "中国联通官方号卡订单自助查询",
+      icon: Wifi,
+      iconColor: "text-orange-600 bg-orange-50",
+      level: "secondary",
+    },
+    {
+      label: "中国电信订单查询",
+      href: "https://pms.189.cn/cljy-ui/xshkzzfw/xshkzzfw_index?shopid=szs-ah&cmpid=szs-ah",
+      desc: "中国电信官方号卡订单自助查询",
+      icon: Radio,
+      iconColor: "text-blue-600 bg-blue-50",
+      level: "secondary",
+    },
+  ],
+};
 
 /* ========== Hero 区 ========== */
 
@@ -362,7 +520,7 @@ function HeroSection() {
             <div className="h-8 w-px bg-gray-200" />
             <div className="text-center">
               <div className="text-3xl font-extrabold text-gray-900">
-                {PLATFORMS.reduce((acc, p) => acc + p.services.length, 0) + PUBLIC_SERVICES.length}+
+                {PLATFORMS.reduce((acc, p) => acc + p.services.length, 0) + PUBLIC_PLATFORM.services.length}+
               </div>
               <div className="mt-1 text-xs text-gray-400">自助服务入口</div>
             </div>
@@ -387,11 +545,13 @@ function HeroSection() {
  * 用于商城、代理申请等核心转化入口。
  */
 function PrimaryServiceCard({ item }: { item: ServiceItem }) {
+  /* 判断是否为站内链接（以 "/" 开头），站内链接不新开标签页 */
+  const isInternal = item.href.startsWith("/");
+
   return (
     <a
       href={item.href}
-      target="_blank"
-      rel="noopener noreferrer"
+      {...(!isInternal && { target: "_blank", rel: "noopener noreferrer" })}
       className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
     >
       {/* 悬停时右上角光晕装饰 */}
@@ -413,14 +573,19 @@ function PrimaryServiceCard({ item }: { item: ServiceItem }) {
           <span className="text-sm font-bold text-gray-800 transition-colors group-hover:text-blue-700">
             {item.label}
           </span>
-          <ExternalLink className="size-3 shrink-0 text-gray-300 opacity-0 transition-all duration-200 group-hover:text-blue-400 group-hover:opacity-100" />
+          {/* 站内链接显示右箭头，外部链接显示外链图标 */}
+          {isInternal ? (
+            <ChevronRight className="size-3 shrink-0 text-gray-300 opacity-0 transition-all duration-200 group-hover:text-blue-400 group-hover:opacity-100" />
+          ) : (
+            <ExternalLink className="size-3 shrink-0 text-gray-300 opacity-0 transition-all duration-200 group-hover:text-blue-400 group-hover:opacity-100" />
+          )}
         </div>
         <p className="mt-1 text-xs leading-relaxed text-gray-400">{item.desc}</p>
       </div>
 
-      {/* 底部"立即前往"提示（悬停显示） */}
+      {/* 底部提示（悬停显示）：站内链接显示"立即办理"，外部链接显示"立即前往" */}
       <div className="flex items-center gap-1 text-xs font-medium text-blue-600 opacity-0 transition-all duration-200 group-hover:opacity-100">
-        立即前往
+        {isInternal ? "立即办理" : "立即前往"}
         <ArrowRight className="size-3" />
       </div>
     </a>
@@ -434,11 +599,13 @@ function PrimaryServiceCard({ item }: { item: ServiceItem }) {
  * 用于订单查询、登录后台、意见反馈等辅助功能。
  */
 function SecondaryServiceCard({ item }: { item: ServiceItem }) {
+  /* 判断是否为站内链接（以 "/" 开头），站内链接不新开标签页 */
+  const isInternal = item.href.startsWith("/");
+
   return (
     <a
       href={item.href}
-      target="_blank"
-      rel="noopener noreferrer"
+      {...(!isInternal && { target: "_blank", rel: "noopener noreferrer" })}
       className="group flex items-center gap-3 rounded-md border border-gray-100 bg-white/70 px-4 py-3.5 transition-all duration-200 hover:border-gray-200 hover:bg-white hover:shadow-sm"
     >
       {/* 图标 */}
@@ -459,8 +626,12 @@ function SecondaryServiceCard({ item }: { item: ServiceItem }) {
         <p className="truncate text-xs text-gray-400">{item.desc}</p>
       </div>
 
-      {/* 右侧箭头 */}
-      <ExternalLink className="size-3.5 shrink-0 text-gray-300 transition-colors group-hover:text-blue-400" />
+      {/* 站内链接显示右箭头，外部链接显示外链图标 */}
+      {isInternal ? (
+        <ChevronRight className="size-3.5 shrink-0 text-gray-300 transition-colors group-hover:text-blue-400" />
+      ) : (
+        <ExternalLink className="size-3.5 shrink-0 text-gray-300 transition-colors group-hover:text-blue-400" />
+      )}
     </a>
   );
 }
@@ -564,7 +735,10 @@ function PlatformCard({ platform }: { platform: ServicePlatform }) {
  */
 function PlatformsSection() {
   return (
-    <section className="bg-white" id="platforms">
+    <section
+      id="platforms"
+      className="bg-[url('/background/background-1.png')] bg-cover bg-center bg-no-repeat"
+    >
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* 区块标题 */}
         <div className="mb-12 text-center">
@@ -577,85 +751,13 @@ function PlatformsSection() {
           </p>
         </div>
 
-        {/* 平台大卡网格：桌面 2 列，移动 1 列 */}
+        {/* 平台大卡网格：桌面 2 列，移动 1 列（含公共服务） */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {PLATFORMS.map((platform) => (
             <PlatformCard key={platform.id} platform={platform} />
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ========== 公共服务区 ========== */
-
-/**
- * 公共（官方权威）服务区域
- *
- * 使用"官方背书"视觉风格：深色徽章 + 渐变卡片，
- * 强调工信部权威性，与平台商业服务形成区别。
- */
-function PublicSection() {
-  return (
-    <section className="bg-white" id="public">
-      <div className={containerClass("py-14 md:py-20")} style={SITE_WIDTH_STYLE}>
-        {/* 区块标题 */}
-        <div className="mb-10 text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-600">
-            <ShieldCheck className="size-3.5" />
-            工信部官方
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            公共服务
-          </h2>
-          <div className="mx-auto mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-slate-400 to-slate-600" />
-          <p className="mx-auto mt-4 max-w-xl text-sm text-gray-500">
-            工信部及运营商官方提供的通用自助服务，权威可信
-          </p>
-        </div>
-
-        {/* 公共服务卡片：宽卡横向布局，强调权威性 */}
-        <div className="mx-auto max-w-2xl space-y-4">
-          {PUBLIC_SERVICES.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-5 overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-            >
-              {/* 图标 */}
-              <div
-                className={cn(
-                  "flex size-14 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110",
-                  item.iconColor || "text-slate-600 bg-slate-100"
-                )}
-              >
-                <item.icon className="size-7" />
-              </div>
-
-              {/* 文字 */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-bold text-gray-800 transition-colors group-hover:text-slate-900">
-                    {item.label}
-                  </span>
-                  {/* 官方认证标签 */}
-                  <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">
-                    官方认证
-                  </span>
-                </div>
-                <p className="mt-1 text-sm leading-relaxed text-gray-500">{item.desc}</p>
-              </div>
-
-              {/* 右侧箭头 */}
-              <div className="flex items-center gap-1 text-sm font-medium text-slate-500 transition-colors group-hover:text-slate-700">
-                前往查询
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </a>
-          ))}
+          {/* 公共服务使用统一平台卡片布局 */}
+          <PlatformCard platform={PUBLIC_PLATFORM} />
         </div>
       </div>
     </section>
@@ -707,7 +809,6 @@ export default function ServicesContent() {
       <main>
         <HeroSection />
         <PlatformsSection />
-        <PublicSection />
         <BottomCTASection />
       </main>
       <Footer />

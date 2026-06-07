@@ -227,13 +227,8 @@ export default function FAQSection() {
   }, [activeCategory]);
 
   return (
-    <section className="relative overflow-hidden">
-      {/* 背景：多层渐变 + 顶部光晕 */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/30 to-white" />
-        <div className="absolute -top-32 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full bg-blue-100/40 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-violet-100/20 blur-3xl" />
-      </div>
+    <section className="relative overflow-hidden bg-[url('/background/background-4.png')] bg-cover bg-center bg-no-repeat">
+
 
       <div className={containerClass("py-16 md:py-24")} style={SITE_WIDTH_STYLE}>
         {/* ===== 顶部标题区 ===== */}

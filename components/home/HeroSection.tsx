@@ -15,22 +15,35 @@ import Link from "next/link";
 import Image from "next/image";
 import { SITE_WIDTH_STYLE, containerClass } from "@/lib/layout";
 import CustomerServiceModal, { type CustomerServiceModalHandle } from "@/components/home/CustomerServiceModal";
+import { CLAIM_RECORDS } from "@/lib/data/claim-records";
 import {
   ArrowRight,
   Banknote,
   ChevronRight,
+  ClipboardList,
+  Cloud,
   CreditCard,
+  ExternalLink,
+  Globe,
   LogIn,
   MessageCircle,
   Package,
+  Radio,
   ShieldCheck,
   ShoppingCart,
   Signal,
   Smartphone,
+  Sparkles,
+  Store,
   Tag,
   UserCircle,
   UserPlus,
   Wifi,
+  Bell,
+  FileText,
+  Receipt,
+  RefreshCw,
+  TrendingUp,
 } from "lucide-react";
 
 /* ========== 轮播图配置 ========== */
@@ -64,13 +77,130 @@ const CAROUSEL_SLIDES = [
 
 /* ========== 左侧垂直菜单 ========== */
 
-const LEFT_MENU = [
-  { icon: Smartphone, title: "172号卡", subtitle: "店铺口碑4.98", href: "/lotml" },
-  { icon: CreditCard, title: "浩卡联盟", subtitle: "号卡精选商城", href: "/haoka" },
-  { icon: Wifi, title: "林夕号卡", subtitle: "万千号卡 尽在林夕", href: "/linxi" },
+/** 二级菜单子项 */
+interface SubMenuItem {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  isExternal: boolean;
+}
+
+/** 二级菜单分组 */
+interface SubMenuGroup {
+  title: string;
+  items: SubMenuItem[];
+}
+
+/** 左侧菜单项（含可选子菜单） */
+interface LeftMenuItem {
+  icon: React.ElementType;
+  title: string;
+  subtitle: string;
+  href: string;
+  children?: SubMenuItem[];
+  groups?: SubMenuGroup[];
+}
+
+/**
+ * 左侧菜单配置
+ * 数据来源：《推广信息.md》各平台入口及链接
+ */
+const LEFT_MENU: LeftMenuItem[] = [
+  {
+    icon: Smartphone,
+    title: "172号卡",
+    subtitle: "店铺口碑4.98",
+    href: "/lotml",
+    children: [
+      { icon: Globe, label: "在线办理", href: "/lotml", isExternal: false },
+      { icon: Store, label: "号卡商城", href: "/lotml", isExternal: false },
+      { icon: UserPlus, label: "代理申请", href: "https://haoka.lot-ml.com/plugreg.html?agentid=90925", isExternal: true },
+      { icon: LogIn, label: "登入后台", href: "https://haoka.lot-ml.com/login.html", isExternal: true },
+    ],
+  },
+  {
+    icon: CreditCard,
+    title: "浩卡联盟",
+    subtitle: "号卡精选商城",
+    href: "/haoka",
+    children: [
+      { icon: Globe, label: "在线办理", href: "/haoka", isExternal: false },
+      { icon: Store, label: "号卡商城", href: "https://mp.yapingkeji.com/#/pages/sales_index/my_store?mall_id=AUEQSwr8rvmcWnFhf%2Fnf0g%3D%3D", isExternal: true },
+      { icon: UserPlus, label: "代理申请", href: "https://s.haokavip.com/u/3792476", isExternal: true },
+      { icon: LogIn, label: "登入后台", href: "https://www.haokavip.com/page.html#/login", isExternal: true },
+    ],
+  },
+  {
+    icon: Wifi,
+    title: "林夕号卡",
+    subtitle: "万千号卡 尽在林夕",
+    href: "/linxi",
+    children: [
+      { icon: Globe, label: "在线办理", href: "/linxi", isExternal: false },
+      { icon: Store, label: "号卡商城", href: "https://h5.vip12300.cn/index?k=SGpiazRLQVZSREk9", isExternal: true },
+      { icon: UserPlus, label: "代理申请", href: "https://h5.vip12300.cn/agent/reg.php?code=6GE6QUOM", isExternal: true },
+      { icon: LogIn, label: "登入后台", href: "https://h5.vip12300.cn/agent/login", isExternal: true },
+    ],
+  },
+  {
+    icon: Cloud,
+    title: "翼卡云",
+    subtitle: "号卡·靓号·订单查询",
+    href: "/yky",
+    children: [
+      { icon: Globe, label: "在线办理", href: "/yky", isExternal: false },
+      { icon: Store, label: "号卡商城", href: "https://iot.87haoka.cn/s/TpImx3gi", isExternal: true },
+      { icon: Sparkles, label: "靓号商城", href: "https://iot.87haoka.cn/shop/#/?indexFirstGroup=1&promoCode=TpImx3gi", isExternal: true },
+      { icon: UserPlus, label: "代理申请", href: "https://iot.87haoka.cn/r/02237888", isExternal: true },
+      { icon: LogIn, label: "登入后台", href: "https://iot.87haoka.cn/admin", isExternal: true },
+      { icon: ClipboardList, label: "订单查询", href: "https://iot.87haoka.cn/shop/#/pages-sub/login/index?promoCode=TpImx3gi", isExternal: true },
+    ],
+  },
+  {
+    icon: Radio,
+    title: "共创通信",
+    subtitle: "优质号卡·共创未来",
+    href: "/gongchuang",
+    children: [
+      { icon: Globe, label: "在线办理", href: "/gongchuang", isExternal: false },
+      { icon: Store, label: "号卡商城", href: "https://haoka.kakatx.com/web/#/?token=MjQ3NDk3fDE3ODA4MjAwNTQ3MDVoYW9rYTY2Ng", isExternal: true },
+      { icon: UserPlus, label: "代理申请", href: "https://haoka.kakatx.com/register?inviteCode=ZKG58800", isExternal: true },
+      { icon: LogIn, label: "登入后台", href: "https://haoka.kakatx.com/index", isExternal: true },
+      { icon: ClipboardList, label: "订单查询", href: "https://haoka.kakatx.com/web/#/pages/order/index1", isExternal: true },
+    ],
+  },
   { icon: Package, title: "生活优惠", subtitle: "外卖红包、打车券、电影票折扣", href: "/cps" },
   { icon: Tag, title: "代理加盟", subtitle: "零门槛 · 高佣金 · 全国招募", href: "/join" },
-  { icon: ShoppingCart, title: "自助服务", subtitle: "一站直达 · 快捷服务", href: "/services" },
+  {
+    icon: ShoppingCart,
+    title: "自助服务",
+    subtitle: "一站直达 · 快捷服务",
+    href: "/services",
+    groups: [
+      {
+        title: "查询服务",
+        items: [
+          { icon: Banknote, label: "话费余额", href: "#", isExternal: false },
+          { icon: Receipt, label: "话费账单", href: "#", isExternal: false },
+          { icon: Signal, label: "流量查询", href: "#", isExternal: false },
+          { icon: TrendingUp, label: "网龄查询", href: "#", isExternal: false },
+          { icon: RefreshCw, label: "话费充值", href: "#", isExternal: false },
+          { icon: ClipboardList, label: "已订业务", href: "#", isExternal: false },
+          { icon: FileText, label: "电子受理", href: "#", isExternal: false },
+          { icon: Bell, label: "详单查询", href: "#", isExternal: false },
+        ],
+      },
+      {
+        title: "充值交费",
+        items: [
+          { icon: Smartphone, label: "手机充值", href: "#", isExternal: false },
+          { icon: CreditCard, label: "固话充值", href: "#", isExternal: false },
+          { icon: Package, label: "充值卡充值", href: "#", isExternal: false },
+          { icon: Banknote, label: "绿通充值", href: "#", isExternal: false },
+        ],
+      },
+    ],
+  },
   { icon: UserCircle, title: "关于我们", subtitle: "携手共赢 · 信赖之选", href: "#" },
 ];
 
@@ -129,6 +259,44 @@ const BRANDS = [
   { src: "/cooperate/顺丰速运.webp", alt: "顺丰速运" },
 ];
 
+/* ========== 号卡领取滚动跑马灯 ========== */
+
+/**
+ * 号卡领取记录跑马灯组件
+ * 无限循环横向滚动，展示虚拟领取成功记录，增强信任感
+ */
+function ClaimTicker() {
+  // 复制一份数据实现无缝循环
+  const items = [...CLAIM_RECORDS, ...CLAIM_RECORDS];
+
+  return (
+    <div className="relative overflow-hidden w-full">
+      {/* 左右渐隐遮罩 */}
+      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-white to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-white to-transparent" />
+      {/* 滚动轨道，45s 慢速循环 */}
+      <div
+        className="flex gap-4 whitespace-nowrap animate-[ticker_45s_linear_infinite]"
+        style={{ width: "max-content" }}
+      >
+        {items.map((record, idx) => (
+          <div
+            key={idx}
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs"
+          >
+            <span className="inline-block size-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="font-medium text-blue-900">{record.phone}</span>
+            <span className="text-blue-500">{record.name}</span>
+            <span className="text-blue-600 font-semibold">领取成功</span>
+            <span className="text-blue-300">·</span>
+            <span className="text-blue-400">{record.plan}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ========== 快捷入口 Item（复用于多端） ========== */
 
 /** 快捷入口单项，支持 Link 和 button 两种形态 */
@@ -183,6 +351,17 @@ export default function HeroSection() {
   const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const modalRef = useRef<CustomerServiceModalHandle>(null);
   const [touchStartX, setTouchStartX] = useState(0);
+  /** 当前 hover 的左侧菜单项 title，用于控制二级弹窗显示 */
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const menuLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** 清除菜单离开定时器 */
+  const clearMenuTimer = useCallback(() => {
+    if (menuLeaveTimer.current) {
+      clearTimeout(menuLeaveTimer.current);
+      menuLeaveTimer.current = null;
+    }
+  }, []);
 
   /** 切换到下一张幻灯片 */
   const nextSlide = useCallback(
@@ -259,7 +438,6 @@ export default function HeroSection() {
         <div className="absolute -bottom-40 -left-32 h-[600px] w-[600px] rounded-full bg-indigo-50/40 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-100/20 blur-3xl" />
         <div className="absolute top-1/3 -right-16 h-[300px] w-[300px] rounded-full bg-amber-50/50 blur-2xl" />
-        {/* 科技网格纹理 */}
         <div
           className="absolute inset-0 opacity-[0.025]"
           style={{
@@ -310,37 +488,173 @@ export default function HeroSection() {
           {/* -------------------------------------------------------------------- */}
           {/* 左侧：垂直业务导航菜单（md+ 均显示）                                   */}
           {/* -------------------------------------------------------------------- */}
-          <div className="hidden md:flex md:flex-col">
-            <div className="flex h-full flex-col overflow-hidden rounded-md border border-gray-100 bg-white/80 shadow-sm backdrop-blur-sm">
+          {/*
+           * 左侧导航容器（relative）= 二级弹窗的定位锚点
+           * 弹窗通过 state 控制显示，absolute top-0 bottom-0 即与导航栏完全等高
+           */}
+          <div className="relative z-10 hidden md:flex md:flex-col">
+            {/* 导航主体 */}
+            <div className="flex h-full flex-col rounded-md border border-gray-100 bg-white/80 shadow-sm backdrop-blur-sm">
               {/* 菜单头部 */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3">
+              <div className="rounded-t-md bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3">
                 <span className="text-sm font-semibold tracking-wide text-white">网上营业厅</span>
               </div>
-              {/* 菜单列表，flex-1 撑满高度 */}
+              {/* 菜单列表 */}
               <nav className="flex flex-1 flex-col divide-y divide-gray-50">
                 {LEFT_MENU.map((item) => {
                   const Icon = item.icon;
+                  const hasSubmenu = !!(item.children || item.groups);
+                  const isActive = activeMenu === item.title;
                   return (
-                    <Link
+                    <div
                       key={item.title}
-                      href={item.href}
-                      className="group flex flex-1 items-center gap-2.5 px-3.5 py-0 transition-colors hover:bg-blue-50/70 lg:gap-3 lg:px-4"
+                      className="relative flex flex-col"
+                      onMouseEnter={() => {
+                        if (!hasSubmenu) return;
+                        clearMenuTimer();
+                        setActiveMenu(item.title);
+                      }}
+                      onMouseLeave={() => {
+                        if (!hasSubmenu) return;
+                        clearMenuTimer();
+                        menuLeaveTimer.current = setTimeout(() => setActiveMenu(null), 120);
+                      }}
                     >
-                      <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 transition-transform group-hover:scale-110 lg:size-8">
-                        <Icon className="size-3.5 text-blue-600 lg:size-4" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium lg:text-sm">{item.title}</p>
-                        <p className="hidden truncate text-[11px] text-muted-foreground lg:block">
-                          {item.subtitle}
-                        </p>
-                      </div>
-                      <ChevronRight className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                    </Link>
+                      {/* 父级菜单项 */}
+                      <Link
+                        href={item.href}
+                        className={[
+                          "flex items-center gap-2.5 px-3.5 py-2 transition-colors lg:gap-3 lg:px-4",
+                          isActive ? "bg-blue-50/80" : "hover:bg-blue-50/70",
+                        ].join(" ")}
+                      >
+                        <div className={[
+                          "flex size-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 transition-transform lg:size-8",
+                          isActive ? "scale-110" : "",
+                        ].join(" ")}>
+                          <Icon className="size-3.5 text-blue-600 lg:size-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium lg:text-sm">{item.title}</p>
+                          <p className="hidden truncate text-[11px] text-muted-foreground lg:block">
+                            {item.subtitle}
+                          </p>
+                        </div>
+                        {hasSubmenu && (
+                          <ChevronRight className={[
+                            "size-3.5 shrink-0 text-muted-foreground transition-transform",
+                            isActive ? "rotate-90 text-blue-500" : "",
+                          ].join(" ")} />
+                        )}
+                      </Link>
+                    </div>
                   );
                 })}
               </nav>
             </div>
+
+            {/* ------------------------------------------------------------------ */}
+            {/* 二级弹窗层：absolute top-0 bottom-0 与整个导航栏完全等高           */}
+            {/* 通过 activeMenu state 控制显示，left-full 贴紧导航栏右边缘          */}
+            {/* ------------------------------------------------------------------ */}
+            {LEFT_MENU.map((item) => {
+              if (!item.children && !item.groups) return null;
+              const isVisible = activeMenu === item.title;
+              return (
+                <div
+                  key={item.title}
+                  className={[
+                    /* 定位：相对于外层 relative 容器，top-0 bottom-0 = 与导航栏等高 */
+                    "absolute top-0 bottom-0 left-full z-50 ml-2",
+                    /* 宽度：md 360px / lg 400px */
+                    "w-[360px] lg:w-[400px]",
+                    /* 动画：translate + scale + opacity + visibility */
+                    "transition-[transform,opacity,visibility] duration-200 ease-out",
+                    isVisible
+                      ? "pointer-events-auto visible translate-x-0 scale-100 opacity-100"
+                      : "pointer-events-none invisible translate-x-3 scale-[0.97] opacity-0",
+                  ].join(" ")}
+                  onMouseEnter={() => {
+                    clearMenuTimer();
+                    setActiveMenu(item.title);
+                  }}
+                  onMouseLeave={() => {
+                    clearMenuTimer();
+                    menuLeaveTimer.current = setTimeout(() => setActiveMenu(null), 120);
+                  }}
+                >
+                  {/* 左侧三角箭头指引（垂直居中） */}
+                  <div className="absolute -left-1.5 top-1/2 size-3 -translate-y-1/2 rotate-45 border-b-0 border-l border-t border-gray-100/80 bg-white shadow-[-1px_1px_2px_rgba(0,0,0,0.04)]" />
+
+                  {/* 弹窗主体：h-full 撑满 + flex 布局 + 内容溢出滚动 */}
+                  <div className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-100/90 bg-white/90 shadow-[0_0_0_1px_rgba(59,130,246,0.05),0_4px_8px_-2px_rgba(0,0,0,0.08),0_16px_32px_-8px_rgba(0,0,0,0.07)] backdrop-blur-md">
+
+                    {/* 内容区：flex-1 + overflow-y-auto */}
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:thin] [scrollbar-color:rgba(59,130,246,0.2)_transparent]">
+
+                      {/*
+                       * 统一使用「分组标题 + 网格图标」样式渲染所有二级菜单
+                       * - groups：多分组，逐组渲染
+                       * - children：单分组，用菜单标题作为分组名
+                       */}
+                      {(() => {
+                        /* 统一转换为分组结构 */
+                        const groups: { title: string; items: SubMenuItem[] }[] = item.groups
+                          ? item.groups
+                          : [{ title: item.title, items: item.children! }];
+
+                        return (
+                          <div className="py-1">
+                            {groups.map((group, groupIndex) => (
+                              <div key={group.title}>
+                                {/* 分组间虚线分隔 */}
+                                {groupIndex > 0 && (
+                                  <div className="mx-5 my-1 border-t border-dashed border-gray-100" />
+                                )}
+                                <div className="px-5 pb-5 pt-4">
+                                  {/* 分组标题：渐变横线 + 居中蓝色标签 */}
+                                  <div className="mb-4 flex items-center gap-3">
+                                    <div className="h-px flex-1 bg-gradient-to-r from-transparent to-blue-200/70" />
+                                    <span className="text-xs font-semibold tracking-[0.12em] text-blue-500 select-none">
+                                      {group.title}
+                                    </span>
+                                    <div className="h-px flex-1 bg-gradient-to-l from-transparent to-blue-200/70" />
+                                  </div>
+                                  {/* 4 列图标网格 */}
+                                  <div className="grid grid-cols-4 gap-x-2 gap-y-3">
+                                    {group.items.map((child) => {
+                                      const ChildIcon = child.icon;
+                                      return (
+                                        <Link
+                                          key={child.label}
+                                          href={child.href}
+                                          target={child.isExternal ? "_blank" : undefined}
+                                          rel={child.isExternal ? "noopener noreferrer" : undefined}
+                                          className="group/item flex flex-col items-center gap-2 rounded-xl px-1.5 py-3 text-center transition-all duration-150 hover:bg-blue-50/80 active:scale-95 active:bg-blue-100/60"
+                                        >
+                                          {/* 圆形图标：size-12，蓝色边框，悬停光晕 */}
+                                          <div className="flex size-12 items-center justify-center rounded-full border border-blue-100 bg-blue-50/90 transition-all duration-200 group-hover/item:border-blue-300 group-hover/item:bg-blue-100/80 group-hover/item:shadow-[0_0_0_4px_rgba(59,130,246,0.08)]">
+                                            <ChildIcon className="size-5 text-blue-500 transition-colors group-hover/item:text-blue-600" />
+                                          </div>
+                                          {/* 标签文字 */}
+                                          <span className="w-full truncate text-xs font-medium leading-tight text-gray-500 transition-colors group-hover/item:text-blue-600">
+                                            {child.label}
+                                          </span>
+                                        </Link>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* -------------------------------------------------------------------- */}
@@ -522,27 +836,14 @@ export default function HeroSection() {
                 </div>
               ))}
             </div>
-            {/* 品牌 Logo */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
-              {BRANDS.map((brand) => (
-                <Image
-                  key={brand.alt}
-                  src={brand.src}
-                  alt={brand.alt}
-                  width={100}
-                  height={28}
-                  loading="lazy"
-                  className="h-7 w-auto object-contain opacity-80"
-                  title={brand.alt}
-                />
-              ))}
-            </div>
+            {/* 号卡领取记录跑马灯（移动端） */}
+            <ClaimTicker />
           </div>
 
-          {/* 平板+桌面：单行完整版 */}
-          <div className="hidden md:flex md:items-center md:justify-between px-5 py-3.5">
-            {/* 运营商标签 */}
-            <div className="flex items-center gap-2.5">
+          {/* 平板+桌面：三列 grid，中间跑马灯不被两侧挤压 */}
+          <div className="hidden md:grid md:grid-cols-[auto_1fr_auto] md:items-center gap-4 px-5 py-3.5">
+            {/* 左：运营商标签 */}
+            <div className="flex items-center gap-2.5 shrink-0">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 合作运营商
               </span>
@@ -559,24 +860,13 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* 品牌 Logo */}
-            <div className="flex items-center gap-4">
-              {BRANDS.map((brand) => (
-                <Image
-                  key={brand.alt}
-                  src={brand.src}
-                  alt={brand.alt}
-                  width={100}
-                  height={36}
-                  loading="lazy"
-                  className="h-9 w-auto object-contain opacity-75 transition-opacity hover:opacity-100"
-                  title={brand.alt}
-                />
-              ))}
+            {/* 中：号卡领取记录跑马灯，占满剩余空间，min-w-0 防止溢出 */}
+            <div className="min-w-0">
+              <ClaimTicker />
             </div>
 
-            {/* 数据统计 */}
-            <div className="flex gap-5">
+            {/* 右：数据统计 */}
+            <div className="flex gap-5 shrink-0">
               <div className="flex flex-col items-center">
                 <span className="text-base font-bold text-foreground">100万+</span>
                 <span className="text-[11px] text-muted-foreground">用户信赖</span>

@@ -61,7 +61,7 @@ const CAROUSEL_SLIDES = [
   },
   {
     id: 2,
-    image: "/HeroSection/1mfx.png",
+    image: "/HeroSection/hero-3.png",
     title: "全国通用流量",
     subtitle: "不限APP、不限速，去哪都能用",
     tag: "爆款套餐",

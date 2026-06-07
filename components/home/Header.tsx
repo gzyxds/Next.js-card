@@ -28,6 +28,7 @@ import {
   Wrench,
   Info,
   HelpCircle,
+  Wifi,
 } from "lucide-react";
 
 /* ========== 导航数据结构 ========== */
@@ -109,6 +110,13 @@ const NAV_ITEMS: NavItem[] = [
         desc: "共创号卡平台，佣金日结",
         icon: BadgeCheck,
         iconColor: "text-violet-600 bg-violet-50",
+      },
+      {
+        label: "随身WIFI",
+        href: "#",
+        desc: "随身WIFI设备，随时上网",
+        icon: Wifi,
+        iconColor: "text-orange-500 bg-orange-50",
       },
     ],
   },

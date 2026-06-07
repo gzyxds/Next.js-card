@@ -36,7 +36,6 @@ import {
   Sparkles,
   Store,
   Tag,
-  UserCircle,
   UserPlus,
   Wifi,
   Bell,
@@ -201,7 +200,6 @@ const LEFT_MENU: LeftMenuItem[] = [
       },
     ],
   },
-  { icon: UserCircle, title: "关于我们", subtitle: "携手共赢 · 信赖之选", href: "#" },
 ];
 
 /* ========== 核心优势 2x2 ========== */
@@ -509,7 +507,7 @@ export default function HeroSection() {
                   return (
                     <div
                       key={item.title}
-                      className="relative flex flex-col"
+                      className="relative flex flex-1 flex-col"
                       onMouseEnter={() => {
                         if (!hasSubmenu) return;
                         clearMenuTimer();
@@ -525,7 +523,7 @@ export default function HeroSection() {
                       <Link
                         href={item.href}
                         className={[
-                          "flex items-center gap-2.5 px-3.5 py-1.5 transition-colors lg:gap-3 lg:px-4",
+                          "flex h-full items-center gap-2.5 px-3.5 transition-colors lg:gap-3 lg:px-4",
                           isActive ? "bg-blue-50/80" : "hover:bg-blue-50/70",
                         ].join(" ")}
                       >

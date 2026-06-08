@@ -368,6 +368,73 @@ function generateKsjSign(params: KsjRequestParams): string {
     return decodeURIComponent(encrypted.toString("base64"));
 }
 
+/* ========== 超时与网络工具 ========== */
+
+/** 单次请求超时时间（毫秒） */
+const FETCH_TIMEOUT_MS = 15000;
+
+/**
+ * 带超时的 fetch 请求
+ *
+ * 使用 AbortController 在指定时间内中断请求，
+ * 防止 Vercel Serverless 函数因外部 API 响应慢而超时挂起。
+ *
+ * @param url - 请求地址
+ * @param options - fetch 选项
+ * @param timeoutMs - 超时毫秒数，默认 15000
+ * @returns Response 对象
+ */
+async function fetchWithTimeout(
+    url: string,
+    options: RequestInit,
+    timeoutMs: number = FETCH_TIMEOUT_MS
+): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+        });
+        return response;
+    } catch (err: unknown) {
+        // 区分超时 / DNS / 网络等不同错误类型
+        if (err instanceof DOMException && err.name === "AbortError") {
+            throw new Error(
+                `请求超时（${timeoutMs / 1000}s），卡世界 API 响应过慢`
+            );
+        }
+        if (err instanceof TypeError) {
+            // TypeError: fetch failed 通常是 DNS 解析失败或网络不可达
+            const cause = (err as TypeError & { cause?: { code?: string } })
+                .cause;
+            const code = cause?.code || "";
+            if (code === "ENOTFOUND" || code === "EAI_AGAIN") {
+                throw new Error(
+                    `DNS 解析失败，无法连接 ksjhaoka.com（错误码: ${code}）`
+                );
+            }
+            if (code === "ECONNREFUSED" || code === "ECONNRESET") {
+                throw new Error(
+                    `连接被拒绝或重置（错误码: ${code}）`
+                );
+            }
+            if (code === "CERT_HAS_EXPIRED" || code === "UNABLE_TO_VERIFY_LEAF_SIGNATURE") {
+                throw new Error(
+                    `SSL 证书验证失败（错误码: ${code}）`
+                );
+            }
+            throw new Error(
+                `网络请求失败: ${err.message}${code ? `（错误码: ${code}）` : ""}`
+            );
+        }
+        throw err;
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
 /* ========== 商品数据接口 ========== */
 
 /**
@@ -409,8 +476,8 @@ async function fetchKsjRaw(
         "https://ksjhaoka.com/api/admin/store/sale?sign=" +
         encodeURIComponent(sign);
 
-    /* ===== 发送请求（模拟浏览器头以通过 WAF） ===== */
-    const response = await fetch(url, {
+    /* ===== 发送请求（带超时保护 + 模拟浏览器头） ===== */
+    const response = await fetchWithTimeout(url, {
         method: "GET",
         headers: {
             Accept: "application/json, text/plain, */*",
@@ -426,7 +493,7 @@ async function fetchKsjRaw(
     });
 
     if (!response.ok) {
-        throw new Error(`卡世界API请求失败: HTTP ${response.status}`);
+        throw new Error(`卡世界API请求失败: HTTP ${response.status}（第${currentPage}页）`);
     }
 
     const result = (await response.json()) as KsjApiResponse;
@@ -470,7 +537,8 @@ export async function fetchKsjProducts(): Promise<{
 
     console.log("[KsjCache] 缓存失效或首次请求，开始拉取数据");
 
-    /* ===== 循环拉取所有分页数据 ===== */
+    /* ===== 循环拉取所有分页数据（最大 5 页，防止 Vercel 函数超时） ===== */
+    const MAX_PAGES = 5;
     const allProducts: KsjProduct[] = [];
     let currentPage = 1;
     let lastPage = 1; // 默认 1 页，首页响应后更新
@@ -488,7 +556,13 @@ export async function fetchKsjProducts(): Promise<{
         );
 
         currentPage++;
-    } while (currentPage <= lastPage);
+    } while (currentPage <= lastPage && currentPage <= MAX_PAGES);
+
+    if (currentPage <= lastPage) {
+        console.warn(
+            `[KsjCache] 已达最大页数限制（${MAX_PAGES} 页），剩余 ${lastPage - MAX_PAGES} 页未加载`
+        );
+    }
 
     console.log(`[KsjCache] 全量拉取完成，共 ${allProducts.length} 条商品`);
 

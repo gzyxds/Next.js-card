@@ -334,7 +334,7 @@ const PLATFORMS: ServicePlatform[] = [
     ],
   },
   {
-    id: "gongchuang",
+    id: "kakatx",
     name: "共创通信",
     description: "共创号卡分销平台，涵盖号卡选购、代理加盟、订单查询等核心功能",
     icon: CreditCard,
@@ -344,7 +344,7 @@ const PLATFORMS: ServicePlatform[] = [
     services: [
       {
         label: "在线办理",
-        href: "/gongchuang",
+        href: "/kakatx",
         desc: "共创号卡精选套餐，站内快速办理下单",
         icon: Smartphone,
         iconColor: "text-amber-600 bg-amber-50",

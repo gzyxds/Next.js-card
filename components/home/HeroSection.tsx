@@ -159,9 +159,9 @@ const LEFT_MENU: LeftMenuItem[] = [
     icon: Radio,
     title: "共创通信",
     subtitle: "优质号卡·共创未来",
-    href: "/gongchuang",
+    href: "/kakatx",
     children: [
-      { icon: Globe, label: "在线办理", href: "/gongchuang", isExternal: false },
+      { icon: Globe, label: "在线办理", href: "/kakatx", isExternal: false },
       { icon: Store, label: "号卡商城", href: "https://haoka.kakatx.com/web/#/?token=MjQ3NDk3fDE3ODA4MjAwNTQ3MDVoYW9rYTY2Ng", isExternal: true },
       { icon: UserPlus, label: "代理申请", href: "https://haoka.kakatx.com/register?inviteCode=ZKG58800", isExternal: true },
       { icon: LogIn, label: "登入后台", href: "https://haoka.kakatx.com/index", isExternal: true },

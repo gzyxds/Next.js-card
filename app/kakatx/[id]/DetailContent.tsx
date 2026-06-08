@@ -78,7 +78,7 @@ function NotFoundPage({ error }: { error?: string }) {
                         {error || "该商品不存在或已下架"}
                     </p>
                     <Link
-                        href="/gongchuang"
+                        href="/kakatx"
                         className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
                     >
                         <ArrowLeft className="size-4" /> 返回商品列表
@@ -105,7 +105,7 @@ function Breadcrumb({ productName }: { productName: string }) {
                     </li>
                     <li className="text-gray-300">/</li>
                     <li>
-                        <Link href="/gongchuang" className="hover:text-blue-600">
+                        <Link href="/kakatx" className="hover:text-blue-600">
                             共创通信
                         </Link>
                     </li>
@@ -351,7 +351,7 @@ function ProductDetail({ product }: { product: GongchuangProductWithMeta }) {
                             立即办理
                         </a>
                         <Link
-                            href="/gongchuang"
+                            href="/kakatx"
                             className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-blue-600 bg-white px-6 py-3 text-sm font-bold text-blue-600 transition-all hover:bg-blue-50"
                         >
                             <ArrowLeft className="size-4" />

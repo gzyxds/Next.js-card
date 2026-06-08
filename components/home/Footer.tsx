@@ -53,7 +53,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/gongchuang" className="transition-colors hover:text-foreground">
+                <Link href="/kakatx" className="transition-colors hover:text-foreground">
                   共创通信
                 </Link>
               </li>

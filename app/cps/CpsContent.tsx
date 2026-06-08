@@ -131,7 +131,7 @@ function CategoryTabs({
                         key={cat.key}
                         type="button"
                         onClick={() => onChange(cat.key)}
-                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300 md:px-4 md:py-2 md:text-sm ${isActive
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-300 md:px-4 md:py-2 md:text-sm ${isActive
                             ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/20"
                             : "border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                             }`}
@@ -174,7 +174,7 @@ function ActivityCard({
     return (
         <div className="group relative flex flex-col overflow-visible rounded-lg border border-gray-200/60 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-md">
             {/* ===== 上半区：分类渐变背景 + 活动信息 ===== */}
-            <div className={`relative overflow-hidden rounded-t-lg bg-gradient-to-br ${catConfig.cardBg} px-4 pb-5 pt-4 sm:px-5 sm:pb-6`}>
+            <div className={`relative overflow-hidden rounded-t-lg bg-linear-to-br ${catConfig.cardBg} px-4 pb-5 pt-4 sm:px-5 sm:pb-6`}>
                 {/* 装饰圆：右上角 */}
                 <div className={`pointer-events-none absolute -right-5 -top-5 size-24 rounded-full ${catConfig.decorColor}`} />
                 {/* 装饰圆：左侧中部 */}
@@ -342,7 +342,7 @@ function LinkModal({
                 </button>
 
                 {/* ===== 头部：分类渐变色，极简一行 ===== */}
-                <div className={`flex items-center gap-2.5 bg-gradient-to-br ${catConfig.headerGradient} px-5 py-3.5`}>
+                <div className={`flex items-center gap-2.5 bg-linear-to-br ${catConfig.headerGradient} px-5 py-3.5`}>
                     <catConfig.icon className="size-5 text-white/80" />
                     <h3 className="text-sm font-bold text-white">扫码参与活动</h3>
                 </div>
@@ -507,7 +507,7 @@ export default function CpsContent({
             <Header />
 
             {/* ===== Hero Banner ===== */}
-            <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-10 sm:py-14 md:py-20">
+            <section className="bg-linear-to-br from-blue-600 via-blue-700 to-indigo-700 py-10 sm:py-14 md:py-20">
                 <div className={containerClass()} style={SITE_WIDTH_STYLE}>
                     <div className="mx-auto max-w-2xl text-center">
                         {/* 标签 */}
@@ -574,7 +574,7 @@ export default function CpsContent({
                 </section>
 
                 {/* ===== 底部 CTA ===== */}
-                <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-10 sm:py-14 md:py-16">
+                <section className="bg-linear-to-r from-blue-600 to-blue-700 py-10 sm:py-14 md:py-16">
                     <div className="mx-auto max-w-2xl px-4 text-center">
                         <h2 className="mb-3 text-2xl font-bold text-white sm:text-3xl">
                             更多优惠，尽在流量派

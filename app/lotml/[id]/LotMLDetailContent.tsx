@@ -138,7 +138,7 @@ function ParamCard({
 }) {
   return (
     <div
-      className={`rounded-xl bg-gradient-to-br p-4 text-center ${gradientFrom || "from-blue-50"} ${gradientTo || "to-indigo-50"}`}
+      className={`rounded-xl bg-linear-to-br p-4 text-center ${gradientFrom || "from-blue-50"} ${gradientTo || "to-indigo-50"}`}
     >
       <p className="mb-1 text-xs text-gray-500">{label}</p>
       <p className={`text-2xl font-black ${textColor || "text-gray-800"}`}>
@@ -208,7 +208,7 @@ function ProductDetail({ product }: { product: LotMLProductWithMeta }) {
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             ) : (
-              <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+              <div className="flex h-full items-center justify-center bg-linear-to-br from-gray-50 to-gray-100">
                 <Signal className="size-16 text-gray-300" />
               </div>
             )}
@@ -327,7 +327,7 @@ function ProductDetail({ product }: { product: LotMLProductWithMeta }) {
               href={orderUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-3 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-linear-to-r from-blue-600 to-blue-700 px-8 py-3 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
             >
               <ShoppingCart className="size-5" />
               立即办理
@@ -611,7 +611,7 @@ function ProductDetail({ product }: { product: LotMLProductWithMeta }) {
           href={orderUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 py-3.5 text-sm font-bold text-white shadow-lg"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-blue-600 to-blue-700 py-3.5 text-sm font-bold text-white shadow-lg"
         >
           <ShoppingCart className="size-5" />
           立即免费办理

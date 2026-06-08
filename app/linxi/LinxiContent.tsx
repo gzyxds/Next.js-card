@@ -58,6 +58,82 @@ const DURATION_OPTIONS = [
   { key: "6个月", label: "6个月" },
 ];
 
+/** 优惠月租筛选选项 */
+const PRICE_OPTIONS = [
+  { key: "all", label: "不限" },
+  { key: "0-19", label: "0-19元" },
+  { key: "19-29", label: "19-29元" },
+  { key: "29-39", label: "29-39元" },
+  { key: "39+", label: "39元以上" },
+];
+
+/**
+ * 月租匹配逻辑
+ * @param p - 商品数据
+ * @param range - 价格区间 key
+ */
+function matchPrice(p: LinxiProductWithMeta, range: string): boolean {
+  const v = p._price;
+  switch (range) {
+    case "0-19": return v > 0 && v <= 19;
+    case "19-29": return v > 19 && v <= 29;
+    case "29-39": return v > 29 && v <= 39;
+    case "39+": return v > 39;
+    default: return true;
+  }
+}
+
+/** 可用流量筛选选项 */
+const FLOW_OPTIONS = [
+  { key: "all", label: "不限" },
+  { key: "0-50", label: "50GB以下" },
+  { key: "50-100", label: "50-100GB" },
+  { key: "100-200", label: "100-200GB" },
+  { key: "200+", label: "200GB以上" },
+];
+
+/**
+ * 流量匹配逻辑
+ * @param p - 商品数据
+ * @param range - 流量区间 key
+ */
+function matchFlow(p: LinxiProductWithMeta, range: string): boolean {
+  const v = parseFloat(p._flow);
+  if (isNaN(v)) return range === "all";
+  switch (range) {
+    case "0-50": return v <= 50;
+    case "50-100": return v > 50 && v <= 100;
+    case "100-200": return v > 100 && v <= 200;
+    case "200+": return v > 200;
+    default: return true;
+  }
+}
+
+/** 通话时长筛选选项 */
+const VOICE_OPTIONS = [
+  { key: "all", label: "不限" },
+  { key: "0", label: "无通话" },
+  { key: "1-100", label: "1-100分钟" },
+  { key: "100-300", label: "100-300分钟" },
+  { key: "300+", label: "300分钟以上" },
+];
+
+/**
+ * 通话时长匹配逻辑
+ * @param p - 商品数据
+ * @param range - 通话区间 key
+ */
+function matchVoice(p: LinxiProductWithMeta, range: string): boolean {
+  const v = parseInt(p._voice);
+  switch (range) {
+    case "0": return isNaN(v) || v === 0;
+    case "1-100": return v >= 1 && v <= 100;
+    case "100-300": return v > 100 && v <= 300;
+    case "300+": return v > 300;
+    default: return true;
+  }
+}
+
 /* ========== 页面顶栏优势 ========== */
 
 /** 页面顶部平台优势介绍 */
@@ -143,7 +219,7 @@ function FilterRow({
           <button
             key={opt.key}
             onClick={() => onChange(opt.key)}
-            className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
+            className={`rounded-md border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
               ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
               : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
               }`}
@@ -169,15 +245,41 @@ function FilterBar({
   onOperatorChange,
   activeDuration,
   onDurationChange,
+  activePrice,
+  onPriceChange,
+  activeFlow,
+  onFlowChange,
+  activeVoice,
+  onVoiceChange,
+  activeLocation,
+  onLocationChange,
   operatorCounts,
   durationCounts,
+  priceCounts,
+  flowCounts,
+  voiceCounts,
+  locationOptions,
+  locationCounts,
 }: {
   activeOperator: string;
   onOperatorChange: (k: string) => void;
   activeDuration: string;
   onDurationChange: (k: string) => void;
+  activePrice: string;
+  onPriceChange: (k: string) => void;
+  activeFlow: string;
+  onFlowChange: (k: string) => void;
+  activeVoice: string;
+  onVoiceChange: (k: string) => void;
+  activeLocation: string;
+  onLocationChange: (k: string) => void;
   operatorCounts: Record<string, number>;
   durationCounts: Record<string, number>;
+  priceCounts: Record<string, number>;
+  flowCounts: Record<string, number>;
+  voiceCounts: Record<string, number>;
+  locationOptions: { key: string; label: string }[];
+  locationCounts: Record<string, number>;
 }) {
   return (
     <div className={containerClass("py-4")} style={SITE_WIDTH_STYLE}>
@@ -191,11 +293,43 @@ function FilterBar({
         />
         <div className="border-t border-gray-50" />
         <FilterRow
+          label="归属地"
+          options={locationOptions}
+          activeKey={activeLocation}
+          onChange={onLocationChange}
+          counts={locationCounts}
+        />
+        <div className="border-t border-gray-50" />
+        <FilterRow
           label="套餐时长"
           options={DURATION_OPTIONS}
           activeKey={activeDuration}
           onChange={onDurationChange}
           counts={durationCounts}
+        />
+        <div className="border-t border-gray-50" />
+        <FilterRow
+          label="优惠月租"
+          options={PRICE_OPTIONS}
+          activeKey={activePrice}
+          onChange={onPriceChange}
+          counts={priceCounts}
+        />
+        <div className="border-t border-gray-50" />
+        <FilterRow
+          label="可用流量"
+          options={FLOW_OPTIONS}
+          activeKey={activeFlow}
+          onChange={onFlowChange}
+          counts={flowCounts}
+        />
+        <div className="border-t border-gray-50" />
+        <FilterRow
+          label="通话时长"
+          options={VOICE_OPTIONS}
+          activeKey={activeVoice}
+          onChange={onVoiceChange}
+          counts={voiceCounts}
         />
       </div>
     </div>
@@ -273,7 +407,7 @@ function LinxiProductCard({ product }: { product: LinxiProductWithMeta }) {
               />
             </div>
           ) : (
-            <div className="aspect-square rounded-lg bg-gradient-to-br from-gray-50 to-gray-100" />
+            <div className="aspect-square rounded-lg bg-linear-to-br from-gray-50 to-gray-100" />
           )}
 
           {/* 运营商标签（左上角毛玻璃） */}
@@ -333,7 +467,7 @@ function LinxiProductCard({ product }: { product: LinxiProductWithMeta }) {
               {product._tags.slice(0, 3).map((tag, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center rounded-full bg-blue-600/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-blue-600/80"
+                  className="inline-flex items-center rounded-full bg-blue-600/4 px-2.5 py-0.5 text-[11px] font-medium text-blue-600/80"
                 >
                   {tag.text}
                 </span>
@@ -408,22 +542,39 @@ function ProductGrid({
   products,
   activeOperator,
   activeDuration,
+  activePrice,
+  activeFlow,
+  activeVoice,
+  activeLocation,
 }: {
   products: LinxiProductWithMeta[];
   activeOperator: string;
   activeDuration: string;
+  activePrice: string;
+  activeFlow: string;
+  activeVoice: string;
+  activeLocation: string;
 }) {
   /* ===== 筛选逻辑 ===== */
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (activeOperator !== "all" && p._operator !== activeOperator) return false;
+      if (activeLocation !== "all") {
+        const loc = p.gsd_province
+          || p.shop_provinces?.split(",")[0]?.trim()
+          || "";
+        if (loc !== activeLocation) return false;
+      }
       if (activeDuration !== "all" && p._duration !== activeDuration) return false;
+      if (activePrice !== "all" && !matchPrice(p, activePrice)) return false;
+      if (activeFlow !== "all" && !matchFlow(p, activeFlow)) return false;
+      if (activeVoice !== "all" && !matchVoice(p, activeVoice)) return false;
       return true;
     });
-  }, [products, activeOperator, activeDuration]);
+  }, [products, activeOperator, activeDuration, activePrice, activeFlow, activeVoice, activeLocation]);
 
   /* ===== 分页状态 ===== */
-  const filterKey = `${activeOperator}-${activeDuration}`;
+  const filterKey = `${activeOperator}-${activeDuration}-${activePrice}-${activeFlow}-${activeVoice}-${activeLocation}`;
   const [visibleCount, dispatchVisible] = useReducer(visibleReducer, PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -473,31 +624,48 @@ function ProductGrid({
         ))}
       </div>
 
-      {/* 分页信息 & 自动加载哨兵 */}
-      <div className="mt-6 flex flex-col items-center gap-3">
-        <p className="text-xs text-gray-400">
-          已加载 {displayed.length} / {filtered.length} 件商品
-        </p>
+      {/* ===== 分页信息栏 ===== */}
+      <div className="mt-8">
+        {/* 进度条 */}
+        <div className="mx-auto mb-4 h-1.5 max-w-xs overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+          <div
+            className="h-full rounded-full bg-linear-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out dark:from-blue-400 dark:to-blue-500"
+            style={{ width: `${Math.round((displayed.length / filtered.length) * 100)}%` }}
+          />
+        </div>
 
         {hasMore && (
-          <>
+          <div className="flex flex-col items-center gap-3">
+            {/* 加载状态文字 */}
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500">
+              已展示
+              <span className="mx-1 font-semibold text-gray-600 dark:text-gray-300">{displayed.length}</span>
+              件，共
+              <span className="mx-1 font-semibold text-gray-600 dark:text-gray-300">{filtered.length}</span>
+              件
+            </p>
+            {/* 哨兵 + 加载更多按钮 */}
             <div ref={sentinelRef} className="h-1 w-full" />
             <button
               type="button"
               onClick={loadMore}
-              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 hover:shadow-md"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:border-blue-500/30 dark:hover:text-blue-400"
             >
               <RefreshCw className="size-4" />
-              加载更多（{filtered.length - displayed.length} 件）
+              加载更多（剩余 {filtered.length - displayed.length} 件）
             </button>
-          </>
+          </div>
         )}
 
         {!hasMore && filtered.length > 0 && (
-          <p className="flex items-center gap-1.5 text-xs text-green-500">
-            <span className="inline-block size-1.5 rounded-full bg-green-500" />
-            已展示全部 {filtered.length} 件商品
-          </p>
+          <div className="mx-auto mt-3 flex max-w-xs items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 shadow-sm dark:bg-blue-700">
+            <span className="inline-block size-2 rounded-full bg-white/70" />
+            <span className="text-sm font-medium text-white">
+              已展示全部
+              <span className="mx-1 font-semibold">{filtered.length}</span>
+              件商品
+            </span>
+          </div>
         )}
       </div>
     </>
@@ -514,13 +682,58 @@ function useFilterCounts(products: LinxiProductWithMeta[]) {
   return useMemo(() => {
     const operatorCounts: Record<string, number> = { all: products.length };
     const durationCounts: Record<string, number> = { all: products.length };
+    const priceCounts: Record<string, number> = { all: products.length };
+    const flowCounts: Record<string, number> = { all: products.length };
+    const voiceCounts: Record<string, number> = { all: products.length };
+    const locationCounts: Record<string, number> = { all: products.length };
+    const locSet = new Set<string>();
 
     for (const p of products) {
       operatorCounts[p._operator] = (operatorCounts[p._operator] || 0) + 1;
       durationCounts[p._duration] = (durationCounts[p._duration] || 0) + 1;
+      // 归属地统计（gsd_province > shop_provinces 首省 > shop_des 提取）
+      const loc = p.gsd_province
+        || p.shop_provinces?.split(",")[0]?.trim()
+        || p.shop_des?.match(/^([\u4e00-\u9fa5]+(?:省|市|区))/)?.[1]
+        || "";
+      if (loc) {
+        locSet.add(loc);
+        locationCounts[loc] = (locationCounts[loc] || 0) + 1;
+      }
+      for (const opt of PRICE_OPTIONS) {
+        if (opt.key !== "all" && matchPrice(p, opt.key)) {
+          priceCounts[opt.key] = (priceCounts[opt.key] || 0) + 1;
+        }
+      }
+      for (const opt of FLOW_OPTIONS) {
+        if (opt.key !== "all" && matchFlow(p, opt.key)) {
+          flowCounts[opt.key] = (flowCounts[opt.key] || 0) + 1;
+        }
+      }
+      for (const opt of VOICE_OPTIONS) {
+        if (opt.key !== "all" && matchVoice(p, opt.key)) {
+          voiceCounts[opt.key] = (voiceCounts[opt.key] || 0) + 1;
+        }
+      }
     }
 
-    return { operatorCounts, durationCounts };
+    const locationOptions = [
+      { key: "all", label: "全部归属地" },
+      ...Array.from(locSet)
+        .sort()
+        .filter((k) => locationCounts[k] > 0)
+        .map((k) => ({ key: k, label: k })),
+    ];
+
+    return {
+      operatorCounts,
+      durationCounts,
+      priceCounts,
+      flowCounts,
+      voiceCounts,
+      locationOptions,
+      locationCounts,
+    };
   }, [products]);
 }
 
@@ -529,7 +742,7 @@ function useFilterCounts(products: LinxiProductWithMeta[]) {
 /** 底部引导区 */
 function CtaSection() {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-14">
+    <section className="bg-linear-to-r from-blue-600 to-blue-700 py-14">
       <div className="mx-auto max-w-2xl px-4 text-center">
         <h2 className="mb-3 text-2xl font-bold text-white sm:text-3xl">
           立即申请，免费包邮到家！
@@ -578,16 +791,28 @@ function ErrorBanner({ error }: { error: string }) {
 /** 林夕通信商品列表页主组件 */
 export default function LinxiContent({ products, error }: LinxiContentProps) {
   const [activeOperator, setActiveOperator] = useState("all");
+  const [activeLocation, setActiveLocation] = useState("all");
   const [activeDuration, setActiveDuration] = useState("all");
+  const [activePrice, setActivePrice] = useState("all");
+  const [activeFlow, setActiveFlow] = useState("all");
+  const [activeVoice, setActiveVoice] = useState("all");
 
-  const { operatorCounts, durationCounts } = useFilterCounts(products);
+  const {
+    operatorCounts,
+    durationCounts,
+    priceCounts,
+    flowCounts,
+    voiceCounts,
+    locationOptions,
+    locationCounts,
+  } = useFilterCounts(products);
 
   return (
     <div className="flex min-h-svh flex-col bg-[#f5f7fa]">
       <Header />
 
       {/* ===== 页面 Banner ===== */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-8 sm:py-12">
+      <section className="bg-linear-to-br from-blue-600 via-blue-700 to-indigo-700 py-8 sm:py-12">
         <div className={containerClass()} style={SITE_WIDTH_STYLE}>
           <div className="flex items-center gap-3">
             <Signal className="size-6 shrink-0 text-blue-200 sm:size-8" />
@@ -615,10 +840,23 @@ export default function LinxiContent({ products, error }: LinxiContentProps) {
         <FilterBar
           activeOperator={activeOperator}
           onOperatorChange={setActiveOperator}
+          activeLocation={activeLocation}
+          onLocationChange={setActiveLocation}
           activeDuration={activeDuration}
           onDurationChange={setActiveDuration}
+          activePrice={activePrice}
+          onPriceChange={setActivePrice}
+          activeFlow={activeFlow}
+          onFlowChange={setActiveFlow}
+          activeVoice={activeVoice}
+          onVoiceChange={setActiveVoice}
           operatorCounts={operatorCounts}
           durationCounts={durationCounts}
+          priceCounts={priceCounts}
+          flowCounts={flowCounts}
+          voiceCounts={voiceCounts}
+          locationOptions={locationOptions}
+          locationCounts={locationCounts}
         />
 
         {/* 商品网格 */}
@@ -626,7 +864,11 @@ export default function LinxiContent({ products, error }: LinxiContentProps) {
           <ProductGrid
             products={products}
             activeOperator={activeOperator}
+            activeLocation={activeLocation}
             activeDuration={activeDuration}
+            activePrice={activePrice}
+            activeFlow={activeFlow}
+            activeVoice={activeVoice}
           />
         </div>
       </main>

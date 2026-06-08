@@ -38,7 +38,7 @@ export async function generateMetadata({
                 "共创通信",
             ],
             alternates: {
-                canonical: `/gongchuang/${id}`,
+                canonical: `/kakatx/${id}`,
             },
             other: {
                 "application/ld+json": JSON.stringify({

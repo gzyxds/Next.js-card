@@ -110,7 +110,7 @@ function FilterRow({
                     <button
                         key={opt.key}
                         onClick={() => onChange(opt.key)}
-                        className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
+                        className={`rounded-md border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
                             ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
                             : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
                             }`}
@@ -192,7 +192,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
     return (
         <div className="group relative mb-8 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-600/20 hover:shadow-lg hover:shadow-blue-600/5">
             {/* 商品图片区域 */}
-            <Link href={`/gongchuang/${product.goods_id}`} className="block">
+            <Link href={`/kakatx/${product.goods_id}`} className="block">
                 <div className="relative overflow-hidden bg-gray-100 p-2">
                     {product.imageUrl ? (
                         <div className="relative aspect-square overflow-hidden rounded-lg">
@@ -205,7 +205,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
                             />
                         </div>
                     ) : (
-                        <div className="flex aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-gray-50 to-gray-100">
+                        <div className="flex aspect-square items-center justify-center rounded-lg bg-linear-to-br from-gray-50 to-gray-100">
                             <Signal className="size-12 text-gray-300" />
                         </div>
                     )}
@@ -231,7 +231,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
 
             {/* 内容区域 */}
             <div className="flex flex-col p-4">
-                <Link href={`/gongchuang/${product.goods_id}`} className="flex-1">
+                <Link href={`/kakatx/${product.goods_id}`} className="flex-1">
                     {/* 套餐名称 */}
                     <h3 className="mb-3 line-clamp-2 text-sm font-bold leading-snug text-gray-800">
                         {product.goods_name}
@@ -256,7 +256,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
                             {product._tags.slice(0, 3).map((tag, i) => (
                                 <span
                                     key={i}
-                                    className="inline-flex items-center rounded-full bg-blue-600/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-blue-600/80"
+                                    className="inline-flex items-center rounded-full bg-blue-600/4 px-2.5 py-0.5 text-[11px] font-medium text-blue-600/80"
                                 >
                                     {tag.text}
                                 </span>
@@ -288,7 +288,7 @@ function GongchuangCard({ product }: { product: GongchuangProductWithMeta }) {
 
                     <div className="flex shrink-0 items-center gap-1.5">
                         <Link
-                            href={`/gongchuang/${product.goods_id}`}
+                            href={`/kakatx/${product.goods_id}`}
                             className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-2 text-sm font-normal text-gray-700 transition-colors hover:border-blue-600/30 hover:text-blue-600"
                         >
                             <Eye className="size-4" />
@@ -393,31 +393,48 @@ function ProductGrid({
                 ))}
             </div>
 
-            {/* 分页信息 & 自动加载哨兵 */}
-            <div className="mt-6 flex flex-col items-center gap-3">
-                <p className="text-xs text-gray-400">
-                    已加载 {displayed.length} / {filtered.length} 件商品
-                </p>
+            {/* ===== 分页信息栏 ===== */}
+            <div className="mt-8">
+                {/* 进度条 */}
+                <div className="mx-auto mb-4 h-1.5 max-w-xs overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                    <div
+                        className="h-full rounded-full bg-linear-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out dark:from-blue-400 dark:to-blue-500"
+                        style={{ width: `${Math.round((displayed.length / filtered.length) * 100)}%` }}
+                    />
+                </div>
 
                 {hasMore && (
-                    <>
+                    <div className="flex flex-col items-center gap-3">
+                        {/* 加载状态文字 */}
+                        <p className="text-center text-xs text-gray-400 dark:text-gray-500">
+                            已展示
+                            <span className="mx-1 font-semibold text-gray-600 dark:text-gray-300">{displayed.length}</span>
+                            件，共
+                            <span className="mx-1 font-semibold text-gray-600 dark:text-gray-300">{filtered.length}</span>
+                            件
+                        </p>
+                        {/* 哨兵 + 加载更多按钮 */}
                         <div ref={sentinelRef} className="h-1 w-full" />
                         <button
                             type="button"
                             onClick={loadMore}
-                            className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 hover:shadow-md"
+                            className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:border-blue-500/30 dark:hover:text-blue-400"
                         >
                             <RefreshCw className="size-4" />
-                            加载更多（{filtered.length - displayed.length} 件）
+                            加载更多（剩余 {filtered.length - displayed.length} 件）
                         </button>
-                    </>
+                    </div>
                 )}
 
                 {!hasMore && filtered.length > 0 && (
-                    <p className="flex items-center gap-1.5 text-xs text-green-500">
-                        <span className="inline-block size-1.5 rounded-full bg-green-500" />
-                        已展示全部 {filtered.length} 件商品
-                    </p>
+                    <div className="mx-auto mt-3 flex max-w-xs items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 shadow-sm dark:bg-blue-700">
+                        <span className="inline-block size-2 rounded-full bg-white/70" />
+                        <span className="text-sm font-medium text-white">
+                            已展示全部
+                            <span className="mx-1 font-semibold">{filtered.length}</span>
+                            件商品
+                        </span>
+                    </div>
                 )}
             </div>
         </>
@@ -447,7 +464,7 @@ function useFilterCounts(products: GongchuangProductWithMeta[]) {
 /** 底部引导区 */
 function CtaSection() {
     return (
-        <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-14">
+        <section className="bg-linear-to-r from-blue-600 to-blue-700 py-14">
             <div className="mx-auto max-w-2xl px-4 text-center">
                 <h2 className="mb-3 text-2xl font-bold text-white sm:text-3xl">
                     立即申请，免费包邮到家！
@@ -494,7 +511,7 @@ function ErrorBanner({ error }: { error: string }) {
 /* ========== 页面主体 ========== */
 
 /** 共创通信商品列表页主组件 */
-export default function GongchuangContent({ products, error }: GongchuangContentProps) {
+export default function KakatxContent({ products, error }: GongchuangContentProps) {
     const [activeOperator, setActiveOperator] = useState("all");
 
     const { operatorCounts } = useFilterCounts(products);
@@ -504,7 +521,7 @@ export default function GongchuangContent({ products, error }: GongchuangContent
             <Header />
 
             {/* ===== 页面 Banner ===== */}
-            <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-12">
+            <section className="bg-linear-to-br from-blue-600 via-blue-700 to-indigo-700 py-8 sm:py-12">
                 <div className={containerClass()} style={SITE_WIDTH_STYLE}>
                     <div className="flex items-center gap-3">
                         <Signal className="size-8 text-blue-200" />

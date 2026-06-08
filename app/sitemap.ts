@@ -48,7 +48,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: FLOW_CARD_LIST,
     },
     {
-      url: `${baseUrl}/gongchuang`,
+      url: `${baseUrl}/kakatx`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: FLOW_CARD_LIST,

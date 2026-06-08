@@ -5,7 +5,7 @@
  * 数据来源：共创号卡系统 /haoka/api/order/getProductList
  */
 import { fetchGongchuangProducts, type GongchuangProductWithMeta } from "@/lib/api/gongchuang";
-import GongchuangContent from "./GongchuangContent";
+import KakatxContent from "./KakatxContent";
 
 export const metadata = {
     title: "共创通信大流量卡 | 19元/29元低月租手机流量卡推荐办理",
@@ -27,7 +27,7 @@ export const metadata = {
         "号卡办理",
     ],
     alternates: {
-        canonical: "/gongchuang",
+        canonical: "/kakatx",
     },
 };
 
@@ -44,5 +44,5 @@ export default async function GongchuangPage() {
         console.error("[GongchuangPage]", error);
     }
 
-    return <GongchuangContent products={products} error={error} />;
+    return <KakatxContent products={products} error={error} />;
 }

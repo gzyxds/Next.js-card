@@ -77,9 +77,9 @@ const NAV_ITEMS: NavItem[] = [
     dropdownTitle: "选择号卡平台",
     children: [
       {
-        label: "号卡联盟",
+        label: "172号卡",
         href: "/lotml",
-        desc: "172号卡全量套餐，全国可办",
+        desc: "全网最热，全国可办",
         icon: CreditCard,
         iconColor: "text-blue-600 bg-blue-50",
       },
@@ -106,15 +106,15 @@ const NAV_ITEMS: NavItem[] = [
       },
       {
         label: "共创通信",
-        href: "/gongchuang",
+        href: "/kakatx",
         desc: "共创号卡平台，佣金日结",
         icon: BadgeCheck,
         iconColor: "text-violet-600 bg-violet-50",
       },
       {
-        label: "随身WIFI",
-        href: "#",
-        desc: "随身WIFI设备，随时上网",
+        label: "卡世界号卡",
+        href: "/ksj",
+        desc: "精选套餐·号卡大全",
         icon: Wifi,
         iconColor: "text-orange-500 bg-orange-50",
       },

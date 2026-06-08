@@ -117,7 +117,7 @@ function FilterRow({
           <button
             key={opt.key}
             onClick={() => onChange(opt.key)}
-            className={`rounded-full border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
+            className={`rounded-md border px-3.5 py-1.5 text-xs transition-all duration-300 ${isActive
                 ? "border-blue-600 bg-blue-600 font-medium text-white shadow-sm shadow-blue-600/20"
                 : "border-transparent bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600"
               }`}
@@ -287,37 +287,48 @@ function ProductGrid({
         ))}
       </div>
 
-      {/* 分页信息 & 自动加载哨兵 */}
-      <div className="mt-6 flex flex-col items-center gap-3">
-        {/* 已加载计数 */}
-        <p className="text-xs text-gray-400">
-          已加载 {displayed.length} / {filtered.length} 件商品
-        </p>
+      {/* ===== 分页信息栏 ===== */}
+      <div className="mt-8">
+        {/* 进度条 */}
+        <div className="mx-auto mb-4 h-1.5 max-w-xs overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+          <div
+              className="h-full rounded-full bg-linear-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out dark:from-blue-400 dark:to-blue-500"
+              style={{ width: `${Math.round((displayed.length / filtered.length) * 100)}%` }}
+            />
+        </div>
 
-        {/* 加载更多（有更多时显示） */}
         {hasMore && (
-          <>
-            {/* 哨兵元素：不可见时自动触发 IntersectionObserver */}
+          <div className="flex flex-col items-center gap-3">
+            {/* 加载状态文字 */}
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500">
+              已展示
+              <span className="mx-1 font-semibold text-gray-600 dark:text-gray-300">{displayed.length}</span>
+              件，共
+              <span className="mx-1 font-semibold text-gray-600 dark:text-gray-300">{filtered.length}</span>
+              件
+            </p>
+            {/* 哨兵 + 加载更多按钮 */}
             <div ref={sentinelRef} className="h-1 w-full" />
-
-            {/* 手动加载按钮（备选方案） */}
             <button
               type="button"
               onClick={loadMore}
-              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 hover:shadow-md"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:border-blue-300 hover:text-blue-600 hover:shadow-md dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:border-blue-500/30 dark:hover:text-blue-400"
             >
               <RefreshCw className="size-4" />
-              加载更多（{filtered.length - displayed.length} 件）
+              加载更多（剩余 {filtered.length - displayed.length} 件）
             </button>
-          </>
+          </div>
         )}
 
-        {/* 已全部加载 */}
         {!hasMore && filtered.length > 0 && (
-          <p className="flex items-center gap-1.5 text-xs text-green-500">
-            <span className="inline-block size-1.5 rounded-full bg-green-500" />
-            已展示全部 {filtered.length} 件商品
-          </p>
+          <div className="mx-auto mt-3 flex max-w-xs items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 shadow-sm dark:bg-blue-700">
+            <span className="inline-block size-2 rounded-full bg-white/70" />
+            <span className="text-sm font-medium text-white">
+              已展示全部
+              <span className="mx-1 font-semibold">{filtered.length}</span>
+              件商品
+            </span>
+          </div>
         )}
       </div>
     </>
@@ -339,7 +350,7 @@ function getProductMeta(product: HaokaProductWithMeta): ProductMeta {
 
 function CtaSection() {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-14">
+    <section className="bg-linear-to-r from-blue-600 to-blue-700 py-14">
       <div className="mx-auto max-w-2xl px-4 text-center">
         <h2 className="mb-3 text-2xl font-bold text-white sm:text-3xl">
           立即申请，免费包邮到家！
@@ -427,7 +438,7 @@ export default function HaokaContent({ products, error }: HaokaContentProps) {
       <Header />
 
       {/* ===== 页面 Banner ===== */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 py-8 sm:py-12">
+      <section className="bg-linear-to-br from-blue-600 via-blue-700 to-indigo-700 py-8 sm:py-12">
         <div className={containerClass()} style={SITE_WIDTH_STYLE}>
           <div className="flex items-center gap-3">
             <Signal className="size-6 shrink-0 text-blue-200 sm:size-8" />

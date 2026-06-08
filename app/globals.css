@@ -6,8 +6,13 @@
 
 /* 跑马灯滚动动画 */
 @keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @theme inline {
@@ -234,6 +239,33 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-scroll-smooth {
     animation: none;
+  }
+
+  .animate-ranking-scroll {
+    animation: none;
+  }
+}
+
+/* ===== 热销榜单垂直滚动动画 ===== */
+@keyframes ranking-scroll {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    /* 内容副本各占 50%，滚动到 -50% 实现无缝循环 */
+    transform: translateY(-50%);
+  }
+}
+
+.animate-ranking-scroll {
+  animation: ranking-scroll 35s linear infinite;
+}
+
+/* 移动端热销榜单滚动降速，降低视觉干扰 */
+@media (max-width: 768px) {
+  .animate-ranking-scroll {
+    animation-duration: 45s;
   }
 }
 

@@ -1,7 +1,7 @@
 /**
  * 首页入口组件
  *
- * 组合 Header / HeroSection / FeaturesSection / PlansSection /
+ * 组合 Header / HeroSection / FeaturesSection / PlansSection / MallProductShowcase /
  * ProcessSection / GuaranteeSection / FAQSection / CTASection / WhyChooseSection / Footer 等子组件
  */
 
@@ -10,6 +10,7 @@ import Header from "@/components/home/Header";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import PlansSection from "@/components/home/PlansSection";
+import MallProductShowcase from "@/components/home/MallProductShowcase";
 import ProcessSection from "@/components/home/ProcessSection";
 import GuaranteeSection from "@/components/home/GuaranteeSection";
 import FAQSection from "@/components/home/FAQSection";
@@ -52,6 +53,7 @@ export default function HomePage() {
         <HeroSection />
         <FeaturesSection />
         <PlansSection />
+        <MallProductShowcase />
         <ProcessSection />
         <GuaranteeSection />
         <FAQSection />

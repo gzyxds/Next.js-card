@@ -25,6 +25,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
@@ -81,6 +82,24 @@ interface QuickEntryItem {
   desc: string;
   iconClassName: string;
   bgClassName: string;
+}
+
+/** 商品展示信息 */
+interface ProductDisplayInfo {
+  title: string;
+  price: string;
+  tags: string[];
+}
+
+/** 通用商品图片组件参数 */
+interface ProductImageFrameProps {
+  src?: string;
+  alt: string;
+  sizes: string;
+  wrapperClassName: string;
+  fallbackClassName: string;
+  imageClassName?: string;
+  priority?: boolean;
 }
 
 /* ==================================================================
@@ -178,6 +197,70 @@ function getPromoTags(product: HaokaProductWithMeta): string[] {
 }
 
 /**
+ * 统一提取商品展示所需信息，避免不同卡片内重复计算。
+ *
+ * @param product - 当前商品对象
+ * @returns 包含标题、价格与展示标签的结构化信息
+ */
+function getProductDisplayInfo(
+  product: HaokaProductWithMeta
+): ProductDisplayInfo {
+  return {
+    title: cleanProductName(product.product_name),
+    price: extractPrice(product.product_name),
+    tags: getPromoTags(product),
+  };
+}
+
+/**
+ * 判断图片地址是否为远程 HTTPS 资源。
+ *
+ * Next/Image 对外部图片常需保留优化能力，而本地或非 HTTPS 图片则禁用优化，
+ * 避免出现加载策略不兼容的问题。
+ *
+ * @param src - 商品图片地址
+ * @returns 是否为 HTTPS 远程图片
+ */
+function isRemoteHttpsImage(src?: string): boolean {
+  return typeof src === "string" && src.startsWith("https");
+}
+
+/**
+ * 根据随机种子生成热销榜单展示数据。
+ *
+ * 使用确定性伪随机算法保证同一批次服务端与客户端选择结果一致，
+ * 从而避免水合不一致问题。
+ *
+ * @param products - 完整商品列表
+ * @param randomSeed - 服务端提供的随机种子
+ * @returns 用于榜单滚动展示的商品数组
+ */
+function getRankingProducts(
+  products: HaokaProductWithMeta[],
+  randomSeed: number
+): HaokaProductWithMeta[] {
+  if (products.length === 0) return [];
+
+  /** 基于 seed + index 的确定性伪随机数，范围 [0, 1) */
+  function seededRandom(index: number): number {
+    const x = Math.sin(randomSeed + index) * 10000;
+    return x - Math.floor(x);
+  }
+
+  /* 从 seed 本身确定抽取数量（15~20） */
+  const count = 15 + Math.floor(seededRandom(0) * 6);
+
+  /* Fisher-Yates 风格的索引洗牌，使用种子化伪随机 */
+  const indices = Array.from(products.keys());
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRandom(i + 1) * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  return indices.slice(0, Math.min(count, indices.length)).map((k) => products[k]);
+}
+
+/**
  * 带重试和超时的 Server Action 调用封装。
  *
  * 使用指数退避策略：首次立即请求，失败后等待 1s、2s、4s… 依次重试。
@@ -231,6 +314,57 @@ async function fetchMallProductsWithRetry(
   throw lastError ?? new Error("获取商品数据失败，请稍后重试");
 }
 
+/**
+ * 订阅系统的“减少动态效果”偏好。
+ *
+ * 使用 `useSyncExternalStore` 直接桥接浏览器媒体查询，避免在 `useEffect`
+ * 中先读取再调用 `setState`，从而规避 React 关于 effect 内同步设值的告警。
+ *
+ * @returns 当前用户是否启用了减少动态效果偏好
+ */
+function usePrefersReducedMotion(): boolean {
+  /**
+   * 订阅媒体查询变化事件。
+   *
+   * @param onStoreChange - 当媒体查询结果变化时，通知 React 重新读取快照
+   * @returns 取消订阅函数
+   */
+  function subscribe(onStoreChange: () => void): () => void {
+    if (typeof window === "undefined") {
+      return () => undefined;
+    }
+
+    const mediaQueryList = window.matchMedia("(prefers-reduced-motion: reduce)");
+    mediaQueryList.addEventListener("change", onStoreChange);
+
+    return () => mediaQueryList.removeEventListener("change", onStoreChange);
+  }
+
+  /**
+   * 在客户端读取当前媒体查询结果。
+   *
+   * @returns 当前是否匹配减少动态效果
+   */
+  function getSnapshot(): boolean {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  /**
+   * 在服务端提供稳定兜底快照，避免预渲染阶段访问 `window`。
+   *
+   * @returns 服务端默认值
+   */
+  function getServerSnapshot(): boolean {
+    return false;
+  }
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
 /* ==================================================================
  * 骨架屏组件
  * ================================================================== */
@@ -252,6 +386,46 @@ function ProductCardSkeleton() {
           <div className="h-8 w-16 animate-pulse rounded-full bg-gray-100 dark:bg-gray-800" />
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * 通用商品图片展示组件。
+ *
+ * 统一处理以下逻辑：
+ * 1. `next/image` 填充式展示
+ * 2. 无图片时的占位文案
+ * 3. 远程 HTTPS 图片的优化策略
+ *
+ * @param props - 图片组件参数
+ * @returns 商品图片展示节点
+ */
+function ProductImageFrame({
+  src,
+  alt,
+  sizes,
+  wrapperClassName,
+  fallbackClassName,
+  imageClassName = "object-cover",
+  priority = false,
+}: ProductImageFrameProps) {
+  return (
+    <div className={wrapperClassName}>
+      {src ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          className={imageClassName}
+          loading={priority ? undefined : "lazy"}
+          priority={priority}
+          unoptimized={!isRemoteHttpsImage(src)}
+        />
+      ) : (
+        <div className={fallbackClassName}>暂无图片</div>
+      )}
     </div>
   );
 }
@@ -286,18 +460,7 @@ function PromoCarousel() {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
-
-  /* 检测用户是否偏好减少动画 */
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mql.matches);
-
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   /* 自动轮播定时器（减少动画偏好时暂停） */
   useEffect(() => {
@@ -419,9 +582,7 @@ function QuickEntryCard({ item }: { item: QuickEntryItem }) {
  * 移动端增加 active 态反馈提升触控体验。
  */
 function PromoProductCard({ product }: { product: HaokaProductWithMeta }) {
-  const price = extractPrice(product.product_name);
-  const title = cleanProductName(product.product_name);
-  const tags = getPromoTags(product);
+  const { price, title, tags } = getProductDisplayInfo(product);
 
   return (
     <a
@@ -430,22 +591,14 @@ function PromoProductCard({ product }: { product: HaokaProductWithMeta }) {
       rel="noopener noreferrer"
       className="group flex h-full flex-col overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-md active:scale-[0.98] dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
     >
-      <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800">
-        {product.product_image ? (
-          <Image
-            src={product.product_image}
-            alt={title}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover"
-            loading="lazy"
-            unoptimized={!product.product_image.startsWith("https")}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-gray-400 dark:text-gray-500">
-            暂无图片
-          </div>
-        )}
+      <div className="relative">
+        <ProductImageFrame
+          src={product.product_image}
+          alt={title}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          wrapperClassName="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800"
+          fallbackClassName="flex h-full w-full items-center justify-center text-xs text-gray-400 dark:text-gray-500"
+        />
 
         {/* 促销角标 */}
         <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/92 px-2.5 py-1 text-[11px] font-semibold text-orange-600 shadow-sm backdrop-blur-sm dark:bg-gray-900/92 dark:text-orange-400">
@@ -519,15 +672,14 @@ function SidebarProductListItem({
   /** 副本元素需标记 aria-hidden 以避免屏幕阅读器重复朗读 */
   ariaHidden?: boolean;
 }) {
-  const price = extractPrice(product.product_name);
-  const title = cleanProductName(product.product_name);
+  const { price, title } = getProductDisplayInfo(product);
 
   return (
     <a
       href={product.product_link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-3 rounded-md border border-gray-100 bg-white px-3 py-2.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-md active:scale-[0.98] dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
+      className="group flex items-center gap-3 rounded-md bg-white px-3 py-2.5 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] dark:bg-gray-900"
       aria-hidden={ariaHidden || undefined}
     >
       {/* 榜单排名编号 */}
@@ -543,23 +695,14 @@ function SidebarProductListItem({
       </div>
 
       {/* 商品缩略图 */}
-      <div className="relative size-12 shrink-0 overflow-hidden rounded-sm bg-gray-50 dark:bg-gray-800">
-        {product.product_image ? (
-          <Image
-            src={product.product_image}
-            alt={title}
-            fill
-            sizes="48px"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-            unoptimized={!product.product_image.startsWith("https")}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-[10px] text-gray-400 dark:text-gray-500">
-            暂无图片
-          </div>
-        )}
-      </div>
+      <ProductImageFrame
+        src={product.product_image}
+        alt={title}
+        sizes="48px"
+        wrapperClassName="relative size-12 shrink-0 overflow-hidden rounded-sm bg-gray-50 dark:bg-gray-800"
+        fallbackClassName="flex h-full w-full items-center justify-center text-[10px] text-gray-400 dark:text-gray-500"
+        imageClassName="object-cover transition-transform duration-500 group-hover:scale-105"
+      />
 
       {/* 标题 + 价格 */}
       <div className="min-w-0 flex-1">
@@ -604,27 +747,11 @@ function HotRankingScroll({
   products: HaokaProductWithMeta[];
   randomSeed: number;
 }) {
-  const scrollProducts = useMemo(() => {
-    if (products.length === 0) return [];
-
-    /** 基于 seed + index 的确定性伪随机数，范围 [0, 1) */
-    function seededRandom(index: number): number {
-      const x = Math.sin(randomSeed + index) * 10000;
-      return x - Math.floor(x);
-    }
-
-    /* 从 seed 本身确定抽取数量（15~20） */
-    const count = 15 + Math.floor(seededRandom(0) * 6);
-
-    /* Fisher-Yates 风格的索引洗牌，使用种子化伪随机 */
-    const indices = Array.from(products.keys());
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(seededRandom(i + 1) * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-
-    return indices.slice(0, Math.min(count, indices.length)).map((k) => products[k]);
-  }, [products, randomSeed]);
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollProducts = useMemo(
+    () => getRankingProducts(products, randomSeed),
+    [products, randomSeed]
+  );
 
   /* 商品不足时回退 */
   if (scrollProducts.length === 0) {
@@ -641,8 +768,13 @@ function HotRankingScroll({
       style={{ height: "480px" }}
       role="marquee"
       aria-label="热销商品榜单滚动列表"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="animate-ranking-scroll space-y-2.5 hover:[animation-play-state:paused] sm:space-y-3">
+      <div
+        className="animate-ranking-scroll space-y-2.5 sm:space-y-3"
+        style={{ animationPlayState: isPaused ? "paused" : "running" }}
+      >
         {scrollProducts.map((product, index) => (
           <SidebarProductListItem key={product.product_id} product={product} index={index} />
         ))}
@@ -701,7 +833,7 @@ function OperatorTabBar({
     <div className="relative">
       {/* 左侧渐变遮罩 */}
       {canScrollLeft && (
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-gradient-to-r from-white to-transparent dark:from-gray-900" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-linear-to-r from-white to-transparent dark:from-gray-900" />
       )}
 
       <div
@@ -737,8 +869,150 @@ function OperatorTabBar({
 
       {/* 右侧渐变遮罩 */}
       {canScrollRight && (
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-gradient-to-l from-white to-transparent dark:from-gray-900" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-linear-to-l from-white to-transparent dark:from-gray-900" />
       )}
+    </div>
+  );
+}
+
+/**
+ * 商城楼层顶部标题区域。
+ *
+ * 仅负责标题文案展示，抽离后让主组件聚焦于数据与布局编排。
+ *
+ * @returns 标题区域节点
+ */
+function MallSectionHeader() {
+  return (
+    <div className="mb-5 flex flex-col gap-2 sm:mb-7">
+      <div className="inline-flex w-fit items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+        <Flame className="size-3.5" />
+        商城爆款推荐
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100">
+            低月租大流量卡专区
+          </h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            精选高性价比流量卡，在线办理，包邮到家
+          </p>
+        </div>
+        <span className="text-xs text-gray-400 dark:text-gray-500">
+          精选展示，快速浏览，轻松办理
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 商城楼层加载态。
+ *
+ * 保持与正式布局一致的骨架结构，减少加载前后视觉跳动。
+ *
+ * @returns 加载态节点
+ */
+function MallShowcaseLoading() {
+  return (
+    <section id="mall" className="bg-[#f8f9fa] dark:bg-gray-950">
+      <div className={containerClass("py-8 md:py-12")} style={SITE_WIDTH_STYLE}>
+        <div className="mb-5 flex flex-col gap-2 sm:mb-7">
+          <div className="h-6 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-800" />
+          <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
+        </div>
+
+        <div className="flex flex-col gap-4 md:gap-5 lg:flex-row lg:gap-5">
+          <div className="w-full lg:w-1/2">
+            <div className="flex flex-col gap-2.5 sm:gap-3">
+              <div className="h-52 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-800 sm:h-60 md:h-64 lg:h-[292px]" />
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-16 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800"
+                  />
+                ))}
+              </div>
+              <div className="space-y-2.5 rounded-md border border-gray-100 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900 sm:p-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <RankingItemSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-1/2">
+            <div className="rounded-md border border-gray-100 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900 sm:p-4 md:p-5">
+              <div className="mb-4 space-y-2">
+                <div className="h-6 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
+                <div className="h-4 w-40 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+              </div>
+              <div className="mb-4 h-8 w-full animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 商城楼层失败态。
+ *
+ * @param props - 失败态参数
+ * @param props.error - 当前错误信息
+ * @param props.onRetry - 用户点击重试时的回调
+ * @returns 失败态节点
+ */
+function MallShowcaseError({
+  error,
+  onRetry,
+}: {
+  error: string;
+  onRetry: () => void;
+}) {
+  return (
+    <section id="mall" className="bg-[#f8f9fa] py-10 dark:bg-gray-950 sm:py-12">
+      <div className="mx-auto flex min-h-[240px] max-w-5xl flex-col items-center justify-center rounded-md border border-dashed border-gray-200 bg-white px-5 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:min-h-[280px] sm:px-6">
+        <Flame className="mb-3 size-10 text-gray-300 dark:text-gray-600" />
+        <p className="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-200">
+          数据加载失败
+        </p>
+        <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">{error}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-400"
+        >
+          <RefreshCw className="size-4" />
+          重新加载
+        </button>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 右侧商品网格空状态。
+ *
+ * @returns 空态提示节点
+ */
+function EmptyFilteredProducts() {
+  return (
+    <div className="flex min-h-[280px] flex-1 flex-col items-center justify-center rounded-md border border-dashed border-gray-200 bg-gray-50/50 text-center dark:border-gray-800 dark:bg-gray-950/40 sm:min-h-[320px]">
+      <Flame className="mb-3 size-10 text-gray-300 dark:text-gray-700" />
+      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        暂无该运营商商品
+      </p>
+      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        请切换其他运营商查看热门套餐
+      </p>
     </div>
   );
 }
@@ -800,87 +1074,24 @@ export default function MallProductShowcase() {
   }, [loadData]);
 
   /* 按运营商筛选数据源 */
-  const filteredSource = useMemo(() => {
-    return activeTab === "all"
-      ? products
-      : products.filter((product) => product._provider === activeTab);
-  }, [products, activeTab]);
+  const filteredProducts = useMemo(() => {
+    const source =
+      activeTab === "all"
+        ? products
+        : products.filter((product) => product._provider === activeTab);
 
-  /* 右侧固定展示 6 个商品，保持整齐网格布局 */
-  const filteredProducts = useMemo(
-    () => filteredSource.slice(0, 6),
-    [filteredSource]
-  );
+    /* 右侧固定展示 6 个商品，保持整齐网格布局 */
+    return source.slice(0, 6);
+  }, [products, activeTab]);
 
   /* ===== 加载中骨架屏状态 ===== */
   if (loading) {
-    return (
-      <section id="mall" className="bg-[#f8f9fa] dark:bg-gray-950">
-        <div className={containerClass("py-8 md:py-12")} style={SITE_WIDTH_STYLE}>
-          {/* 标题区骨架 */}
-          <div className="mb-5 flex flex-col gap-2 sm:mb-7">
-            <div className="h-6 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-800" />
-            <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-          </div>
-
-          <div className="flex flex-col gap-4 md:gap-5 lg:flex-row lg:gap-5">
-            {/* 左侧骨架 */}
-            <div className="w-full lg:w-1/2">
-              <div className="flex flex-col gap-2.5 sm:gap-3">
-                <div className="h-52 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-800 sm:h-60 md:h-64 lg:h-[292px]" />
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-16 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800" />
-                  ))}
-                </div>
-                <div className="space-y-2.5 rounded-md border border-gray-100 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900 sm:p-4">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <RankingItemSkeleton key={i} />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 右侧骨架 */}
-            <div className="w-full lg:w-1/2">
-              <div className="rounded-md border border-gray-100 bg-white p-3.5 dark:border-gray-800 dark:bg-gray-900 sm:p-4 md:p-5">
-                <div className="mb-4 space-y-2">
-                  <div className="h-6 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-                  <div className="h-4 w-40 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                </div>
-                <div className="mb-4 h-8 w-full animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
-                <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <ProductCardSkeleton key={i} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
+    return <MallShowcaseLoading />;
   }
 
   /* ===== 加载失败状态（含重试按钮） ===== */
   if (error) {
-    return (
-      <section id="mall" className="bg-[#f8f9fa] py-10 dark:bg-gray-950 sm:py-12">
-        <div className="mx-auto flex min-h-[240px] max-w-5xl flex-col items-center justify-center rounded-md border border-dashed border-gray-200 bg-white px-5 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:min-h-[280px] sm:px-6">
-          <Flame className="mb-3 size-10 text-gray-300 dark:text-gray-600" />
-          <p className="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-200">数据加载失败</p>
-          <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">{error}</p>
-          <button
-            type="button"
-            onClick={loadData}
-            className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-400"
-          >
-            <RefreshCw className="size-4" />
-            重新加载
-          </button>
-        </div>
-      </section>
-    );
+    return <MallShowcaseError error={error} onRetry={loadData} />;
   }
 
   /* ===== 正常渲染 ===== */
@@ -888,23 +1099,7 @@ export default function MallProductShowcase() {
     <section id="mall" className="bg-[#f8f9fa] dark:bg-gray-950">
       <div className={containerClass("py-8 md:py-12")} style={SITE_WIDTH_STYLE}>
         {/* ===== 区段标题 ===== */}
-        <div className="mb-5 flex flex-col gap-2 sm:mb-7">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-            <Flame className="size-3.5" />
-            商城爆款推荐
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100">
-                低月租大流量卡专区
-              </h2>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                精选高性价比流量卡，在线办理，包邮到家
-              </p>
-            </div>
-            <span className="text-xs text-gray-400 dark:text-gray-500">精选展示，快速浏览，轻松办理</span>
-          </div>
-        </div>
+        <MallSectionHeader />
 
         {/* ===== 主体内容区：移动端堆叠，桌面端左右分栏（lg:items-stretch 保证等高） ===== */}
         <div className="flex flex-col gap-4 md:gap-5 lg:flex-row lg:items-stretch lg:gap-5">
@@ -961,11 +1156,7 @@ export default function MallProductShowcase() {
               {/* 商品网格区域 */}
               <div className="mt-4">
                 {filteredProducts.length === 0 ? (
-                  <div className="flex min-h-[280px] flex-1 flex-col items-center justify-center rounded-md border border-dashed border-gray-200 bg-gray-50/50 text-center dark:border-gray-800 dark:bg-gray-950/40 sm:min-h-[320px]">
-                    <Flame className="mb-3 size-10 text-gray-300 dark:text-gray-700" />
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">暂无该运营商商品</p>
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">请切换其他运营商查看热门套餐</p>
-                  </div>
+                  <EmptyFilteredProducts />
                 ) : (
                   <div className="grid flex-1 grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3">
                     {filteredProducts.map((product) => (

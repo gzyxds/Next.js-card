@@ -29,6 +29,7 @@ import {
   Info,
   HelpCircle,
   Wifi,
+  Search,
 } from "lucide-react";
 
 /* ========== 导航数据结构 ========== */
@@ -121,6 +122,7 @@ const NAV_ITEMS: NavItem[] = [
     ],
   },
   { label: "生活优惠", href: "/cps", icon: Tag, iconColor: "text-orange-600 bg-orange-50" },
+  { label: "全站搜索", href: "/search", icon: Search, iconColor: "text-blue-600 bg-blue-50" },
   { label: "下载APP", href: "/download", icon: Download, iconColor: "text-blue-600 bg-blue-50" },
   { label: "代理加盟", href: "/join", icon: Users, iconColor: "text-violet-600 bg-violet-50" },
   { label: "合作伙伴", href: "/cooperate", icon: Handshake, iconColor: "text-sky-600 bg-sky-50" },

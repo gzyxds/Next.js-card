@@ -127,7 +127,7 @@ export default function RootLayout({
               "@type": "Organization",
               name: "流量派",
               url: "https://www.urlka.cn",
-              logo: "https://wwww.urlka.cn/logo.svg",
+              logo: "https://www.urlka.cn/logo.svg",
               description: SITE_DESC,
               sameAs: [
                 "https://www.urlka.cn",

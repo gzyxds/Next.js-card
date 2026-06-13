@@ -60,6 +60,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: FLOW_CARD_LIST,
     },
     {
+      url: `${baseUrl}/ksj`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: FLOW_CARD_LIST,
+    },
+    {
+      url: `${baseUrl}/gantanhao`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: FLOW_CARD_LIST,
+    },
+    {
       url: `${baseUrl}/join`,
       lastModified: new Date(),
       changeFrequency: "weekly",
@@ -100,6 +112,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: FUNCTIONAL,
+    },
+    {
+      url: `${baseUrl}/news`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/faq`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
     },
   ];
 }

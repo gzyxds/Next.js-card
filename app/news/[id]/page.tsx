@@ -101,6 +101,40 @@ export default async function NewsDetailPage({
     return (
         <div className="min-h-screen bg-white dark:bg-gray-950">
             <Header />
+            {/* ===== JSON-LD 结构化数据 — Article Schema ===== */}
+            <script
+                type="application/ld+json"
+                // eslint-disable-next-line react/no-dangerously-set-innerhtml
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        headline: article.title,
+                        description: article.description,
+                        image: article.imageUrl || undefined,
+                        datePublished: article.datetime,
+                        dateModified: article.datetime,
+                        author: {
+                            "@type": "Person",
+                            name: article.author.name,
+                            image: article.author.avatarUrl || undefined,
+                        },
+                        publisher: {
+                            "@type": "Organization",
+                            name: "流量派",
+                            url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.urlka.cn",
+                            logo: {
+                                "@type": "ImageObject",
+                                url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.urlka.cn"}/logo.svg`,
+                            },
+                        },
+                        mainEntityOfPage: {
+                            "@type": "WebPage",
+                            "@id": `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.urlka.cn"}/news/${article.id}`,
+                        },
+                    }),
+                }}
+            />
             <DetailContent article={article} relatedArticles={relatedArticles} />
             <Footer />
         </div>

@@ -354,7 +354,7 @@ export default async function SearchPage() {
     /* ========== JSON-LD 结构化数据（SEO） ========== */
 
     /** 站点基础 URL */
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://urlka.com";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.urlka.cn";
 
     /** SearchAction + CollectionPage Schema */
     const jsonLd = {

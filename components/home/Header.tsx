@@ -30,6 +30,7 @@ import {
   HelpCircle,
   Wifi,
   Search,
+  Megaphone,
 } from "lucide-react";
 
 /* ========== 导航数据结构 ========== */
@@ -118,6 +119,13 @@ const NAV_ITEMS: NavItem[] = [
         desc: "精选套餐·号卡大全",
         icon: Wifi,
         iconColor: "text-orange-500 bg-orange-50",
+      },
+      {
+        label: "卡业联盟",
+        href: "/gantanhao",
+        desc: "感叹号联盟，正规大流量卡",
+        icon: Megaphone,
+        iconColor: "text-rose-600 bg-rose-50",
       },
     ],
   },

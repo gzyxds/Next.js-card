@@ -290,3 +290,216 @@
   margin-right: -7px;
   box-shadow: inset 1px 0 0 0 rgb(0 0 0 / 4%);
 }
+
+/* ===== Markdown 文章正文样式（参考 Astro 博客详情页） ===== */
+.markdown-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.8;
+  word-wrap: break-word;
+  font-size: 17px;
+  color: #374151;
+}
+
+.dark .markdown-body {
+  color: #d1d5db;
+}
+
+/* 二级标题 */
+.markdown-body h2 {
+  font-size: 1.75em;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #f3f4f6;
+  color: #111827;
+}
+
+.dark .markdown-body h2 {
+  border-bottom-color: #374151;
+  color: #f9fafb;
+}
+
+/* 三级标题 */
+.markdown-body h3 {
+  font-size: 1.4em;
+  font-weight: 600;
+  margin-top: 1.6em;
+  margin-bottom: 0.8em;
+  color: #1f2937;
+}
+
+.dark .markdown-body h3 {
+  color: #f3f4f6;
+}
+
+/* 四级标题 */
+.markdown-body h4 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-top: 1.4em;
+  margin-bottom: 0.6em;
+  color: #1f2937;
+}
+
+.dark .markdown-body h4 {
+  color: #e5e7eb;
+}
+
+/* 段落 */
+.markdown-body p {
+  margin-bottom: 1.5em;
+  text-align: justify;
+}
+
+/* 粗体 */
+.markdown-body strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.dark .markdown-body strong {
+  color: #fff;
+}
+
+/* 无序列表 */
+.markdown-body ul,
+.markdown-body ol {
+  margin-bottom: 1.5em;
+  padding-left: 1.5em;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+.markdown-body li {
+  margin-bottom: 0.5em;
+}
+
+/* 引用块 */
+.markdown-body blockquote {
+  padding: 1em 1.5em;
+  color: #4b5563;
+  border-left: 0.25em solid #3b82f6;
+  background: #f9fafb;
+  border-radius: 0 0.5em 0.5em 0;
+  margin: 1.5em 0;
+}
+
+.dark .markdown-body blockquote {
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+.markdown-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* 行内代码 */
+.markdown-body code:not(pre code) {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
+  color: #2563eb;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dark .markdown-body code:not(pre code) {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+/* 代码块 */
+.markdown-body pre {
+  padding: 1.5em;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #1e293b;
+  border-radius: 12px;
+  margin-bottom: 1.5em;
+  border: 1px solid #334155;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0;
+  font-size: 14px;
+}
+
+/* 图片 */
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 2em auto;
+  display: block;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 表格 */
+.markdown-body table {
+  width: 100%;
+  margin-bottom: 1.5em;
+  border-collapse: collapse;
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 0.75em 1em;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.dark .markdown-body th,
+.dark .markdown-body td {
+  border-color: #374151;
+}
+
+.markdown-body th {
+  background-color: #f8fafc;
+  font-weight: 600;
+}
+
+.dark .markdown-body th {
+  background-color: #111827;
+}
+
+/* 链接 */
+.markdown-body a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+/* 分隔线 */
+.markdown-body hr {
+  margin: 2em 0;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .markdown-body hr {
+  border-top-color: #374151;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .markdown-body {
+    font-size: 16px;
+  }
+
+  .markdown-body h2 {
+    font-size: 1.5em;
+  }
+}

@@ -16,6 +16,7 @@ import GuaranteeSection from "@/components/home/GuaranteeSection";
 import FAQSection from "@/components/home/FAQSection";
 import CTASection from "@/components/home/CTASection";
 import WhyChooseSection from "@/components/home/WhyChooseSection";
+import LatestNewsSection from "@/components/home/LatestNewsSection";
 import Footer from "@/components/home/Footer";
 
 /** 首页 SEO 元数据 — 融入核心高搜索指数关键词 */
@@ -58,6 +59,7 @@ export default function HomePage() {
         <GuaranteeSection />
         <FAQSection />
         <WhyChooseSection />
+        <LatestNewsSection />
         <CTASection />
       </main>
       <Footer />

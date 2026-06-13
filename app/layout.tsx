@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import ScrollToTopButton from "@/components/home/ScrollToTopButton";
+import { ExternalBrowserGuide } from "@/lib/layout";
 import "./globals.css";
 
 /* ========== 字体配置 ========== */
@@ -140,6 +141,7 @@ export default function RootLayout({
       >
         {children}
         <ScrollToTopButton />
+        <ExternalBrowserGuide />
       </body>
     </html>
   );
